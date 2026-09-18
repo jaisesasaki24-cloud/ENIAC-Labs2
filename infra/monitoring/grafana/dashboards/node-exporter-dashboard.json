@@ -1,0 +1,154 @@
+{
+    "fiscalYearStartMonth":  0,
+    "time":  {
+                 "to":  "now",
+                 "from":  "now-15m"
+             },
+    "editable":  true,
+    "refresh":  "5s",
+    "links":  [
+
+              ],
+    "schemaVersion":  38,
+    "panels":  [
+                   {
+                       "gridPos":  {
+                                       "y":  0,
+                                       "w":  12,
+                                       "x":  0,
+                                       "h":  8
+                                   },
+                       "title":  "Uso de CPU del Servidor (%)",
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "custom":  {
+                                                                           "lineInterpolation":  "smooth",
+                                                                           "drawStyle":  "line",
+                                                                           "fillOpacity":  20
+                                                                       },
+                                                            "unit":  "percent"
+                                                        }
+                                       },
+                       "type":  "timeseries",
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "CPU Utilizada: {{instance}}",
+                                           "expr":  "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\u0027idle\u0027}[1m])) * 100)",
+                                           "refId":  "A"
+                                       }
+                                   ]
+                   },
+                   {
+                       "gridPos":  {
+                                       "y":  0,
+                                       "w":  12,
+                                       "x":  12,
+                                       "h":  8
+                                   },
+                       "title":  "Uso de Memoria RAM del Sistema (Bytes)",
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "custom":  {
+                                                                           "drawStyle":  "line",
+                                                                           "lineInterpolation":  "smooth"
+                                                                       },
+                                                            "unit":  "bytes"
+                                                        }
+                                       },
+                       "type":  "timeseries",
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "Memoria Usada: {{instance}}",
+                                           "expr":  "node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes",
+                                           "refId":  "A"
+                                       },
+                                       {
+                                           "legendFormat":  "Memoria Total: {{instance}}",
+                                           "expr":  "node_memory_MemTotal_bytes",
+                                           "refId":  "B"
+                                       }
+                                   ]
+                   },
+                   {
+                       "gridPos":  {
+                                       "y":  8,
+                                       "w":  12,
+                                       "x":  0,
+                                       "h":  8
+                                   },
+                       "title":  "TrÃ¡fico de Red I/O (Bytes/s)",
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "custom":  {
+                                                                           "drawStyle":  "line",
+                                                                           "lineInterpolation":  "smooth"
+                                                                       },
+                                                            "unit":  "Bps"
+                                                        }
+                                       },
+                       "type":  "timeseries",
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "RX (Entrada): {{instance}}",
+                                           "expr":  "sum(rate(node_network_receive_bytes_total[1m])) by (instance)",
+                                           "refId":  "A"
+                                       },
+                                       {
+                                           "legendFormat":  "TX (Salida): {{instance}}",
+                                           "expr":  "sum(rate(node_network_transmit_bytes_total[1m])) by (instance)",
+                                           "refId":  "B"
+                                       }
+                                   ]
+                   },
+                   {
+                       "gridPos":  {
+                                       "y":  8,
+                                       "w":  12,
+                                       "x":  12,
+                                       "h":  8
+                                   },
+                       "title":  "Actividad de Disco I/O (Lectura / Escritura)",
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "custom":  {
+                                                                           "drawStyle":  "line",
+                                                                           "lineInterpolation":  "smooth"
+                                                                       },
+                                                            "unit":  "Bps"
+                                                        }
+                                       },
+                       "type":  "timeseries",
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "Read: {{instance}}",
+                                           "expr":  "sum(rate(node_disk_read_bytes_total[1m])) by (instance)",
+                                           "refId":  "A"
+                                       },
+                                       {
+                                           "legendFormat":  "Write: {{instance}}",
+                                           "expr":  "sum(rate(node_disk_written_bytes_total[1m])) by (instance)",
+                                           "refId":  "B"
+                                       }
+                                   ]
+                   }
+               ],
+    "liveNow":  true,
+    "annotations":  {
+                        "list":  [
+
+                                 ]
+                    },
+    "style":  "dark",
+    "graphTooltip":  1,
+    "version":  1,
+    "timezone":  "browser",
+    "tags":  [
+                 "eniaclabs",
+                 "node-exporter",
+                 "system",
+                 "infrastructure"
+             ],
+    "uid":  "eniaclabs-node-exporter",
+    "title":  "ENIAC Labs - Infraestructura \u0026 Node Exporter",
+    "id":  null
+}

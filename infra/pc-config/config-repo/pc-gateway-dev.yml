@@ -1,0 +1,49 @@
+server:
+  port: 18080
+
+spring:
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: pc-catalogo-categorias
+              uri: lb://PC-CATALOGO-MS
+              predicates:
+                - Path=/api/v1/categorias/**
+            - id: pc-catalogo-productos
+              uri: lb://PC-CATALOGO-MS
+              predicates:
+                - Path=/api/v1/productos/**
+            - id: pc-orden-ms
+              uri: lb://PC-ORDEN-MS
+              predicates:
+                - Path=/api/v1/ordenes/**
+            - id: pc-pago-ms
+              uri: lb://PC-PAGO-MS
+              predicates:
+                - Path=/api/v1/pagos/**
+            - id: pc-cotizacion-ms
+              uri: lb://PC-COTIZACION-MS
+              predicates:
+                - Path=/api/v1/cotizaciones/**
+
+eureka:
+  instance:
+    hostname: localhost
+    instance-id: ${spring.application.name}:${server.port}
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    registry-fetch-interval-seconds: 5
+    service-url:
+      defaultZone: http://localhost:18761/eureka
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always

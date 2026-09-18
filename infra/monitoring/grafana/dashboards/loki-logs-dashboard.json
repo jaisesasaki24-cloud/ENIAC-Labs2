@@ -1,0 +1,90 @@
+{
+    "fiscalYearStartMonth":  0,
+    "time":  {
+                 "to":  "now",
+                 "from":  "now-1h"
+             },
+    "editable":  true,
+    "refresh":  "5s",
+    "links":  [
+
+              ],
+    "schemaVersion":  38,
+    "panels":  [
+                   {
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "custom":  {
+                                                                           "drawStyle":  "bars",
+                                                                           "fillOpacity":  50
+                                                                       }
+                                                        }
+                                       },
+                       "gridPos":  {
+                                       "y":  0,
+                                       "w":  24,
+                                       "x":  0,
+                                       "h":  6
+                                   },
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "{{level}}",
+                                           "expr":  "sum by (level) (count_over_time({job=~\u0027.+\u0027}[1m]))",
+                                           "refId":  "A"
+                                       }
+                                   ],
+                       "datasource":  {
+                                          "type":  "loki",
+                                          "uid":  "Loki"
+                                      },
+                       "type":  "timeseries",
+                       "title":  "Volumen de Logs por Nivel (LogQL)"
+                   },
+                   {
+                       "gridPos":  {
+                                       "y":  6,
+                                       "w":  24,
+                                       "x":  0,
+                                       "h":  18
+                                   },
+                       "targets":  [
+                                       {
+                                           "refId":  "A",
+                                           "expr":  "{job=~\u0027.+\u0027}"
+                                       }
+                                   ],
+                       "datasource":  {
+                                          "type":  "loki",
+                                          "uid":  "Loki"
+                                      },
+                       "type":  "logs",
+                       "options":  {
+                                       "sortOrder":  "Descending",
+                                       "enableLogDetails":  true,
+                                       "dedupStrategy":  "none",
+                                       "wrapLogMessage":  true,
+                                       "showLabels":  true
+                                   },
+                       "title":  "Stream de Logs en Tiempo Real (ENIAC Labs Ecosistema)"
+                   }
+               ],
+    "liveNow":  true,
+    "annotations":  {
+                        "list":  [
+
+                                 ]
+                    },
+    "style":  "dark",
+    "graphTooltip":  1,
+    "version":  1,
+    "timezone":  "browser",
+    "tags":  [
+                 "eniaclabs",
+                 "loki",
+                 "promtail",
+                 "logging"
+             ],
+    "uid":  "eniaclabs-loki-logs",
+    "title":  "ENIAC Labs - Logs Centralizados con Loki",
+    "id":  null
+}

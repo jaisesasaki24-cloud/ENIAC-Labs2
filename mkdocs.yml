@@ -1,0 +1,49 @@
+site_name: ENIAC Labs - Ecosistema Distribuido
+site_description: Documentacion oficial de la arquitectura de microservicios para ENIAC Labs
+site_author: Eliceo Parillo Mostajo & Laura Vargas Cristhian Paul
+
+theme:
+  name: material
+  language: es
+  palette:
+    - scheme: default
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: Cambiar a modo oscuro
+    - scheme: slate
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Cambiar a modo claro
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+
+nav:
+  - Inicio: index.md
+  - Proyecto Sello:
+      - Brief del Proyecto: proyecto-sello/brief.md
+      - Producto Unidad 1: proyecto-sello/u1-producto.md
+  - Sesiones Unidad 1:
+      - S01 - Servicio Base: sesiones/S01_Construccion_Servicio_Base.md
+      - S02 - Config Server: sesiones/S02_Configuracion_Centralizada_Ambientes.md
+      - S03 - Eureka y Concurrencia: sesiones/S03_Registro_Descubrimiento_Ejecucion_Concurrente.md
+      - S04 - API Gateway WebMVC: sesiones/S04_Punto_Unico_Acceso_Distribucion_Trafico.md
+      - S05 - Evaluacion U1: sesiones/S05_Evaluacion_Unidad_1.md
+      - S06 - Monitoreo y Observabilidad: sesiones/S06_Monitoreo_Prometheus_Grafana_Loki.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - tables
+  - attr_list

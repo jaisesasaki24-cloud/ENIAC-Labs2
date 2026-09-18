@@ -1,0 +1,23 @@
+name: eniaclabs-catalogo-dev
+
+services:
+  eniaclabs-db-catalogo:
+    image: postgres:16-alpine
+    container_name: eniaclabs-db-catalogo
+    restart: unless-stopped
+    ports:
+      - "15432:5432"
+    environment:
+      POSTGRES_DB: eniaclabs_catalogo_db
+      POSTGRES_USER: eniaclabs
+      POSTGRES_PASSWORD: eniaclabs
+    volumes:
+      - eniaclabs_catalogo_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eniaclabs -d eniaclabs_catalogo_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  eniaclabs_catalogo_data:

@@ -1,0 +1,62 @@
+name: eniaclabs-infra
+
+services:
+  pc-config:
+    build:
+      context: ./pc-config
+      dockerfile: Dockerfile
+    container_name: eniaclabs-config
+    restart: unless-stopped
+    ports:
+      - "18888:8888"
+    volumes:
+      - ./pc-config/config-repo:/config-repo
+    environment:
+      SERVER_PORT: 8888
+      SPRING_PROFILES_ACTIVE: native
+      CONFIG_REPO_LOCATION: file:/config-repo
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/localhost/8888' || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    networks:
+      - eniaclabs-net
+
+  pc-eureka:
+    build:
+      context: ./pc-eureka
+      dockerfile: Dockerfile
+    container_name: eniaclabs-eureka
+    restart: unless-stopped
+    ports:
+      - "18761:8761"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      CONFIG_SERVER_URL: http://pc-config:8888
+    depends_on:
+      pc-config:
+        condition: service_healthy
+    networks:
+      - eniaclabs-net
+
+  pc-gateway:
+    build:
+      context: ./pc-gateway
+      dockerfile: Dockerfile
+    container_name: eniaclabs-gateway
+    restart: unless-stopped
+    ports:
+      - "18080:28080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      CONFIG_SERVER_URL: http://pc-config:8888
+    depends_on:
+      - pc-eureka
+    networks:
+      - eniaclabs-net
+
+networks:
+  eniaclabs-net:
+    name: eniaclabs-net

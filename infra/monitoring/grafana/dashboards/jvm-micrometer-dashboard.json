@@ -1,0 +1,271 @@
+{
+    "fiscalYearStartMonth":  0,
+    "time":  {
+                 "to":  "now",
+                 "from":  "now-15m"
+             },
+    "editable":  true,
+    "refresh":  "5s",
+    "links":  [
+
+              ],
+    "schemaVersion":  38,
+    "panels":  [
+                   {
+                       "gridPos":  {
+                                       "y":  0,
+                                       "w":  24,
+                                       "x":  0,
+                                       "h":  4
+                                   },
+                       "title":  "Estado de Microservicios (Prometheus UP)",
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "color":  {
+                                                                          "mode":  "thresholds"
+                                                                      },
+                                                            "thresholds":  {
+                                                                               "steps":  [
+                                                                                             {
+                                                                                                 "value":  null,
+                                                                                                 "color":  "red"
+                                                                                             },
+                                                                                             {
+                                                                                                 "value":  1,
+                                                                                                 "color":  "green"
+                                                                                             }
+                                                                                         ],
+                                                                               "mode":  "absolute"
+                                                                           },
+                                                            "mappings":  [
+                                                                             {
+                                                                                 "options":  {
+                                                                                                 "1":  {
+                                                                                                           "text":  "UP",
+                                                                                                           "color":  "green"
+                                                                                                       },
+                                                                                                 "0":  {
+                                                                                                           "text":  "DOWN",
+                                                                                                           "color":  "red"
+                                                                                                       }
+                                                                                             },
+                                                                                 "type":  "value"
+                                                                             }
+                                                                         ]
+                                                        }
+                                       },
+                       "type":  "stat",
+                       "targets":  [
+                                       {
+                                           "refId":  "A",
+                                           "expr":  "max(up{application=~\u0027pc-.*\u0027}) by (application)",
+                                           "legendFormat":  "{{application}}"
+                                       }
+                                   ],
+                       "options":  {
+                                       "reduceOptions":  {
+                                                             "values":  false,
+                                                             "calcs":  [
+                                                                           "lastNotNull"
+                                                                       ],
+                                                             "fields":  ""
+                                                         },
+                                       "orientation":  "auto",
+                                       "textMode":  "auto",
+                                       "colorMode":  "value",
+                                       "graphMode":  "none",
+                                       "justifyMode":  "auto"
+                                   },
+                       "transformations":  [
+
+                                           ]
+                   },
+                   {
+                       "gridPos":  {
+                                       "y":  4,
+                                       "w":  12,
+                                       "x":  0,
+                                       "h":  8
+                                   },
+                       "title":  "Memoria JVM Heap Utilizada por Microservicio",
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "custom":  {
+                                                                           "lineInterpolation":  "smooth",
+                                                                           "drawStyle":  "line",
+                                                                           "fillOpacity":  15
+                                                                       },
+                                                            "unit":  "bytes"
+                                                        }
+                                       },
+                       "type":  "timeseries",
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "{{application}}",
+                                           "expr":  "sum(jvm_memory_used_bytes{area=\u0027heap\u0027}) by (application)",
+                                           "refId":  "A"
+                                       }
+                                   ]
+                   },
+                   {
+                       "gridPos":  {
+                                       "y":  4,
+                                       "w":  12,
+                                       "x":  12,
+                                       "h":  8
+                                   },
+                       "title":  "Uso de CPU del Proceso vs Sistema",
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "custom":  {
+                                                                           "drawStyle":  "line",
+                                                                           "lineInterpolation":  "smooth"
+                                                                       },
+                                                            "unit":  "percentunit"
+                                                        }
+                                       },
+                       "type":  "timeseries",
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "Process: {{application}}",
+                                           "expr":  "avg(process_cpu_usage) by (application)",
+                                           "refId":  "A"
+                                       },
+                                       {
+                                           "legendFormat":  "System: {{application}}",
+                                           "expr":  "avg(system_cpu_usage) by (application)",
+                                           "refId":  "B"
+                                       }
+                                   ]
+                   },
+                   {
+                       "gridPos":  {
+                                       "y":  12,
+                                       "w":  12,
+                                       "x":  0,
+                                       "h":  8
+                                   },
+                       "title":  "Rendimiento HTTP Throughput (req/s)",
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "custom":  {
+                                                                           "lineInterpolation":  "smooth",
+                                                                           "drawStyle":  "line",
+                                                                           "fillOpacity":  20
+                                                                       },
+                                                            "unit":  "reqps"
+                                                        }
+                                       },
+                       "type":  "timeseries",
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "{{application}}",
+                                           "expr":  "sum(rate(http_server_requests_seconds_count[1m])) by (application)",
+                                           "refId":  "A"
+                                       }
+                                   ]
+                   },
+                   {
+                       "gridPos":  {
+                                       "y":  12,
+                                       "w":  12,
+                                       "x":  12,
+                                       "h":  8
+                                   },
+                       "title":  "Latencia HTTP p95 (Segundos)",
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "custom":  {
+                                                                           "drawStyle":  "line",
+                                                                           "lineInterpolation":  "smooth"
+                                                                       },
+                                                            "unit":  "s"
+                                                        }
+                                       },
+                       "type":  "timeseries",
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "p95: {{application}}",
+                                           "expr":  "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket[1m])) by (le, application))",
+                                           "refId":  "A"
+                                       }
+                                   ]
+                   },
+                   {
+                       "gridPos":  {
+                                       "y":  20,
+                                       "w":  12,
+                                       "x":  0,
+                                       "h":  8
+                                   },
+                       "title":  "Hilos Activos (JVM Threads Live)",
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "custom":  {
+                                                                           "drawStyle":  "line",
+                                                                           "lineInterpolation":  "smooth"
+                                                                       },
+                                                            "unit":  "none"
+                                                        }
+                                       },
+                       "type":  "timeseries",
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "{{application}}",
+                                           "expr":  "avg(jvm_threads_live_threads) by (application)",
+                                           "refId":  "A"
+                                       }
+                                   ]
+                   },
+                   {
+                       "gridPos":  {
+                                       "y":  20,
+                                       "w":  12,
+                                       "x":  12,
+                                       "h":  8
+                                   },
+                       "title":  "Pool de Conexiones DB HikariCP (Activas vs Idle)",
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "custom":  {
+                                                                           "drawStyle":  "line",
+                                                                           "lineInterpolation":  "smooth"
+                                                                       },
+                                                            "unit":  "none"
+                                                        }
+                                       },
+                       "type":  "timeseries",
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "Activas: {{application}}",
+                                           "expr":  "sum(hikaricp_connections_active) by (application)",
+                                           "refId":  "A"
+                                       },
+                                       {
+                                           "legendFormat":  "Idle: {{application}}",
+                                           "expr":  "sum(hikaricp_connections_idle) by (application)",
+                                           "refId":  "B"
+                                       }
+                                   ]
+                   }
+               ],
+    "liveNow":  true,
+    "annotations":  {
+                        "list":  [
+
+                                 ]
+                    },
+    "style":  "dark",
+    "graphTooltip":  1,
+    "version":  1,
+    "timezone":  "browser",
+    "tags":  [
+                 "eniaclabs",
+                 "spring-boot",
+                 "micrometer",
+                 "jvm"
+             ],
+    "uid":  "eniaclabs-jvm-metrics",
+    "title":  "ENIAC Labs - Microservicios \u0026 Metricas JVM",
+    "id":  null
+}

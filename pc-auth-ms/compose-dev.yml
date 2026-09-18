@@ -1,0 +1,23 @@
+name: eniaclabs-auth-dev
+
+services:
+  eniaclabs-db-auth:
+    image: postgres:16-alpine
+    container_name: eniaclabs-db-auth
+    restart: unless-stopped
+    ports:
+      - "5435:5432"
+    environment:
+      POSTGRES_DB: eniaclabs_auth_db
+      POSTGRES_USER: eniaclabs
+      POSTGRES_PASSWORD: eniaclabs
+    volumes:
+      - eniaclabs_auth_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eniaclabs -d eniaclabs_auth_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  eniaclabs_auth_data:

@@ -1,0 +1,37 @@
+server:
+  port: 8080
+
+mercadopago:
+  access-token: ${MP_ACCESS_TOKEN:PROD-TOKEN}
+  public-key: ${MP_PUBLIC_KEY:PROD-KEY}
+  webhook-secret: ${MP_WEBHOOK_SECRET:PROD-SECRET}
+
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:eniaclabs-db-pago}:${DB_PORT:5432}/eniaclabs_pago_db
+    username: ${DB_USER:eniaclabs}
+    password: ${DB_PASS:eniaclabs_secret_pass}
+    driver-class-name: org.postgresql.Driver
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${server.port}
+  client:
+    service-url:
+      defaultZone: http://pc-eureka:8761/eureka

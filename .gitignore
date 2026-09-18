@@ -1,0 +1,54 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/nbactions.xml
+/nb-configuration.xml
+/nblibraries.xml
+
+### VS Code ###
+.vscode/
+
+### OS ###
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+### Logs ###
+*.log
+logs/
+
+### Site & Local runtime ###
+site/
+.mkdocs.pid
+__pycache__/
+*.py[cod]
+~$*.pptx
+*.backup*.pptx
+test_slide1.pptx
+slide1_test.png
+test_grafana.png
+
+### Monitoring local binaries (Docker Compose is used instead) ###
+infra/monitoring/bin/

@@ -1,0 +1,13 @@
+apiVersion: 1
+
+providers:
+  - name: 'ENIAC Labs Ecosistema Dashboards'
+    orgId: 1
+    folder: 'ENIAC Labs Observabilidad'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards
+      foldersFromFilesStructure: true

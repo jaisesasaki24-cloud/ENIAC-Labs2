@@ -1,0 +1,23 @@
+name: eniaclabs-pago-dev
+
+services:
+  eniaclabs-db-pago:
+    image: postgres:16-alpine
+    container_name: eniaclabs-db-pago
+    restart: unless-stopped
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: eniaclabs_pago_db
+      POSTGRES_USER: eniaclabs
+      POSTGRES_PASSWORD: eniaclabs
+    volumes:
+      - eniaclabs_pago_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eniaclabs -d eniaclabs_pago_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  eniaclabs_pago_data:

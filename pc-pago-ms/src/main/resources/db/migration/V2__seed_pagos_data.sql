@@ -1,0 +1,2 @@
+INSERT INTO transacciones_pago (orden_id, codigo_orden, monto, moneda, metodo_pago, estado, mp_payment_id, mp_preference_id, sandbox_init_point, external_reference, payer_email, fecha_creacion, fecha_actualizacion)
+VALUES (1, 'ENIAC-20260901-0001', 7727.82, 'PEN', 'MERCADO_PAGO_SANDBOX', 'APROBADO', 'MP-PAY-987654321', 'PREF-7800X3D-RTX4080', 'https://sandbox.mercadopago.com.pe/checkout/v1/redirect?pref_id=PREF-7800X3D-RTX4080', 'EXT-ENIAC-20260901-0001-1726000000', 'eliceo.parillo@upeu.edu.pe', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);

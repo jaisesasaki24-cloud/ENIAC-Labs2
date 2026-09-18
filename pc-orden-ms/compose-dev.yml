@@ -1,0 +1,23 @@
+name: eniaclabs-orden-dev
+
+services:
+  eniaclabs-db-orden:
+    image: postgres:16-alpine
+    container_name: eniaclabs-db-orden
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: eniaclabs_orden_db
+      POSTGRES_USER: eniaclabs
+      POSTGRES_PASSWORD: eniaclabs
+    volumes:
+      - eniaclabs_orden_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eniaclabs -d eniaclabs_orden_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  eniaclabs_orden_data:
