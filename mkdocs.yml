@@ -43,7 +43,8 @@ nav:
       - S10 - Monitoreo y Observabilidad: sesiones/S06_Monitoreo_Prometheus_Grafana_Loki.md
       - S12 - Evaluación de la Unidad II: sesiones/S12_Evaluacion_Unidad_2.md
   - Entregas y Tareas:
-      - Tarea JWT (S07): entregas/TAREA_JWT_ENTREGA.md
+      - Tarea 1 - Feign y Circuit Breaker (S06): entregas/tarea_1_feign_cb.md
+      - Tarea 2 - Seguridad JWT (S07): entregas/tarea_2_jwt.md
 
 markdown_extensions:
   - admonition
