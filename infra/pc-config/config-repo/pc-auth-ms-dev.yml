@@ -3,11 +3,12 @@ server:
 
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:eniaclabs_auth_db;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5435/eniaclabs_auth_db}
     username: ${DB_USER:eniaclabs}
     password: ${DB_PASS:eniaclabs}
-    driver-class-name: ${SPRING_DATASOURCE_DRIVER:org.h2.Driver}
+    driver-class-name: org.postgresql.Driver
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     show-sql: false
@@ -15,7 +16,7 @@ spring:
     enabled: false
 
 jwt:
-  secret: ${JWT_SECRET:}
+  secret: ${JWT_SECRET:EniacLabs2026SecureJwtSecretKeyMustBe32BytesLong!}
   expiration: 86400000
 
 springdoc:
@@ -37,7 +38,7 @@ management:
 
 eureka:
   instance:
-    hostname: localhost
+    hostname: host.docker.internal
     instance-id: ${spring.application.name}:${server.port}
   client:
     register-with-eureka: true

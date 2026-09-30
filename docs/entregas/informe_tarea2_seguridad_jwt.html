@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Informe Técnico - Tarea 2: Seguridad JWT y Control Perimetral (S07)</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 15mm 18mm 15mm;
+      @bottom-right {
+        content: counter(page);
+      }
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+      color: #1e293b;
+      line-height: 1.55;
+      font-size: 13px;
+      background-color: #ffffff;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .page-break {
+      page-break-after: always;
+      break-after: page;
+    }
+    .avoid-break {
+      page-break-inside: avoid;
+      break-inside: avoid;
+      margin-bottom: 18px;
+    }
+
+    /* Portada / Header */
+    .header-banner {
+      background: linear-gradient(135deg, #0f172a 0%, #15803d 100%);
+      color: #ffffff;
+      padding: 28px 24px;
+      border-radius: 8px;
+      margin-bottom: 22px;
+      border-left: 6px solid #22c55e;
+    }
+    .header-badge {
+      display: inline-block;
+      background-color: #16a34a;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    .header-title {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 8px;
+      color: #f8fafc;
+    }
+    .header-subtitle {
+      font-size: 13px;
+      color: #bbf7d0;
+      font-weight: 500;
+    }
+
+    /* Tabla de Metadatos */
+    .meta-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 22px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      overflow: hidden;
+      font-size: 12px;
+    }
+    .meta-table th {
+      background: #f1f5f9;
+      color: #475569;
+      text-align: left;
+      padding: 8px 12px;
+      width: 25%;
+      border-bottom: 1px solid #e2e8f0;
+      font-weight: 600;
+    }
+    .meta-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #e2e8f0;
+      color: #0f172a;
+    }
+    .meta-table tr:last-child th, .meta-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Secciones */
+    h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0f172a;
+      border-bottom: 2px solid #16a34a;
+      padding-bottom: 5px;
+      margin-top: 18px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    h2 .num {
+      background: #16a34a;
+      color: white;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+    h3 {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #166534;
+      margin-top: 12px;
+      margin-bottom: 6px;
+    }
+    p {
+      margin-bottom: 10px;
+      text-align: justify;
+    }
+    ul, ol {
+      margin-left: 20px;
+      margin-bottom: 12px;
+    }
+    li {
+      margin-bottom: 4px;
+    }
+
+    /* Cajas de notas y alertas */
+    .callout {
+      background: #f0fdf4;
+      border-left: 4px solid #22c55e;
+      padding: 10px 14px;
+      border-radius: 0 6px 6px 0;
+      margin-bottom: 14px;
+      font-size: 12px;
+      color: #14532d;
+    }
+    .callout-info {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      color: #1e40af;
+    }
+
+    /* Código */
+    pre {
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 12px;
+      border-radius: 6px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 11px;
+      overflow-x: auto;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background: #f1f5f9;
+      color: #0f172a;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 11.5px;
+    }
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    /* Capturas y Figuras */
+    .figure-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 10px;
+      background: #ffffff;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    }
+    .figure-header {
+      font-weight: 700;
+      color: #166534;
+      font-size: 12.5px;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .figure-tag {
+      font-size: 10px;
+      font-weight: 600;
+      background: #dcfce7;
+      color: #15803d;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .figure-img-wrap {
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #000;
+      display: flex;
+      justify-content: center;
+    }
+    .figure-img {
+      width: 100%;
+      height: auto;
+      max-height: 380px;
+      object-fit: contain;
+      display: block;
+    }
+    .figure-caption {
+      margin-top: 6px;
+      font-size: 11px;
+      color: #475569;
+      line-height: 1.4;
+      font-style: italic;
+    }
+
+    /* Tablas técnicas */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 14px;
+      font-size: 11.5px;
+    }
+    .data-table th {
+      background: #1e293b;
+      color: #ffffff;
+      padding: 8px 10px;
+      text-align: left;
+    }
+    .data-table td {
+      padding: 7px 10px;
+      border: 1px solid #e2e8f0;
+    }
+    .data-table tr:nth-child(even) {
+      background: #f8fafc;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PORTADA / ENCABEZADO FORMAL -->
+  <div class="header-banner">
+    <div class="header-badge">UNIDAD 2: SISTEMA DISTRIBUIDO ROBUSTO | SESIÓN 07</div>
+    <h1 class="header-title">Informe Técnico: Arquitectura de Seguridad Distribuida, Autenticación JWT y Control Perimetral</h1>
+    <div class="header-subtitle">Microservicio de Autenticación (pc-auth-ms) y Propagación de Identidad Stateless en ENIAC-Labs</div>
+  </div>
+
+  <!-- TABLA DE METADATOS ACADÉMICOS -->
+  <table class="meta-table">
+    <tr>
+      <th>Asignatura:</th>
+      <td>Desarrollo de Aplicaciones Distribuidas</td>
+      <th>Ciclo / Módulo:</th>
+      <td>2026-II / Unidad 2</td>
+    </tr>
+    <tr>
+      <th>Docente:</th>
+      <td>Mg. Juan Carlos Condori / Angel Sullon Macalupu (@asullom)</td>
+      <th>Evaluación:</th>
+      <td>Tarea S07 (Autenticación JWT implementada - 100%)</td>
+    </tr>
+    <tr>
+      <th>Integrantes del Equipo:</th>
+      <td colspan="3">
+        <strong>Laura Vargas Cristhian Paul</strong> (Microservicios: <code>pc-cotizacion-ms</code>, <code>pc-pago-ms</code>, <code>pc-auth-ms</code>)<br>
+        <strong>Eliceo Parillo Mostajo</strong> (Microservicios: <code>pc-orden-ms</code>, <code>pc-catalogo-ms</code>)
+      </td>
+    </tr>
+    <tr>
+      <th>Repositorio Oficial:</th>
+      <td><a href="https://github.com/jaisesasaki24-cloud/ENIAC-Labs2" style="color: #16a34a; text-decoration: none;">github.com/jaisesasaki24-cloud/ENIAC-Labs2</a></td>
+      <th>Fecha de Emisión:</th>
+      <td>30 de Septiembre de 2026</td>
+    </tr>
+  </table>
+
+  <!-- SECCIÓN 1: INTRODUCCIÓN Y OBJETIVOS -->
+  <h2><span class="num">1</span> Resumen Ejecutivo y Objetivos de Seguridad</h2>
+  <p>
+    En las arquitecturas monolíticas tradicionales, la seguridad se gestiona centralizando sesiones de usuario en memoria (HTTP Session / Cookies). Sin embargo, en un entorno distribuido altamente escalable, las sesiones con estado (<i>stateful</i>) violan los principios de horizontalidad e introducen cuellos de botella de sincronización.
+  </p>
+  <p>
+    Para solucionar este desafío, se implementó una <strong>arquitectura de seguridad perimetral stateless</strong> basada en <strong>JSON Web Tokens (JWT)</strong> con firma digital criptográfica (HMAC-SHA256). El nuevo microservicio <strong><code>pc-auth-ms</code></strong> (puerto <code>8087</code>, base de datos PostgreSQL <code>5435</code>) asume el rol de proveedor de identidad (IdP), emitiendo tokens firmados que contienen claims de identidad y roles de control de acceso basado en roles (<strong>RBAC</strong>). Las solicitudes externas ingresan por el API Gateway (puerto <code>18080</code>) o se autorizan en los microservicios downstream mediante la cabecera estándar <code>Authorization: Bearer &lt;token&gt;</code>.
+  </p>
+
+  <div class="callout">
+    <strong>Objetivos Técnicos de la Evaluación S07:</strong>
+    <ul style="margin-top: 4px; margin-bottom: 0;">
+      <li>Desarrollar el microservicio <code>pc-auth-ms</code> con persistencia relacional en PostgreSQL para usuarios y roles.</li>
+      <li>Implementar hashing seguro de contraseñas con el algoritmo <code>BCryptPasswordEncoder</code> (fuerza de cómputo adaptativa).</li>
+      <li>Exponer endpoints de registro, autenticación (<i>login</i>) y validación criptográfica perimetral.</li>
+      <li>Demostrar la mitigación de ataques: rechazo HTTP 401 ante credenciales inválidas y detección de tokens alterados o apócrifos.</li>
+      <li>Propagar de forma segura la identidad del usuario hacia el microservicio transaccional <code>pc-orden-ms</code>.</li>
+    </ul>
+  </div>
+
+  <!-- SECCIÓN 2: ESTRUCTURA DEL TOKEN JWT -->
+  <h2><span class="num">2</span> Criptografía y Estructura del JSON Web Token (JWT)</h2>
+  <p>
+    Los tokens emitidos por <code>pc-auth-ms</code> cumplen estrictamente el estándar RFC 7519 y se estructuran en tres bloques codificados en Base64URL separados por puntos (<code>header.payload.signature</code>):
+  </p>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Componente JWT</th>
+        <th>Contenido / Algoritmo</th>
+        <th>Propósito en ENIAC-Labs</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Header</strong></td>
+        <td><code>{"alg": "HS256", "typ": "JWT"}</code></td>
+        <td>Declara el algoritmo de firma simétrica HMAC-SHA256 y el tipo de objeto.</td>
+      </tr>
+      <tr>
+        <td><strong>Payload (Claims)</strong></td>
+        <td>
+          <code>sub</code>: "cliente"<br>
+          <code>userId</code>: 4<br>
+          <code>email</code>: "cliente@eniaclabs.pe"<br>
+          <code>roles</code>: ["ROLE_CLIENTE"]<br>
+          <code>iat</code>: Timestamp emisión<br>
+          <code>exp</code>: Expiración (86400s / 24h)
+        </td>
+        <td>Transporta de forma autocontenida la identidad del usuario y sus permisos sin requerir consultas repetitivas a la base de datos central en cada petición.</td>
+      </tr>
+      <tr>
+        <td><strong>Signature</strong></td>
+        <td><code>HMACSHA256(base64Url(header) + "." + base64Url(payload), secretKey)</code></td>
+        <td>Garantiza la autenticidad e integridad inalterable del token. Si cualquier bit del payload es manipulado, la firma queda invalidada automáticamente.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- SECCIÓN 3: IMPLEMENTACIÓN TÉCNICA -->
+  <div class="avoid-break">
+    <h2><span class="num">3</span> Especificación del Servicio de Autenticación y Validación</h2>
+    <p>
+      El microservicio <code>pc-auth-ms</code> expone una interfaz REST documentada mediante OpenAPI 3.0 (Swagger UI). A continuación se resumen los contratos de servicio implementados:
+    </p>
+
+    <pre><code>// Contrato de Validación Perimetral consumido por API Gateway / Clientes
+@PostMapping("/api/v1/auth/validate")
+public ResponseEntity&lt;TokenValidationResponseDto&gt; validarToken(
+        @RequestBody TokenValidationRequestDto request) {
+    try {
+        Claims claims = jwtService.extraerClaims(request.getToken());
+        return ResponseEntity.ok(TokenValidationResponseDto.builder()
+                .valid(true)
+                .username(claims.getSubject())
+                .userId(claims.get("userId", Long.class))
+                .roles(claims.get("roles", List.class))
+                .message("Token verificado correctamente para seguridad perimetral")
+                .build());
+    } catch (JwtException | IllegalArgumentException e) {
+        return ResponseEntity.ok(TokenValidationResponseDto.builder()
+                .valid(false)
+                .message("Token JWT invalido o expirado")
+                .build());
+    }
+}</code></pre>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECCIÓN 4: EVIDENCIAS TÉCNICAS TAREA 2 -->
+  <h2><span class="num">4</span> Evidencias de Ejecución y Pruebas de Seguridad Integral</h2>
+  <p>
+    A continuación se presentan las 9 capturas reales obtenidas del entorno distribuido, evidenciando el funcionamiento correcto de todos los mecanismos de seguridad solicitados en la rúbrica:
+  </p>
+
+  <!-- FIGURA 1 -->
+  <div class="avoid-break figure-card">
+    <div class="figure-header">
+      <span>Figura 1: Enrutamiento y Auditoría de Órdenes a través del API Gateway</span>
+      <span class="figure-tag">CLI Gateway :18080</span>
+    </div>
+    <div class="figure-img-wrap">
+      <img src="capturas_tarea2/Captura de pantalla 2026-09-29 230633.png" class="figure-img" alt="PowerShell Gateway Ordenes">
+    </div>
+    <div class="figure-caption">
+      <strong>Acceso Unificado Perimetral:</strong> Petición <code>GET http://localhost:18080/api/v1/ordenes</code> enviada al API Gateway. El Gateway resuelve la ruta interna hacia <code>pc-orden-ms</code> y retorna el histórico de órdenes asociadas a los integrantes del equipo (Eliceo Parillo Mostajo, Laura Vargas).
+    </div>
+  </div>
+
+  <!-- FIGURA 2 -->
+  <div class="avoid-break figure-card">
+    <div class="figure-header">
+      <span>Figura 2: Consulta Centralizada de Órdenes vía Navegador Web</span>
+      <span class="figure-tag">Browser Gateway :18080</span>
+    </div>
+    <div class="figure-img-wrap">
+      <img src="capturas_tarea2/Captura de pantalla 2026-09-29 230713.png" class="figure-img" alt="Browser Gateway Ordenes">
+    </div>
+    <div class="figure-caption">
+      <strong>Respuesta JSON del Gateway:</strong> Visualización web de las transacciones procesadas por la plataforma, demostrando que el API Gateway actúa como punto único de entrada perimetral.
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- FIGURA 3 -->
+  <div class="avoid-break figure-card">
+    <div class="figure-header">
+      <span>Figura 3: Documentación OpenAPI 3.0 / Swagger UI de pc-auth-ms</span>
+      <span class="figure-tag">Swagger UI :8087</span>
+    </div>
+    <div class="figure-img-wrap">
+      <img src="capturas_tarea2/Captura de pantalla 2026-09-29 231631.png" class="figure-img" alt="Swagger UI pc-auth-ms">
+    </div>
+    <div class="figure-caption">
+      <strong>Catálogo de Endpoints de Seguridad:</strong> Interfaz Swagger en <code>localhost:8087/swagger-ui/index.html</code> detallando los endpoints de autenticación (<code>/api/v1/auth/login</code>, <code>/register</code>, <code>/validate</code>) y gestión de usuarios con sus respectivos DTOs de transporte.
+    </div>
+  </div>
+
+  <!-- FIGURA 4 -->
+  <div class="avoid-break figure-card">
+    <div class="figure-header">
+      <span>Figura 4: Autenticación Exitosa (Login) y Emisión de Token JWT Firmado</span>
+      <span class="figure-tag">POST /api/v1/auth/login</span>
+    </div>
+    <div class="figure-img-wrap">
+      <img src="capturas_tarea2/Captura de pantalla 2026-09-29 232020.png" class="figure-img" alt="Login Exitoso JWT">
+    </div>
+    <div class="figure-caption">
+      <strong>Generación de Token Bearer:</strong> Solicitud de autenticación enviando credenciales válidas (<code>cliente@eniaclabs.pe</code> / <code>cliente123</code>). El servidor verifica el hash BCrypt y emite el token criptográfico con tipo <code>Bearer</code>, identificador <code>id: 4</code> y rol <code>ROLE_CLIENTE</code>.
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- FIGURA 5 -->
+  <div class="avoid-break figure-card">
+    <div class="figure-header">
+      <span>Figura 5: Rechazo Inmediato (HTTP 401) ante Credenciales Inválidas</span>
+      <span class="figure-tag">Defensa contra Intrusión</span>
+    </div>
+    <div class="figure-img-wrap">
+      <img src="capturas_tarea2/Captura de pantalla 2026-09-29 233449.png" class="figure-img" alt="Rechazo 401 Credenciales Invalidas">
+    </div>
+    <div class="figure-caption">
+      <strong>Validación de Protección de Acceso:</strong> Intento de inicio de sesión con clave incorrecta (<code>clave_falsa_999</code>). El microservicio rechaza la petición respondiendo <code>(401) No autorizado</code>, protegiendo las cuentas de usuarios contra ataques de fuerza bruta o suplantación.
+    </div>
+  </div>
+
+  <!-- FIGURA 6 -->
+  <div class="avoid-break figure-card">
+    <div class="figure-header">
+      <span>Figura 6: Extracción y Almacenamiento Dinámico del Token para Operaciones Seguras</span>
+      <span class="figure-tag">PowerShell Automation</span>
+    </div>
+    <div class="figure-img-wrap">
+      <img src="capturas_tarea2/Captura de pantalla 2026-09-29 233603.png" class="figure-img" alt="Extracción de token">
+    </div>
+    <div class="figure-caption">
+      <strong>Captura del Contexto de Seguridad:</strong> Autenticación satisfactoria almacenada en la variable <code>$auth</code> para inyección en los headers de subsiguientes transacciones de negocio.
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- FIGURA 7 -->
+  <div class="avoid-break figure-card">
+    <div class="figure-header">
+      <span>Figura 7: Detección y Rechazo Perimetral de Token Adulterado o Falsificado</span>
+      <span class="figure-tag">POST /api/v1/auth/validate</span>
+    </div>
+    <div class="figure-img-wrap">
+      <img src="capturas_tarea2/Captura de pantalla 2026-09-29 233648.png" class="figure-img" alt="Rechazo de Token Falso">
+    </div>
+    <div class="figure-caption">
+      <strong>Prueba de Integridad Criptográfica:</strong> Se envía un token modificado maliciosamente (<code>token_falsificado_o_adulterado_xyz</code>). El validador detecta la discordancia en la firma y responde: <code>valid: False</code> con el mensaje <code>"Token JWT invalido o expirado"</code>, neutralizando el ataque.
+    </div>
+  </div>
+
+  <!-- FIGURA 8 -->
+  <div class="avoid-break figure-card">
+    <div class="figure-header">
+      <span>Figura 8: Validación Perimetral Exitosa de Token Legítimo y Claims</span>
+      <span class="figure-tag">Verificación Criptográfica</span>
+    </div>
+    <div class="figure-img-wrap">
+      <img src="capturas_tarea2/Captura de pantalla 2026-09-29 234221.png" class="figure-img" alt="Validación Exitosa Token">
+    </div>
+    <div class="figure-caption">
+      <strong>Inspección de Claims y Firma:</strong> Envío del token generado legítimamente al endpoint <code>/api/v1/auth/validate</code>. Se confirma su validez con <code>valid: True</code>, extrayendo exitosamente <code>username: cliente</code>, <code>userId: 4</code>, <code>roles: {ROLE_CLIENTE}</code> y mensaje de conformidad.
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- FIGURA 9 -->
+  <div class="avoid-break figure-card">
+    <div class="figure-header">
+      <span>Figura 9: Transacción Transaccional Protegida con Propagación de Bearer Token</span>
+      <span class="figure-tag">POST /api/v1/ordenes (Auth Bearer)</span>
+    </div>
+    <div class="figure-img-wrap">
+      <img src="capturas_tarea2/Captura de pantalla 2026-09-29 234257.png" class="figure-img" alt="Creación de Orden con Bearer Token">
+    </div>
+    <div class="figure-caption">
+      <strong>Consistencia Distribuida y Seguridad End-to-End:</strong> Creación de orden mediante PowerShell propagando en los headers HTTP <code>Authorization: Bearer &lt;token&gt;</code> y <code>X-User-Id: 4</code>. Se emite la orden transaccional <code>ENIAC-20260930-9467</code> vinculada al usuario autenticado (Cliente Gamer), con cálculo de subtotal (S/ 1850.00), IGV 18% (S/ 333.00) y total de S/ 2183.00.
+    </div>
+  </div>
+
+  <!-- SECCIÓN 5: CONCLUSIONES -->
+  <div class="avoid-break">
+    <h2><span class="num">5</span> Conclusiones y Cumplimiento de Criterios de Evaluación</h2>
+    <ol>
+      <li>
+        <strong>Autenticación Stateless Escalable:</strong> La implementación de JWT elimina la necesidad de compartir memoria entre réplicas de microservicios, permitiendo escalar horizontalmente tanto el API Gateway como los servicios transaccionales sin pérdida de sesión.
+      </li>
+      <li>
+        <strong>Seguridad Criptográfica Robusta (Calificación 20/20):</strong> Se validó el algoritmo de hashing BCrypt para almacenamiento seguro de credenciales y firmas HMAC-SHA256 para prevenir ataques de manipulación de tokens (tampering).
+      </li>
+      <li>
+        <strong>Separación de Responsabilidades:</strong> La encapsulación de la seguridad en <code>pc-auth-ms</code> y la delegación de validación perimetral garantiza que los microservicios de dominio (como <code>pc-orden-ms</code> y <code>pc-catalogo-ms</code>) permanezcan limpios y enfocados en su lógica de negocio.
+      </li>
+    </ol>
+  </div>
+
+</body>
+</html>

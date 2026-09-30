@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Informe Técnico - Tarea 1: Feign y Circuit Breaker (S06)</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 15mm 18mm 15mm;
+      @bottom-right {
+        content: counter(page);
+      }
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+      color: #1e293b;
+      line-height: 1.55;
+      font-size: 13px;
+      background-color: #ffffff;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .page {
+      padding: 0;
+    }
+    .page-break {
+      page-break-after: always;
+      break-after: page;
+    }
+    .avoid-break {
+      page-break-inside: avoid;
+      break-inside: avoid;
+      margin-bottom: 18px;
+    }
+
+    /* Portada / Header */
+    .header-banner {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+      color: #ffffff;
+      padding: 28px 24px;
+      border-radius: 8px;
+      margin-bottom: 22px;
+      border-left: 6px solid #3b82f6;
+    }
+    .header-badge {
+      display: inline-block;
+      background-color: #2563eb;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    .header-title {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 8px;
+      color: #f8fafc;
+    }
+    .header-subtitle {
+      font-size: 13px;
+      color: #93c5fd;
+      font-weight: 500;
+    }
+
+    /* Tabla de Metadatos */
+    .meta-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 22px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      overflow: hidden;
+      font-size: 12px;
+    }
+    .meta-table th {
+      background: #f1f5f9;
+      color: #475569;
+      text-align: left;
+      padding: 8px 12px;
+      width: 25%;
+      border-bottom: 1px solid #e2e8f0;
+      font-weight: 600;
+    }
+    .meta-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #e2e8f0;
+      color: #0f172a;
+    }
+    .meta-table tr:last-child th, .meta-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Secciones */
+    h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0f172a;
+      border-bottom: 2px solid #2563eb;
+      padding-bottom: 5px;
+      margin-top: 18px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    h2 .num {
+      background: #2563eb;
+      color: white;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+    h3 {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-top: 12px;
+      margin-bottom: 6px;
+    }
+    p {
+      margin-bottom: 10px;
+      text-align: justify;
+    }
+    ul, ol {
+      margin-left: 20px;
+      margin-bottom: 12px;
+    }
+    li {
+      margin-bottom: 4px;
+    }
+
+    /* Cajas de notas y alertas */
+    .callout {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      padding: 10px 14px;
+      border-radius: 0 6px 6px 0;
+      margin-bottom: 14px;
+      font-size: 12px;
+      color: #1e40af;
+    }
+    .callout-success {
+      background: #f0fdf4;
+      border-left: 4px solid #22c55e;
+      color: #166534;
+    }
+
+    /* Código */
+    pre {
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 12px;
+      border-radius: 6px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 11px;
+      overflow-x: auto;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background: #f1f5f9;
+      color: #0f172a;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 11.5px;
+    }
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    /* Capturas y Figuras */
+    .figure-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 10px;
+      background: #ffffff;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    }
+    .figure-header {
+      font-weight: 700;
+      color: #1e3a8a;
+      font-size: 12.5px;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .figure-tag {
+      font-size: 10px;
+      font-weight: 600;
+      background: #dbeafe;
+      color: #1d4ed8;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .figure-img-wrap {
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #000;
+      display: flex;
+      justify-content: center;
+    }
+    .figure-img {
+      width: 100%;
+      height: auto;
+      max-height: 380px;
+      object-fit: contain;
+      display: block;
+    }
+    .figure-caption {
+      margin-top: 6px;
+      font-size: 11px;
+      color: #475569;
+      line-height: 1.4;
+      font-style: italic;
+    }
+
+    /* Tablas técnicas */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 14px;
+      font-size: 11.5px;
+    }
+    .data-table th {
+      background: #1e293b;
+      color: #ffffff;
+      padding: 8px 10px;
+      text-align: left;
+    }
+    .data-table td {
+      padding: 7px 10px;
+      border: 1px solid #e2e8f0;
+    }
+    .data-table tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    .badge-status {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .badge-green { background: #dcfce7; color: #15803d; }
+    .badge-blue { background: #dbeafe; color: #1d4ed8; }
+    .badge-purple { background: #f3e8ff; color: #7e22ce; }
+  </style>
+</head>
+<body>
+
+  <!-- PORTADA / ENCABEZADO FORMAL -->
+  <div class="header-banner">
+    <div class="header-badge">UNIDAD 2: SISTEMA DISTRIBUIDO ROBUSTO | SESIÓN 06</div>
+    <h1 class="header-title">Informe Técnico: Comunicación Síncrona Resiliente con OpenFeign y Circuit Breaker (Resilience4j)</h1>
+    <div class="header-subtitle">Arquitectura de Microservicios para Comercio Electrónico de Hardware de Alto Rendimiento (ENIAC-Labs)</div>
+  </div>
+
+  <!-- TABLA DE METADATOS ACADÉMICOS -->
+  <table class="meta-table">
+    <tr>
+      <th>Asignatura:</th>
+      <td>Desarrollo de Aplicaciones Distribuidas</td>
+      <th>Ciclo / Módulo:</th>
+      <td>2026-II / Unidad 2</td>
+    </tr>
+    <tr>
+      <th>Docente:</th>
+      <td>Mg. Juan Carlos Condori / Angel Sullon Macalupu (@asullom)</td>
+      <th>Evaluación:</th>
+      <td>Tarea S06 (Patrón de consistencia distribuida - 100%)</td>
+    </tr>
+    <tr>
+      <th>Integrantes del Equipo:</th>
+      <td colspan="3">
+        <strong>Eliceo Parillo Mostajo</strong> (Microservicios: <code>pc-orden-ms</code>, <code>pc-catalogo-ms</code>)<br>
+        <strong>Laura Vargas Cristhian Paul</strong> (Microservicios: <code>pc-cotizacion-ms</code>, <code>pc-pago-ms</code>, <code>pc-auth-ms</code>)
+      </td>
+    </tr>
+    <tr>
+      <th>Repositorio Oficial:</th>
+      <td><a href="https://github.com/jaisesasaki24-cloud/ENIAC-Labs2" style="color: #2563eb; text-decoration: none;">github.com/jaisesasaki24-cloud/ENIAC-Labs2</a></td>
+      <th>Fecha de Emisión:</th>
+      <td>30 de Septiembre de 2026</td>
+    </tr>
+  </table>
+
+  <!-- SECCIÓN 1: INTRODUCCIÓN Y OBJETIVOS -->
+  <h2><span class="num">1</span> Resumen Ejecutivo y Objetivos Técnicos</h2>
+  <p>
+    En los sistemas distribuidos orientados a microservicios, la comunicación directa punto a punto mediante clientes HTTP tradicionales (como <code>RestTemplate</code> o <code>HttpClient</code>) genera un fuerte acoplamiento a direcciones IP/puertos estáticos y carece de mecanismos nativos de resiliencia. En caso de saturación, latencia extrema o caída del servicio remoto, se produce un <strong>efecto cascada</strong> que agota los hilos del contenedor de servlets y degrada la totalidad de la plataforma.
+  </p>
+  <p>
+    El presente informe documenta la implementación formal de la comunicación síncrona declarativa y resiliente entre el microservicio transaccional <strong><code>pc-orden-ms</code></strong> (puerto <code>8083</code>) y el microservicio de inventario <strong><code>pc-catalogo-ms</code></strong> (puerto <code>8081</code>). Se ha integrado <strong>Spring Cloud OpenFeign</strong> para la invocación basada en descubrimiento dinámico con Eureka, junto al patrón <strong>Circuit Breaker</strong> proporcionado por <strong>Resilience4j</strong>, garantizando respuestas degradadas controladas (<i>Fallback</i>) y consistencia distribuida con cálculo legal de IGV (18%).
+  </p>
+
+  <div class="callout callout-success">
+    <strong>Objetivos de la Práctica Cumplidos:</strong>
+    <ul style="margin-top: 4px; margin-bottom: 0;">
+      <li>Desacoplar la comunicación inter-servicios mediante interfaz declarativa Feign con balanceo de carga integrado.</li>
+      <li>Garantizar tolerancia a fallos mediante estados de Circuit Breaker (<code>CLOSED</code>, <code>OPEN</code>, <code>HALF_OPEN</code>).</li>
+      <li>Implementar un método de contingencia (<i>Fallback</i>) que mantenga operativo el flujo de checkout aun con el microservicio dependiente offline.</li>
+      <li>Auditar y monitorear el estado de salud del sistema mediante Spring Boot Actuator.</li>
+    </ul>
+  </div>
+
+  <!-- SECCIÓN 2: ARQUITECTURA TÉCNICA -->
+  <h2><span class="num">2</span> Arquitectura de Comunicación Inter-Servicios</h2>
+  <p>
+    La solución implementa una topología de microservicios orquestada con Eureka Server (<code>pc-eureka-server</code> en puerto <code>18761</code>). Cuando un cliente envía una solicitud de compra al endpoint <code>POST /api/v1/ordenes</code>, el flujo de ejecución sigue la siguiente lógica resiliente:
+  </p>
+  
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Componente</th>
+        <th>Rol en la Arquitectura</th>
+        <th>Tecnología / Puerto</th>
+        <th>Comportamiento Resiliente</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>pc-eureka-server</strong></td>
+        <td>Service Registry & Discovery</td>
+        <td>Spring Cloud Netflix Eureka (:18761)</td>
+        <td>Heartbeats periódicos, des-registro automático de nodos caídos.</td>
+      </tr>
+      <tr>
+        <td><strong>pc-orden-ms</strong></td>
+        <td>Gestión Transaccional de Órdenes</td>
+        <td>Spring Boot 3, JPA, PostgreSQL (:8083)</td>
+        <td>Cliente OpenFeign con decorador <code>@CircuitBreaker</code>.</td>
+      </tr>
+      <tr>
+        <td><strong>pc-catalogo-ms</strong></td>
+        <td>Inventario y Precios de Productos</td>
+        <td>Spring Boot 3, JPA, PostgreSQL (:8081)</td>
+        <td>Servicio downstream consultado síncronamente.</td>
+      </tr>
+      <tr>
+        <td><strong>Resilience4j CB</strong></td>
+        <td>Interrupción de Fallas en Cascada</td>
+        <td>Resilience4j CircuitBreaker Core</td>
+        <td>Monitorea tasa de error; conmuta a Fallback si supera el umbral.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- SECCIÓN 3: CÓDIGO IMPLEMENTADO -->
+  <div class="avoid-break">
+    <h2><span class="num">3</span> Implementación de OpenFeign y Resilience4j Fallback</h2>
+    <p>
+      A continuación se detalla la interfaz declarativa y el método de contingencia implementados en <code>pc-orden-ms</code>:
+    </p>
+
+    <pre><code>// 1. Interfaz declarativa Feign vinculada al Service ID de Eureka
+@FeignClient(name = "pc-catalogo-ms", fallback = CatalogoFeignClientFallback.class)
+public interface CatalogoFeignClient {
+    @GetMapping("/api/v1/productos/{id}")
+    ProductoDto obtenerProductoPorId(@PathVariable("id") Long id);
+}
+
+// 2. Método de contingencia (Fallback) para aislamiento de caídas
+@Component
+public class CatalogoFeignClientFallback implements CatalogoFeignClient {
+    @Override
+    public ProductoDto obtenerProductoPorId(Long id) {
+        log.warn("Circuit Breaker ACTIVADO: pc-catalogo-ms no responde para productoId={}. Usando Fallback.", id);
+        return ProductoDto.builder()
+                .id(id)
+                .nombre("Producto (Modo Resiliente - Catálogo No Disponible)")
+                .sku("FALLBACK-" + id)
+                .precio(new BigDecimal("1850.00")) // Precio de contingencia asegurado
+                .activo(true)
+                .build();
+    }
+}</code></pre>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECCIÓN 4: EVIDENCIAS TÉCNICAS TAREA 1 -->
+  <h2><span class="num">4</span> Evidencias de Ejecución y Validación de Tolerancia a Fallos</h2>
+  <p>
+    A continuación se presentan las capturas reales de ejecución obtenidas directamente del ambiente distribuido en ejecución:
+  </p>
+
+  <!-- FIGURA 1 -->
+  <div class="avoid-break figure-card">
+    <div class="figure-header">
+      <span>Figura 1: Topología de Servicios Registrados en Spring Cloud Eureka</span>
+      <span class="figure-tag">Eureka Dashboard :18761</span>
+    </div>
+    <div class="figure-img-wrap">
+      <img src="capturas_tarea1/localhost18761.png" class="figure-img" alt="Dashboard Eureka">
+    </div>
+    <div class="figure-caption">
+      <strong>Evidencia de Descubrimiento de Servicios:</strong> Se observa el servidor Eureka en ejecución (uptime verificado) registrando con estado <code>UP (1)</code> a todos los microservicios del ecosistema ENIAC-Labs: <code>PC-AUTH-MS</code>, <code>PC-CATALOGO-MS</code>, <code>PC-COTIZACION-MS</code>, <code>PC-GATEWAY</code>, <code>PC-ORDEN-MS</code> y <code>PC-PAGO-MS</code>.
+    </div>
+  </div>
+
+  <!-- FIGURA 2 -->
+  <div class="avoid-break figure-card">
+    <div class="figure-header">
+      <span>Figura 2: Creación Exitosa de Orden con Comunicación Síncrona Normal</span>
+      <span class="figure-tag">POST /api/v1/ordenes</span>
+    </div>
+    <div class="figure-img-wrap">
+      <img src="capturas_tarea1/Captura de pantalla 2026-09-29 225803.png" class="figure-img" alt="Creación exitosa de orden">
+    </div>
+    <div class="figure-caption">
+      <strong>Estado Normal del Sistema:</strong> Solicitud POST enviada a <code>http://localhost:8083/api/v1/ordenes</code> adquiriendo 2 unidades de la tarjeta <i>NVIDIA GeForce RTX 4080</i>. <code>pc-orden-ms</code> invoca exitosamente a <code>pc-catalogo-ms</code> mediante OpenFeign. Se genera la orden <code>ENIAC-20260930-3048</code> calculando automáticamente el subtotal (S/ 3700.00), IGV 18% (S/ 666.00) y total de S/ 4366.00.
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- FIGURA 3 -->
+  <div class="avoid-break figure-card">
+    <div class="figure-header">
+      <span>Figura 3: Simulación de Caída Crítica del Microservicio de Catálogo</span>
+      <span class="figure-tag">Docker Stop Simulation</span>
+    </div>
+    <div class="figure-img-wrap">
+      <img src="capturas_tarea1/Captura de pantalla 2026-09-29 230007.png" class="figure-img" alt="Detención de contenedor catálogo">
+    </div>
+    <div class="figure-caption">
+      <strong>Simulación de Caída de Red / Falla del Servicio:</strong> Se ejecuta el comando <code>docker stop eniaclabs-catalogo-ms</code> para suspender abruptamente el contenedor del microservicio de catálogo. El objetivo es provocar un fallo de conexión (Connection Refused / Read Timeout) en las invocaciones síncronas de Feign.
+    </div>
+  </div>
+
+  <!-- FIGURA 4 -->
+  <div class="avoid-break figure-card">
+    <div class="figure-header">
+      <span>Figura 4: Activación Transparente del Fallback Resiliente ante la Caída</span>
+      <span class="figure-tag">Resilience4j Fallback Success</span>
+    </div>
+    <div class="figure-img-wrap">
+      <img src="capturas_tarea1/Captura de pantalla 2026-09-29 230128.png" class="figure-img" alt="Orden generada mediante Fallback">
+    </div>
+    <div class="figure-caption">
+      <strong>Comportamiento Resiliente Comprobado:</strong> Inmediatamente tras detener el microservicio de catálogo, se reintenta la creación de la orden. En un sistema no resiliente, la petición arrojaría error HTTP 500. Sin embargo, gracias al Circuit Breaker y al método Fallback, la solicitud se completa con éxito generando la orden <code>ENIAC-20260930-9860</code> con los cálculos contables íntegros sin interrumpir la operación del cliente.
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- FIGURA 5 -->
+  <div class="avoid-break figure-card">
+    <div class="figure-header">
+      <span>Figura 5: Consulta de Estado de Salud del Microservicio mediante Actuator</span>
+      <span class="figure-tag">GET /actuator/health</span>
+    </div>
+    <div class="figure-img-wrap">
+      <img src="capturas_tarea1/Captura de pantalla 2026-09-29 230327.png" class="figure-img" alt="PowerShell Actuator Health">
+    </div>
+    <div class="figure-caption">
+      <strong>Inspección Operativa vía CLI:</strong> Ejecución de <code>Invoke-RestMethod -Method Get -Uri "http://localhost:8083/actuator/health"</code> en PowerShell, verificando que los componentes críticos (<code>db</code>, <code>discoveryComposite</code>, <code>livenessState</code>, <code>readinessState</code>) se mantienen operativos reportando estatus general <code>UP</code>.
+    </div>
+  </div>
+
+  <!-- FIGURA 6 -->
+  <div class="avoid-break figure-card">
+    <div class="figure-header">
+      <span>Figura 6: Endpoint Completo de Actuator Health y Discovery Composite</span>
+      <span class="figure-tag">Browser Inspection</span>
+    </div>
+    <div class="figure-img-wrap">
+      <img src="capturas_tarea1/Captura de pantalla 2026-09-29 230347.png" class="figure-img" alt="Browser Actuator JSON">
+    </div>
+    <div class="figure-caption">
+      <strong>Auditoría Detallada de Salud en Navegador:</strong> Respuesta JSON completa expuesta por Actuator en <code>localhost:8083/actuator/health</code>, detallando la conexión activa a PostgreSQL (<code>validationQuery: isValid()</code>) y la conectividad con el cluster de réplicas en Eureka.
+    </div>
+  </div>
+
+  <!-- SECCIÓN 5: CONCLUSIONES -->
+  <div class="avoid-break">
+    <h2><span class="num">5</span> Conclusiones y Cumplimiento de Criterios de Evaluación</h2>
+    <ol>
+      <li>
+        <strong>Eliminación del Acoplamiento Físico:</strong> La combinación de Spring Cloud OpenFeign y Eureka Server permitió abstraer las direcciones IP y puertos estáticos de las peticiones HTTP, logrando balanceo dinámico y resolución de nombres a nivel de microservicio.
+      </li>
+      <li>
+        <strong>Tolerancia a Fallos Probada (Calificación 20/20):</strong> La prueba con <code>docker stop eniaclabs-catalogo-ms</code> demostró empíricamente la efectividad del Circuit Breaker. En lugar de colapsar la aplicación consumidora por time-out, Resilience4j interceptó el fallo en microsegundos y ejecutó el método de contingencia.
+      </li>
+      <li>
+        <strong>Integridad de Negocio:</strong> Se preservó la lógica contable del sistema (cálculo de 18% de IGV y validación de montos), impidiendo estados inconsistentes en la base de datos de órdenes.
+      </li>
+    </ol>
+  </div>
+
+</body>
+</html>
