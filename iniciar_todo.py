@@ -141,6 +141,15 @@ SERVICES: List[Dict[str, Any]] = [
         "browser": True,
     },
     {
+        "id": "auth",
+        "name": "pc-auth-ms (Swagger UI)",
+        "category": "Seguridad",
+        "url": "http://localhost:8087/swagger-ui/index.html",
+        "check_url": "http://127.0.0.1:8087/swagger-ui/index.html",
+        "desc": "Autenticacion Centralizada JWT & Usuarios Semilla (S07)",
+        "browser": True,
+    },
+    {
         "id": "grafana",
         "name": "Grafana Server",
         "category": "Observabilidad",

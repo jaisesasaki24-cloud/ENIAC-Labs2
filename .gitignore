@@ -1,54 +1,42 @@
+# Maven
 target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+*.jar
+*.war
+*.ear
+*.class
+*.log
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
+# IDE
+.idea/
 *.iml
 *.ipr
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/nbactions.xml
-/nb-configuration.xml
-/nblibraries.xml
-
-### VS Code ###
+*.iws
 .vscode/
+*.swp
+*.swo
 
-### OS ###
-Thumbs.db
-Desktop.ini
+# OS
 .DS_Store
+Thumbs.db
 
-### Logs ###
-*.log
-logs/
+# Docker
+.env
 
-### Site & Local runtime ###
-site/
-.mkdocs.pid
-__pycache__/
-*.py[cod]
-~$*.pptx
-*.backup*.pptx
-test_slide1.pptx
-slide1_test.png
-test_grafana.png
+# Test
+test-results/
+surefire-reports/
 
-### Monitoring local binaries (Docker Compose is used instead) ###
+# Build
+*.pid
+*.backup
+
+# PPTX
+*.pptx
+
+# Database
+*.db
+*.sqlite
+
+# Monitoring Binaries and generated docs site
 infra/monitoring/bin/
+site/

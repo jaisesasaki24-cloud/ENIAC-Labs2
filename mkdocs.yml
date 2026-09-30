@@ -29,13 +29,19 @@ nav:
   - Proyecto Sello:
       - Brief del Proyecto: proyecto-sello/brief.md
       - Producto Unidad 1: proyecto-sello/u1-producto.md
+      - Producto Unidad 2: proyecto-sello/u2-producto.md
   - Sesiones Unidad 1:
       - S01 - Servicio Base: sesiones/S01_Construccion_Servicio_Base.md
       - S02 - Config Server: sesiones/S02_Configuracion_Centralizada_Ambientes.md
       - S03 - Eureka y Concurrencia: sesiones/S03_Registro_Descubrimiento_Ejecucion_Concurrente.md
       - S04 - API Gateway WebMVC: sesiones/S04_Punto_Unico_Acceso_Distribucion_Trafico.md
       - S05 - Evaluacion U1: sesiones/S05_Evaluacion_Unidad_1.md
-      - S06 - Monitoreo y Observabilidad: sesiones/S06_Monitoreo_Prometheus_Grafana_Loki.md
+  - Sesiones Unidad 2:
+      - S06 - Comunicación Síncrona Resiliente: sesiones/S06_Comunicacion_Sincrona_Resiliente.md
+      - S07 - Seguridad Distribuida: sesiones/S07_Seguridad_Distribuida_Control_Acceso.md
+      - S08 - Mensajería Asíncrona Kafka: sesiones/S08_Mensajeria_Asincrona_Entre_Servicios.md
+      - S10 - Monitoreo y Observabilidad: sesiones/S06_Monitoreo_Prometheus_Grafana_Loki.md
+      - S12 - Evaluación de la Unidad II: sesiones/S12_Evaluacion_Unidad_2.md
 
 markdown_extensions:
   - admonition

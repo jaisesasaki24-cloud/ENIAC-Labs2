@@ -11,5 +11,6 @@ public interface ProductoService {
     ProductoResponseDto update(Long id, ProductoRequestDto request);
     StockResponseDto verificarStock(Long id, Integer cantidad);
     StockResponseDto descontarStock(Long id, Integer cantidad);
+    StockResponseDto reponerStock(Long id, Integer cantidad);
     void delete(Long id);
 }

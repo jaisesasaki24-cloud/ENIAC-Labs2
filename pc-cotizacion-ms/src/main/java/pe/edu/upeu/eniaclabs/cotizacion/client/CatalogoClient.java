@@ -10,6 +10,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import java.time.Duration;
+
 @Slf4j
 @Component
 public class CatalogoClient {
@@ -19,7 +22,10 @@ public class CatalogoClient {
 
     public CatalogoClient(DiscoveryClient discoveryClient) {
         this.discoveryClient = discoveryClient;
-        this.restClient = RestClient.builder().build();
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(Duration.ofMillis(2000));
+        requestFactory.setReadTimeout(Duration.ofMillis(3500));
+        this.restClient = RestClient.builder().requestFactory(requestFactory).build();
     }
 
     public BigDecimal consultarPrecioActualizado(Long productoId) {

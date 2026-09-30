@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pe.edu.upeu.eniaclabs.catalogo.dto.*;
+import pe.edu.upeu.eniaclabs.catalogo.service.InventarioRedisReservationService;
 import pe.edu.upeu.eniaclabs.catalogo.service.ProductoService;
 
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.List;
 public class ProductoController {
 
     private final ProductoService productoService;
+    private final InventarioRedisReservationService inventarioRedisService;
 
     @GetMapping
     @Operation(summary = "Listar productos de hardware con filtros opcionales")
@@ -68,10 +70,37 @@ public class ProductoController {
         return ResponseEntity.ok(productoService.descontarStock(id, request.getCantidad()));
     }
 
+    @PostMapping("/{id}/stock/reponer")
+    @Operation(summary = "Reponer stock tras compensacion Saga o cancelacion")
+    public ResponseEntity<StockResponseDto> reponerStock(
+            @PathVariable Long id,
+            @Valid @RequestBody StockOperationDto request) {
+        return ResponseEntity.ok(productoService.reponerStock(id, request.getCantidad()));
+    }
+
     @DeleteMapping("/{id}")
     @Operation(summary = "Desactivar componente del catalogo")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         productoService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/stock/reservar-redis")
+    @Operation(summary = "Reserva atómica de stock en memoria L4/L7 (Redis Lua Script) recomendada por Nemotron 3 Ultra")
+    public ResponseEntity<Boolean> reservarStockRedis(
+            @RequestParam String sku,
+            @RequestParam int cantidad,
+            @RequestParam String orderId) {
+        return ResponseEntity.ok(inventarioRedisService.tryReserveStock(sku, cantidad, orderId));
+    }
+
+    @PostMapping("/stock/revertir-redis")
+    @Operation(summary = "Reversión atómica de reserva en Redis recomendada por Nemotron 3 Ultra")
+    public ResponseEntity<Void> revertirReservaRedis(
+            @RequestParam String sku,
+            @RequestParam int cantidad,
+            @RequestParam String orderId) {
+        inventarioRedisService.rollbackReservation(sku, cantidad, orderId);
+        return ResponseEntity.ok().build();
     }
 }

@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5436}/eniaclabs_cotizacion_db
+    url: jdbc:postgresql://${DB_HOST:eniaclabs-db-cotizacion}:${DB_PORT:5432}/eniaclabs_cotizacion_db
     username: ${DB_USER:eniaclabs}
     password: ${DB_PASS:eniaclabs}
     driver-class-name: org.postgresql.Driver

@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:postgresql://${DB_HOST:eniaclabs-db-catalogo}:${DB_PORT:5432}/eniaclabs_catalogo_db
     username: ${DB_USER:eniaclabs}
-    password: ${DB_PASS:eniaclabs_secret_pass}
+    password: ${DB_PASS:eniaclabs}
     driver-class-name: org.postgresql.Driver
   flyway:
     enabled: true

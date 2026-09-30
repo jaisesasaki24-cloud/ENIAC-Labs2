@@ -121,22 +121,38 @@ public class ProductoServiceImpl implements ProductoService {
     @Override
     @Transactional
     public StockResponseDto descontarStock(Long id, Integer cantidad) {
-        ProductoHardware p = productoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con ID: " + id));
-        if (p.getStockActual() < cantidad) {
+        int updated = productoRepository.descontarStockAtomico(id, cantidad);
+        if (updated == 0) {
+            ProductoHardware p = productoRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con ID: " + id));
             throw new InsufficientStockException("Stock insuficiente para SKU: " + p.getSku() + ". Requerido: " + cantidad + ", Actual: " + p.getStockActual());
         }
-        int anterior = p.getStockActual();
-        p.setStockActual(anterior - cantidad);
-        productoRepository.save(p);
-
+        ProductoHardware p = productoRepository.findById(id).orElseThrow();
         return StockResponseDto.builder()
                 .productoId(p.getId())
                 .sku(p.getSku())
-                .stockAnterior(anterior)
+                .stockAnterior(p.getStockActual() + cantidad)
                 .stockActual(p.getStockActual())
                 .disponible(true)
-                .mensaje("Stock descontado exitosamente para la orden ENIAC Labs")
+                .mensaje("Stock descontado exitosamente de forma atómica")
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public StockResponseDto reponerStock(Long id, Integer cantidad) {
+        int updated = productoRepository.reponerStockAtomico(id, cantidad);
+        if (updated == 0) {
+            throw new ResourceNotFoundException("Producto no encontrado con ID: " + id);
+        }
+        ProductoHardware p = productoRepository.findById(id).orElseThrow();
+        return StockResponseDto.builder()
+                .productoId(p.getId())
+                .sku(p.getSku())
+                .stockAnterior(p.getStockActual() - cantidad)
+                .stockActual(p.getStockActual())
+                .disponible(true)
+                .mensaje("Stock repuesto exitosamente tras compensación Saga")
                 .build();
     }
 

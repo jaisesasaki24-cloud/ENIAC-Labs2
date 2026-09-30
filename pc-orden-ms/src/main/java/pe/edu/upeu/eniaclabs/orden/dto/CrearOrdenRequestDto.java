@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import java.util.List;
 
@@ -14,9 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class CrearOrdenRequestDto {
-    @NotNull(message = "El ID del cliente es obligatorio")
-    private Long clienteId;
-
     @NotBlank(message = "El nombre del cliente es obligatorio")
     private String clienteNombre;
 

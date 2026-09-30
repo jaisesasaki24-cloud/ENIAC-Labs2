@@ -13,7 +13,7 @@ services:
     environment:
       POSTGRES_DB: eniaclabs_catalogo_db
       POSTGRES_USER: eniaclabs
-      POSTGRES_PASSWORD: eniaclabs
+      POSTGRES_PASSWORD: ${DB_PASSWORD:eniaclabs}
     volumes:
       - eniaclabs_catalogo_pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -23,6 +23,14 @@ services:
       retries: 5
     networks:
       - eniaclabs-network
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
 
   eniaclabs-db-orden:
     image: postgres:16-alpine
@@ -33,7 +41,7 @@ services:
     environment:
       POSTGRES_DB: eniaclabs_orden_db
       POSTGRES_USER: eniaclabs
-      POSTGRES_PASSWORD: eniaclabs
+      POSTGRES_PASSWORD: ${DB_PASSWORD:eniaclabs}
     volumes:
       - eniaclabs_orden_pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -43,6 +51,14 @@ services:
       retries: 5
     networks:
       - eniaclabs-network
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
 
   eniaclabs-db-pago:
     image: postgres:16-alpine
@@ -53,7 +69,7 @@ services:
     environment:
       POSTGRES_DB: eniaclabs_pago_db
       POSTGRES_USER: eniaclabs
-      POSTGRES_PASSWORD: eniaclabs
+      POSTGRES_PASSWORD: ${DB_PASSWORD:eniaclabs}
     volumes:
       - eniaclabs_pago_pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -63,6 +79,14 @@ services:
       retries: 5
     networks:
       - eniaclabs-network
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
 
   eniaclabs-db-cotizacion:
     image: postgres:16-alpine
@@ -73,7 +97,7 @@ services:
     environment:
       POSTGRES_DB: eniaclabs_cotizacion_db
       POSTGRES_USER: eniaclabs
-      POSTGRES_PASSWORD: eniaclabs
+      POSTGRES_PASSWORD: ${DB_PASSWORD:eniaclabs}
     volumes:
       - eniaclabs_cotizacion_pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -83,6 +107,67 @@ services:
       retries: 5
     networks:
       - eniaclabs-network
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+
+  eniaclabs-db-auth:
+    image: postgres:16-alpine
+    container_name: eniaclabs-db-auth
+    restart: unless-stopped
+    ports:
+      - "5435:5432"
+    environment:
+      POSTGRES_DB: eniaclabs_auth_db
+      POSTGRES_USER: eniaclabs
+      POSTGRES_PASSWORD: ${DB_PASSWORD:eniaclabs}
+    volumes:
+      - eniaclabs_auth_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eniaclabs -d eniaclabs_auth_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - eniaclabs-network
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+
+  eniaclabs-redis:
+    image: redis:7-alpine
+    container_name: eniaclabs-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - eniaclabs_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - eniaclabs-network
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+        reservations:
+          cpus: "0.1"
+          memory: 128M
 
   # ==========================================
   # SERVIDORES DE INFRAESTRUCTURA SPRING CLOUD
@@ -109,6 +194,14 @@ services:
       start_period: 10s
     networks:
       - eniaclabs-network
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+        reservations:
+          cpus: "0.1"
+          memory: 128M
 
   pc-eureka:
     build:
@@ -126,6 +219,14 @@ services:
         condition: service_healthy
     networks:
       - eniaclabs-network
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+        reservations:
+          cpus: "0.1"
+          memory: 128M
 
   pc-gateway:
     build:
@@ -142,9 +243,17 @@ services:
       - pc-eureka
     networks:
       - eniaclabs-network
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
 
   # ==========================================
-  # MICROSERVICIOS DE NEGOCIO (4 TOTAL = 2 POR ALUMNO)
+  # MICROSERVICIOS DE NEGOCIO (4 TOTAL)
   # ==========================================
   # 1. Eliceo Parillo: No Transaccional
   pc-catalogo-ms:
@@ -161,7 +270,8 @@ services:
       DB_HOST: eniaclabs-db-catalogo
       DB_PORT: 5432
       DB_USER: eniaclabs
-      DB_PASS: eniaclabs
+      DB_PASS: ${DB_PASSWORD:eniaclabs}
+      JWT_SECRET: ${JWT_SECRET:}
     depends_on:
       eniaclabs-db-catalogo:
         condition: service_healthy
@@ -169,6 +279,14 @@ services:
         condition: service_started
     networks:
       - eniaclabs-network
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
 
   # 2. Eliceo Parillo: UNICO MICROSERVICIO TRANSACCIONAL
   pc-orden-ms:
@@ -185,7 +303,8 @@ services:
       DB_HOST: eniaclabs-db-orden
       DB_PORT: 5432
       DB_USER: eniaclabs
-      DB_PASS: eniaclabs
+      DB_PASS: ${DB_PASSWORD:eniaclabs}
+      JWT_SECRET: ${JWT_SECRET:}
     depends_on:
       eniaclabs-db-orden:
         condition: service_healthy
@@ -193,6 +312,14 @@ services:
         condition: service_started
     networks:
       - eniaclabs-network
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
 
   # 3. Laura Vargas: No Transaccional (Adaptador Pasarela Externa)
   pc-pago-ms:
@@ -209,7 +336,8 @@ services:
       DB_HOST: eniaclabs-db-pago
       DB_PORT: 5432
       DB_USER: eniaclabs
-      DB_PASS: eniaclabs
+      DB_PASS: ${DB_PASSWORD:eniaclabs}
+      JWT_SECRET: ${JWT_SECRET:}
     depends_on:
       eniaclabs-db-pago:
         condition: service_healthy
@@ -217,6 +345,14 @@ services:
         condition: service_started
     networks:
       - eniaclabs-network
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
 
   # 4. Laura Vargas: No Transaccional (Cotizador PC Gamer / Vende el Sistema)
   pc-cotizacion-ms:
@@ -233,7 +369,8 @@ services:
       DB_HOST: eniaclabs-db-cotizacion
       DB_PORT: 5432
       DB_USER: eniaclabs
-      DB_PASS: eniaclabs
+      DB_PASS: ${DB_PASSWORD:eniaclabs}
+      JWT_SECRET: ${JWT_SECRET:}
     depends_on:
       eniaclabs-db-cotizacion:
         condition: service_healthy
@@ -241,6 +378,47 @@ services:
         condition: service_started
     networks:
       - eniaclabs-network
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+
+  # 5. Seguridad y Autenticación Centralizada JWT
+  pc-auth-ms:
+    build:
+      context: ./pc-auth-ms
+      dockerfile: Dockerfile
+    container_name: eniaclabs-auth-ms
+    restart: unless-stopped
+    ports:
+      - "8087:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      CONFIG_SERVER_URL: http://pc-config:8888
+      DB_HOST: eniaclabs-db-auth
+      DB_PORT: 5432
+      DB_USER: eniaclabs
+      DB_PASS: ${DB_PASSWORD:eniaclabs}
+      JWT_SECRET: ${JWT_SECRET:}
+    depends_on:
+      eniaclabs-db-auth:
+        condition: service_healthy
+      pc-eureka:
+        condition: service_started
+    networks:
+      - eniaclabs-network
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
 
   # ==========================================
   # STACK DE MONITOREO Y OBSERVABILIDAD
@@ -264,6 +442,14 @@ services:
       - "host.docker.internal:host-gateway"
     networks:
       - eniaclabs-network
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 1G
+        reservations:
+          cpus: "0.1"
+          memory: 256M
 
   grafana:
     image: grafana/grafana:latest
@@ -273,7 +459,7 @@ services:
       - "3000:3000"
     environment:
       - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:admin}
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
@@ -288,7 +474,14 @@ services:
       - loki
     networks:
       - eniaclabs-network
-
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+        reservations:
+          cpus: "0.1"
+          memory: 128M
 
   loki:
     image: grafana/loki:latest
@@ -303,6 +496,14 @@ services:
     command: -config.file=/etc/loki/local-config.yaml
     networks:
       - eniaclabs-network
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+        reservations:
+          cpus: "0.1"
+          memory: 128M
 
   promtail:
     image: grafana/promtail:latest
@@ -319,6 +520,14 @@ services:
       - loki
     networks:
       - eniaclabs-network
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 256M
+        reservations:
+          cpus: "0.05"
+          memory: 64M
 
   node-exporter:
     image: prom/node-exporter:latest
@@ -328,12 +537,22 @@ services:
       - "9100:9100"
     networks:
       - eniaclabs-network
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 256M
+        reservations:
+          cpus: "0.05"
+          memory: 64M
 
 volumes:
   eniaclabs_catalogo_pgdata:
   eniaclabs_orden_pgdata:
   eniaclabs_pago_pgdata:
   eniaclabs_cotizacion_pgdata:
+  eniaclabs_auth_pgdata:
+  eniaclabs_redis_data:
   eniaclabs_prometheus_data:
   eniaclabs_grafana_data:
   eniaclabs_loki_data:

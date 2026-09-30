@@ -1,0 +1,12 @@
+services:
+  eniaclabs-eventos-py:
+    build: .
+    container_name: eniaclabs-eventos-py
+    restart: unless-stopped
+    command: tail -f /dev/null
+    networks:
+      - eniaclabs-kafka-dev-net
+
+networks:
+  eniaclabs-kafka-dev-net:
+    external: true

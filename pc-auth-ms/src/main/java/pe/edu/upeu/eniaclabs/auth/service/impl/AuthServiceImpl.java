@@ -2,6 +2,7 @@ package pe.edu.upeu.eniaclabs.auth.service.impl;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pe.edu.upeu.eniaclabs.auth.dto.*;
@@ -13,9 +14,6 @@ import pe.edu.upeu.eniaclabs.auth.repository.UsuarioRepository;
 import pe.edu.upeu.eniaclabs.auth.security.JwtUtil;
 import pe.edu.upeu.eniaclabs.auth.service.AuthService;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,6 +24,7 @@ public class AuthServiceImpl implements AuthService {
     private final UsuarioRepository usuarioRepository;
     private final RolRepository rolRepository;
     private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional(readOnly = true)
@@ -37,9 +36,8 @@ public class AuthServiceImpl implements AuthService {
             throw new AuthenticationException("La cuenta de usuario esta inactiva o suspendida");
         }
 
-        String inputHash = hashPassword(req.getPassword());
-        if (!usuario.getPasswordHash().equals(inputHash)) {
-            throw new AuthenticationException("Credenciales invalidas: contraseÃ±a incorrecta");
+        if (!passwordEncoder.matches(req.getPassword(), usuario.getPasswordHash())) {
+            throw new AuthenticationException("Credenciales invalidas: contrasena incorrecta");
         }
 
         List<String> roles = usuario.getRoles().stream()
@@ -78,7 +76,7 @@ public class AuthServiceImpl implements AuthService {
         Usuario nuevo = Usuario.builder()
                 .username(req.getUsername())
                 .email(req.getEmail())
-                .passwordHash(hashPassword(req.getPassword()))
+                .passwordHash(passwordEncoder.encode(req.getPassword()))
                 .nombres(req.getNombres())
                 .apellidos(req.getApellidos())
                 .telefono(req.getTelefono())
@@ -117,22 +115,6 @@ public class AuthServiceImpl implements AuthService {
                 .roles(roles)
                 .message("Token verificado correctamente para seguridad perimetral")
                 .build();
-    }
-
-    private String hashPassword(String password) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] encodedHash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
-            StringBuilder hexString = new StringBuilder();
-            for (byte b : encodedHash) {
-                String hex = Integer.toHexString(0xff & b);
-                if (hex.length() == 1) hexString.append('0');
-                hexString.append(hex);
-            }
-            return hexString.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Error hashing password", e);
-        }
     }
 
     private UsuarioResponseDto mapToUserDto(Usuario u) {

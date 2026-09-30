@@ -45,9 +45,16 @@ public class OrdenCompraController {
 
     @PostMapping
     @Operation(summary = "Crear nueva orden de compra con calculo automatico de subtotal, IGV 18% y total")
-    public ResponseEntity<OrdenResponseDto> create(@Valid @RequestBody CrearOrdenRequestDto request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ordenService.create(request));
+    public ResponseEntity<OrdenResponseDto> create(
+            @RequestHeader(value = "X-User-Id", required = false) Long headerClienteId,
+            @Valid @RequestBody CrearOrdenRequestDto request) {
+        // CORREGIDO por Nemotron: eliminado fallback hardcoded a clienteId=1L (vulnerabilidad de seguridad)
+        if (headerClienteId == null) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(ordenService.create(request, headerClienteId));
     }
+
 
     @PatchMapping("/{id}/estado")
     @Operation(summary = "Actualizar estado de la orden (PENDIENTE, PAGADA, ENSAMBLANDO, ENVIADA, etc.)")

@@ -12,6 +12,8 @@ public interface OrdenService {
     OrdenResponseDto findById(Long id);
     OrdenResponseDto findByCodigoOrden(String codigoOrden);
     OrdenResponseDto create(CrearOrdenRequestDto request);
+    OrdenResponseDto create(CrearOrdenRequestDto request, Long clienteId);
     OrdenResponseDto updateStatus(Long id, ActualizarEstadoOrdenDto request);
+    void marcarPagada(Long ordenId);
     void cancel(Long id);
 }

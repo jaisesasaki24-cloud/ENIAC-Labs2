@@ -5,6 +5,41 @@ spring:
     active: dev
   config:
     import: "optional:configserver:${CONFIG_SERVER_URL:http://localhost:18888}"
+  # Seguridad JWT - Nemotron: agregar validacion de tokens Keycloak
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://keycloak:8080/realms/eniaclabs}
+          jwk-set-uri: ${KEYCLOAK_JWK_URI:http://keycloak:8080/realms/eniaclabs/protocol/openid-connect/certs}
 
 server:
   port: 8081
+
+# Observabilidad - Nemotron: exponer todas las metricas
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,loggers,env
+  endpoint:
+    health:
+      show-details: when_authorized
+      probes:
+        enabled: true
+  tracing:
+    sampling:
+      probability: 1.0  # 100% en dev, reducir en prod
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_URL:http://zipkin:9411}/api/v2/spans
+
+# Logging estructurado con traceId/spanId - Nemotron
+logging:
+  pattern:
+    correlation: "[%X{traceId:-} %X{spanId:-}]"
+  level:
+    root: INFO
+    pe.edu.upeu.eniaclabs: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.data.redis: DEBUG

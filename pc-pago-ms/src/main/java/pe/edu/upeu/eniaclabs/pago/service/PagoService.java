@@ -6,9 +6,12 @@ import pe.edu.upeu.eniaclabs.pago.dto.PagoResponseDto;
 import pe.edu.upeu.eniaclabs.pago.dto.SimularPagoDto;
 import pe.edu.upeu.eniaclabs.pago.entity.EstadoPago;
 
+import pe.edu.upeu.eniaclabs.pago.event.OrdenCreadaEvento;
+
 import java.util.List;
 
 public interface PagoService {
+    void procesar(OrdenCreadaEvento orden);
     PagoResponseDto crearCheckoutSandbox(CheckoutRequestDto request);
     PagoResponseDto procesarWebhook(MercadoPagoWebhookDto webhookPayload, String rawPayload);
     PagoResponseDto simularResultadoPago(Long id, SimularPagoDto request);

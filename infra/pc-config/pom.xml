@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.0.7</version>
+		<version>3.4.1</version>
 		<relativePath/>
 	</parent>
 	<groupId>pe.edu.upeu.eniaclabs</groupId>
 	<artifactId>pc-config</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>pc-config</name>
-	<description>Servidor de Configuracion Centralizada ENIAC Labs</description>
+	<description>Servidor de Configuracion Centralizado Spring Cloud Config - ENIAC Labs</description>
 
 	<properties>
 		<java.version>21</java.version>
-		<spring-cloud.version>2025.1.2</spring-cloud.version>
+		<spring-cloud.version>2024.0.0</spring-cloud.version>
 	</properties>
 
 	<dependencies>
@@ -30,19 +31,8 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<scope>runtime</scope>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.micrometer</groupId>
-			<artifactId>micrometer-registry-prometheus</artifactId>
-			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
 

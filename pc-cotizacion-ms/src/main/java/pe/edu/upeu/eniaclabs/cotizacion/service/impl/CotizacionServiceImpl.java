@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pe.edu.upeu.eniaclabs.cotizacion.client.CatalogoClient;
+import pe.edu.upeu.eniaclabs.cotizacion.client.NemotronAiClient;
 import pe.edu.upeu.eniaclabs.cotizacion.client.OrdenClient;
 import pe.edu.upeu.eniaclabs.cotizacion.dto.*;
 import pe.edu.upeu.eniaclabs.cotizacion.entity.CotizacionItem;
@@ -27,6 +28,7 @@ public class CotizacionServiceImpl implements CotizacionService {
     private final CotizacionRepository cotizacionRepository;
     private final CatalogoClient catalogoClient;
     private final OrdenClient ordenClient;
+    private final NemotronAiClient nemotronAiClient;
 
     private static final BigDecimal IGV_RATE = new BigDecimal("0.18");
 
@@ -217,5 +219,11 @@ public class CotizacionServiceImpl implements CotizacionService {
                 .fechaCreacion(c.getFechaCreacion())
                 .items(itemsDto)
                 .build();
+    }
+
+    @Override
+    public AsesorIaResponseDto asesorarConIa(AsesorIaRequestDto request) {
+        log.info("Procesando asesoria de hardware con NVIDIA Nemotron 3 Ultra para: {}", request.getTipoUso());
+        return nemotronAiClient.consultarAsesorHardware(request);
     }
 }

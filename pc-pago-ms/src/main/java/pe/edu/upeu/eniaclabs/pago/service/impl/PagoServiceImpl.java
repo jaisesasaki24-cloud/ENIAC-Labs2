@@ -15,6 +15,15 @@ import pe.edu.upeu.eniaclabs.pago.exception.ResourceNotFoundException;
 import pe.edu.upeu.eniaclabs.pago.repository.TransaccionPagoRepository;
 import pe.edu.upeu.eniaclabs.pago.service.PagoService;
 
+import org.springframework.beans.factory.annotation.Value;
+import pe.edu.upeu.eniaclabs.pago.entity.Pago;
+import pe.edu.upeu.eniaclabs.pago.event.OrdenCreadaEvento;
+import pe.edu.upeu.eniaclabs.pago.event.PagoValidadoEvento;
+import pe.edu.upeu.eniaclabs.pago.messaging.PagoEventosProducer;
+import pe.edu.upeu.eniaclabs.pago.repository.PagoRepository;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -25,7 +34,38 @@ import java.util.stream.Collectors;
 public class PagoServiceImpl implements PagoService {
 
     private final TransaccionPagoRepository transaccionRepository;
+    private final PagoRepository pagoRepository;
+    private final PagoEventosProducer pagoEventosProducer;
     private final OrdenClient ordenClient;
+
+    @Value("${spring.application.name:pc-pago-ms}")
+    private String nombreServicio;
+
+    @Override
+    @Transactional
+    public void procesar(OrdenCreadaEvento orden) {
+        log.info("component=service ordenId={} status=processing", orden.getOrdenId());
+        Pago pago = pagoRepository.save(Pago.builder()
+                .ordenId(orden.getOrdenId())
+                .monto(orden.getTotal())
+                .metodoPago(orden.getMetodoPago() != null ? orden.getMetodoPago() : "TARJETA")
+                .estado(EstadoPago.VALIDADO)
+                .fechaPago(LocalDateTime.now())
+                .build());
+
+        pagoEventosProducer.publicarTrasCommit(PagoValidadoEvento.builder()
+                .tipoEvento("pago.validado")
+                .ordenId(pago.getOrdenId())
+                .pagoId(pago.getId())
+                .monto(pago.getMonto())
+                .metodoPago(pago.getMetodoPago())
+                .estado(pago.getEstado().name())
+                .origen(nombreServicio)
+                .timestamp(Instant.now().toEpochMilli())
+                .build());
+
+        log.info("component=processor ordenId={} estado={} status=processed", pago.getOrdenId(), pago.getEstado());
+    }
 
     @Override
     @Transactional
@@ -60,24 +100,46 @@ public class PagoServiceImpl implements PagoService {
             paymentId = String.valueOf(webhook.getId());
         }
 
-        List<TransaccionPago> pendientes = transaccionRepository.findByEstado(EstadoPago.PENDIENTE);
-        TransaccionPago tx;
-        if (!pendientes.isEmpty()) {
-            tx = pendientes.get(pendientes.size() - 1);
-        } else {
-            List<TransaccionPago> all = transaccionRepository.findAll();
-            if (all.isEmpty()) {
-                throw new ResourceNotFoundException("No existen transacciones de pago para asociar el webhook de Mercado Pago");
+        // Búsqueda determinista por correlación real o preferencia
+        TransaccionPago tx = null;
+        if (webhook.getExternalReference() != null) {
+            tx = transaccionRepository.findByExternalReference(webhook.getExternalReference()).orElse(null);
+        }
+
+        if (tx == null && webhook.getPreferenceId() != null) {
+            tx = transaccionRepository.findByMpPreferenceId(webhook.getPreferenceId()).orElse(null);
+        }
+
+        if (tx == null && paymentId != null) {
+            tx = transaccionRepository.findByMpPaymentId(paymentId).orElse(null);
+        }
+
+        if (tx == null) {
+            // Fallback para pruebas si no viene referencia explícita
+            List<TransaccionPago> pendientes = transaccionRepository.findByEstado(EstadoPago.PENDIENTE);
+            if (!pendientes.isEmpty()) {
+                tx = pendientes.get(pendientes.size() - 1);
+                log.warn("Webhook sin correlación explícita. Asociado a la transacción pendiente ID: {}", tx.getId());
+            } else {
+                throw new ResourceNotFoundException("No se encontró transacción para la referencia del webhook de Mercado Pago");
             }
-            tx = all.get(all.size() - 1);
+        }
+
+        // Idempotencia: Si ya estaba aprobada, no duplicar la notificación a la orden
+        if (tx.getEstado() == EstadoPago.APROBADO) {
+            log.info("Transacción {} ya fue aprobada previamente. Operación idempotente omitida.", tx.getId());
+            return mapToDto(tx);
         }
 
         tx.setMpPaymentId(paymentId != null ? paymentId : "MP-WH-" + System.currentTimeMillis());
         tx.setRawWebhookPayload(rawPayload);
 
-        if ("payment.created".equalsIgnoreCase(webhook.getAction()) || "payment".equalsIgnoreCase(webhook.getType())) {
+        if ("payment.created".equalsIgnoreCase(webhook.getAction()) || 
+            "payment".equalsIgnoreCase(webhook.getType()) ||
+            "approved".equalsIgnoreCase(webhook.getStatus())) {
+            
             tx.setEstado(EstadoPago.APROBADO);
-            // Notificacion sincrona distribuida hacia pc-orden-ms via Eureka
+            // Notificación sincrona distribuida hacia pc-orden-ms via Eureka
             ordenClient.actualizarEstadoOrden(tx.getOrdenId(), "PAGADA");
         } else {
             tx.setEstado(EstadoPago.EN_PROCESO);

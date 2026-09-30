@@ -20,6 +20,30 @@ spring:
       ddl-auto: validate
     show-sql: false
 
+  kafka:
+    bootstrap-servers: eniaclabs-kafka:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+    consumer:
+      group-id: pc-pago-ms
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+        spring.json.value.default.type: pe.edu.upeu.eniaclabs.pago.event.OrdenCreadaEvento
+        spring.json.trusted.packages: pe.edu.upeu.eniaclabs.pago.event
+        spring.json.use.type.headers: false
+
+app:
+  kafka:
+    topic:
+      ordenes: orden-eventos
+      pagos: pago-eventos
+
 management:
   endpoints:
     web:

@@ -1,79 +1,88 @@
-﻿global:
+global:
   scrape_interval: 5s
   evaluation_interval: 5s
 
 scrape_configs:
-  - job_name: 'prometheus'
+  - job_name: "prometheus"
     static_configs:
-      - targets: ['localhost:9090']
+      - targets: ["localhost:9090"]
 
-  - job_name: 'node-exporter'
+  - job_name: "node-exporter"
     static_configs:
-      - targets: ['node-exporter:9100']
+      - targets: ["node-exporter:9100"]
 
-  - job_name: 'loki'
+  - job_name: "loki"
     static_configs:
-      - targets: ['loki:3100']
+      - targets: ["loki:3100"]
 
-  - job_name: 'pc-gateway'
-    metrics_path: '/actuator/prometheus'
+  - job_name: "pc-gateway"
+    metrics_path: "/actuator/prometheus"
     scrape_interval: 5s
     static_configs:
-      - targets: ['pc-gateway:28080']
+      - targets: ["pc-gateway:28080"]
         labels:
-          application: 'pc-gateway'
-          environment: 'production'
+          application: "pc-gateway"
+          environment: "production"
 
-  - job_name: 'pc-catalogo-ms'
-    metrics_path: '/actuator/prometheus'
+  - job_name: "pc-catalogo-ms"
+    metrics_path: "/actuator/prometheus"
     scrape_interval: 5s
     static_configs:
-      - targets: ['pc-catalogo-ms:8080']
+      - targets: ["pc-catalogo-ms:8080"]
         labels:
-          application: 'pc-catalogo-ms'
-          environment: 'production'
+          application: "pc-catalogo-ms"
+          environment: "production"
 
-  - job_name: 'pc-orden-ms'
-    metrics_path: '/actuator/prometheus'
+  - job_name: "pc-orden-ms"
+    metrics_path: "/actuator/prometheus"
     scrape_interval: 5s
     static_configs:
-      - targets: ['pc-orden-ms:8080']
+      - targets: ["pc-orden-ms:8080"]
         labels:
-          application: 'pc-orden-ms'
-          environment: 'production'
+          application: "pc-orden-ms"
+          environment: "production"
 
-  - job_name: 'pc-pago-ms'
-    metrics_path: '/actuator/prometheus'
+  - job_name: "pc-pago-ms"
+    metrics_path: "/actuator/prometheus"
     scrape_interval: 5s
     static_configs:
-      - targets: ['pc-pago-ms:8080']
+      - targets: ["pc-pago-ms:8080"]
         labels:
-          application: 'pc-pago-ms'
-          environment: 'production'
+          application: "pc-pago-ms"
+          environment: "production"
 
-  - job_name: 'pc-cotizacion-ms'
-    metrics_path: '/actuator/prometheus'
+  - job_name: "pc-cotizacion-ms"
+    metrics_path: "/actuator/prometheus"
     scrape_interval: 5s
     static_configs:
-      - targets: ['pc-cotizacion-ms:8080']
+      - targets: ["pc-cotizacion-ms:8080"]
         labels:
-          application: 'pc-cotizacion-ms'
-          environment: 'production'
+          application: "pc-cotizacion-ms"
+          environment: "production"
 
-  - job_name: 'pc-eureka'
-    metrics_path: '/actuator/prometheus'
+  - job_name: "pc-auth-ms"
+    metrics_path: "/actuator/prometheus"
     scrape_interval: 5s
     static_configs:
-      - targets: ['pc-eureka:8761']
+      - targets: ["pc-auth-ms:8080"]
         labels:
-          application: 'pc-eureka'
-          environment: 'production'
+          application: "pc-auth-ms"
+          environment: "production"
 
-  - job_name: 'pc-config'
-    metrics_path: '/actuator/prometheus'
+  - job_name: "pc-eureka"
+    metrics_path: "/actuator/prometheus"
     scrape_interval: 5s
     static_configs:
-      - targets: ['pc-config:8888']
+      - targets: ["pc-eureka:8761"]
         labels:
-          application: 'pc-config'
-          environment: 'production'
+          application: "pc-eureka"
+          environment: "production"
+
+  - job_name: "pc-config"
+    metrics_path: "/actuator/prometheus"
+    scrape_interval: 5s
+    static_configs:
+      - targets: ["pc-config:8888"]
+        labels:
+          application: "pc-config"
+          environment: "production"

@@ -15,6 +15,30 @@ spring:
       ddl-auto: validate
     show-sql: false
 
+  kafka:
+    bootstrap-servers: eniaclabs-kafka:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+    consumer:
+      group-id: pc-orden-ms
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+        spring.json.value.default.type: pe.edu.upeu.eniaclabs.orden.event.PagoValidadoEvento
+        spring.json.trusted.packages: pe.edu.upeu.eniaclabs.orden.event
+        spring.json.use.type.headers: false
+
+app:
+  kafka:
+    topic:
+      ordenes: orden-eventos
+      pagos: pago-eventos
+
 management:
   endpoints:
     web:
@@ -30,3 +54,15 @@ eureka:
   client:
     service-url:
       defaultZone: http://pc-eureka:8761/eureka
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      catalogoPrecio:
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 5
+        minimum-number-of-calls: 3
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 2
+        automatic-transition-from-open-to-half-open-enabled: true

@@ -1,0 +1,21 @@
+package pe.edu.upeu.eniaclabs.pago.config;
+
+import org.apache.kafka.clients.admin.NewTopic;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.config.TopicBuilder;
+
+@Configuration
+public class KafkaTopicsConfig {
+
+    @Bean
+    public NewTopic ordenEventos(@Value("${app.kafka.topic.ordenes:orden-eventos}") String nombre) {
+        return TopicBuilder.name(nombre).partitions(3).replicas(1).build();
+    }
+
+    @Bean
+    public NewTopic pagoEventos(@Value("${app.kafka.topic.pagos:pago-eventos}") String nombre) {
+        return TopicBuilder.name(nombre).partitions(3).replicas(1).build();
+    }
+}

@@ -9,4 +9,5 @@ public interface CotizacionService {
     CotizacionResponseDto buscarPorId(Long id);
     ValidarCompatibilidadDto validarCompatibilidad(ValidarCompatibilidadDto request);
     ConvertirOrdenResponseDto convertirAOrden(Long cotizacionId);
+    AsesorIaResponseDto asesorarConIa(AsesorIaRequestDto request);
 }

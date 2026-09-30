@@ -9,6 +9,9 @@ import org.springframework.web.client.RestClient;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import java.time.Duration;
+
 @Slf4j
 @Component
 public class OrdenClient {
@@ -18,7 +21,10 @@ public class OrdenClient {
 
     public OrdenClient(DiscoveryClient discoveryClient) {
         this.discoveryClient = discoveryClient;
-        this.restClient = RestClient.builder().build();
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(Duration.ofMillis(2000));
+        requestFactory.setReadTimeout(Duration.ofMillis(4000));
+        this.restClient = RestClient.builder().requestFactory(requestFactory).build();
     }
 
     @SuppressWarnings("unchecked")
@@ -35,6 +41,7 @@ public class OrdenClient {
 
                 return restClient.post()
                         .uri(baseUrl + "/api/v1/ordenes")
+                        .header("X-User-Id", String.valueOf(ordenRequest.getOrDefault("clienteId", "1")))
                         .body(ordenRequest)
                         .retrieve()
                         .body(Map.class);

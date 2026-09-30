@@ -17,6 +17,9 @@ public class ProductoHardware {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Version
+    private Long version;
+
     @Column(nullable = false, unique = true, length = 60)
     private String sku;
 

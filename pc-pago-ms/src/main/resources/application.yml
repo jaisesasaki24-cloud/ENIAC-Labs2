@@ -8,3 +8,27 @@ spring:
 
 server:
   port: 8085
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,loggers
+  endpoint:
+    health:
+      show-details: when_authorized
+      probes:
+        enabled: true
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_URL:http://zipkin:9411}/api/v2/spans
+
+logging:
+  pattern:
+    correlation: "[%X{traceId:-} %X{spanId:-}]"
+  level:
+    root: INFO
+    pe.edu.upeu.eniaclabs: DEBUG

@@ -49,4 +49,10 @@ public class CotizacionController {
     public ResponseEntity<ConvertirOrdenResponseDto> convertirAOrden(@PathVariable Long id) {
         return ResponseEntity.ok(cotizacionService.convertirAOrden(id));
     }
+
+    @PostMapping("/asesor-ia")
+    @Operation(summary = "Asesor inteligente de hardware y compatibilidad impulsado por NVIDIA Nemotron 3 Ultra (550B)")
+    public ResponseEntity<AsesorIaResponseDto> asesorarHardwareIa(@RequestBody AsesorIaRequestDto request) {
+        return ResponseEntity.ok(cotizacionService.asesorarConIa(request));
+    }
 }
