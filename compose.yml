@@ -374,7 +374,9 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: prod
       CONFIG_SERVER_URL: http://pc-config:8888
-      FRONTEND_URL: https://localhost:4200
+      FRONTEND_URL: https://eniaclabs-nine.vercel.app
+      MP_ACCESS_TOKEN: APP_USR-7798988609356730-111819-96e585696ba88ed36d038c742adc400c-3649448406
+      MP_PUBLIC_KEY: APP_USR-9f3f0419-e6bf-4800-ab6b-50bfd5db448e
       DB_HOST: eniaclabs-db-pago
       DB_PORT: 5432
       DB_USER: eniaclabs
