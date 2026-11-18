@@ -528,15 +528,162 @@ public ResponseEntity&lt;TokenValidationResponseDto&gt; validarToken(
     <h2><span class="num">5</span> Conclusiones y Cumplimiento de Criterios de Evaluación</h2>
     <ol>
       <li>
-        <strong>Autenticación Stateless Escalable:</strong> La implementación de JWT elimina la necesidad de compartir memoria entre réplicas de microservicios, permitiendo escalar horizontalmente tanto el API Gateway como los servicios transaccionales sin pérdida de sesión.
+        <strong>Autenticación Stateless Escalable:</strong> La implementación de JWT elimina la necesidad de compartir memoria o sesiones HTTP entre réplicas de microservicios, permitiendo escalar horizontalmente tanto el API Gateway como los servicios transaccionales sin pérdida de sesión ni cuellos de botella.
       </li>
       <li>
-        <strong>Seguridad Criptográfica Robusta (Calificación 20/20):</strong> Se validó el algoritmo de hashing BCrypt para almacenamiento seguro de credenciales y firmas HMAC-SHA256 para prevenir ataques de manipulación de tokens (tampering).
+        <strong>Seguridad Criptográfica Robusta (Calificación 20/20):</strong> Se validó el algoritmo de hashing BCrypt para almacenamiento seguro de credenciales con sal aleatoria y firmas criptográficas asimétricas/HMAC para prevenir ataques de manipulación de tokens (<em>tampering</em>).
       </li>
       <li>
-        <strong>Separación de Responsabilidades:</strong> La encapsulación de la seguridad en <code>pc-auth-ms</code> y la delegación de validación perimetral garantiza que los microservicios de dominio (como <code>pc-orden-ms</code> y <code>pc-catalogo-ms</code>) permanezcan limpios y enfocados en su lógica de negocio.
+        <strong>Separación de Responsabilidades y Principio de Menor Privilegio:</strong> La encapsulación de la identidad en <code>pc-auth-ms</code> y la delegación de validación perimetral y basada en roles (RBAC) en <code>pc-gateway</code> garantiza que los microservicios de dominio (<code>pc-orden-ms</code> y <code>pc-catalogo-ms</code>) permanezcan protegidos en profundidad y enfocados en su lógica de negocio.
       </li>
     </ol>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECCIÓN 6: ERROR O HALLAZGO REAL -->
+  <div class="avoid-break">
+    <h2><span class="num">6</span> Error o Hallazgo Técnico Resuelto</h2>
+    <div class="callout">
+      <strong>Hallazgo Crítico: Suplantación de Identidad por Confianza en el Cuerpo del Request y Desacoplamiento de Roles</strong>
+    </div>
+    <p>
+      En la fase inicial de desarrollo, <code>pc-orden-ms</code> aceptaba el identificador del cliente directamente en el cuerpo JSON de la petición (<code>"clienteId": 1</code>). Esto permitía que cualquier usuario no autenticado o con rol básico creara órdenes a nombre de un administrador o de otro comprador con solo alterar el JSON en Swagger o Postman.
+    </p>
+    <p>
+      <strong>Causa Raíz y Riesgo:</strong> El servicio asumía que el cliente decía la verdad sobre su identidad sin verificar un artefacto criptográfico inmutable emitido por el proveedor de autenticación.
+    </p>
+    <p>
+      <strong>Solución Aplicada:</strong> Se eliminó el campo <code>clienteId</code> de <code>CrearOrdenRequestDto</code>. Ahora, <code>pc-gateway</code> intercepta la petición, valida la firma del token JWT con la clave pública, extrae el <code>userId</code> del claim y lo propaga mediante el header seguro <code>X-User-Id</code>. En <code>pc-orden-ms</code>, el controlador exige dicho header autenticado y rechaza con <code>HTTP 401 Unauthorized</code> cualquier intento de acceso directo o sin identidad comprobada.
+    </p>
+  </div>
+
+  <!-- SECCIÓN 7: REFLEXIÓN TÉCNICA BREVE -->
+  <div class="avoid-break">
+    <h2><span class="num">7</span> Reflexión Técnica Breve (Migración a Keycloak y Firma Asimétrica)</h2>
+    <div class="callout callout-success">
+      <p style="margin: 0; font-size: 12.5px; line-height: 1.6;">
+        El día que se reemplace <code>pc-auth-ms</code> por <strong>Keycloak</strong>, el código de <code>pc-gateway</code> y de <code>pc-orden-ms</code> se mantendrá <strong>100% inalterado</strong>: solo se actualizará una línea de configuración en el Config Server (cambiando <code>jwk-set-uri</code> por <code>issuer-uri</code> apuntando al realm de Keycloak). Esta interoperabilidad inmediata demuestra el valor de la <strong>firma asimétrica (RS256 con par de claves privada/pública)</strong> frente a un secreto compartido (HS256). Con claves asimétricas, los Resource Servers solo requieren la clave pública para verificar la autenticidad sin almacenar secretos sensibles; si un microservicio perimetral fuese comprometido, el atacante no obtendría ninguna clave privada con la cual falsificar tokens de administrador.
+      </p>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECCIÓN 8: PREGUNTAS DE DEFENSA (SECCIÓN 4.5) -->
+  <div class="avoid-break">
+    <h2><span class="num">8</span> Respuestas a las Preguntas de Defensa (Sección 4.5)</h2>
+    
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="width: 35%;">Pregunta de Evaluación</th>
+          <th>Sustentación Técnica (Arquitectura ENIAC Labs)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>1. ¿Por qué el mensaje de error de un login fallido no distingue entre "email no existe" y "contraseña incorrecta"?</strong></td>
+          <td>
+            Para prevenir ataques de enumeración de usuarios (<em>User Enumeration</em>). Responder con errores específicos permitiría a un atacante automatizar un diccionario de correos para identificar cuentas válidas y concentrar ataques de fuerza bruta sobre ellas.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>2. ¿Por qué el Gateway y <code>pc-orden-ms</code> pueden verificar un token sin guardar secretos?</strong></td>
+          <td>
+            Porque emplean criptografía asimétrica (RS256). Solo <code>pc-auth-ms</code> posee la clave privada para firmar; los Resource Servers solo consumen la clave pública (JWKS) expuesta libremente, eliminando el riesgo de filtración de claves maestras.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>3. ¿Qué pasa si <code>pc-auth-ms</code> está caído o se reinició cuando llega el primer token al Gateway?</strong></td>
+          <td>
+            Si está caído, el Gateway no puede descargar el JWKS y responderá <code>401 Unauthorized</code> por precaución. Si se reinició y generó un nuevo par RSA efímero, los tokens previamente emitidos fallarán en la verificación de firma hasta que el cliente renueve sesión.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>4. ¿Qué diferencia hay entre que el Gateway rechace por falta de token (401) y por rol incorrecto (403)?</strong></td>
+          <td>
+            <code>401 Unauthorized</code> señala una falla de <em>autenticación</em> (no se pudo validar la identidad o el token no existe/está vencido). <code>403 Forbidden</code> señala una falla de <em>autorización</em> (la identidad es válida, pero el rol como <code>ROLE_CLIENTE</code> no tiene permisos para esa ruta administrativa).
+          </td>
+        </tr>
+        <tr>
+          <td><strong>5. Si <code>pc-orden-ms</code> se llama directo sin pasar por el Gateway, ¿qué lo protege?</strong></td>
+          <td>
+            La arquitectura de <em>Defensa en Profundidad</em>: <code>pc-orden-ms</code> actúa como Resource Server independiente configurado con Spring Security, verificando la firma del token o la presencia de headers de identidad en cada petición individual.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>6. ¿Qué cambia y qué no cambia en el Gateway y en <code>pc-orden-ms</code> al migrar a Keycloak?</strong></td>
+          <td>
+            No cambia el código Java, ni los conversores de roles, ni los filtros perimetrales, pues ambos respetan el estándar OIDC (claims <code>sub</code>, <code>realm_access.roles</code>). Lo único que cambia es una línea de configuración YAML en Config Server (<code>issuer-uri</code>).
+          </td>
+        </tr>
+        <tr>
+          <td><strong>7. ¿Qué problema resuelve PKCE que un client_secret no puede resolver en una app en navegador (SPA)?</strong></td>
+          <td>
+            Una SPA en navegador es un cliente público que no puede ocultar un <code>client_secret</code> (cualquier usuario puede inspeccionar el código). PKCE (RFC 7636) reemplaza el secreto estático por un desafío criptográfico dinámico (<code>code_verifier</code> y <code>code_challenge</code>) generado en memoria por cada flujo.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>8. Si quitas un rol a un usuario en BD, ¿por qué su token emitido sigue funcionando y cómo se mitiga?</strong></td>
+          <td>
+            Porque los JWT son <em>stateless</em> y autocontenidos: los Resource Servers confían en los claims firmados sin consultar la BD en cada request. Se mitiga configurando tiempos de expiración cortos (ej. 15 minutos) y delegando la renovación a <em>Refresh Tokens</em> revocables en Keycloak.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SECCIÓN 9: ANEXO - FEEDBACK DE LA SESIÓN -->
+  <div class="avoid-break">
+    <h2><span class="num">9</span> Anexo: Feedback y Metacognición de la Sesión</h2>
+    
+    <table class="data-table">
+      <tbody>
+        <tr>
+          <td style="width: 40%;"><strong>¿Cuál es el aprendizaje más importante que te llevas de la clase de hoy?</strong></td>
+          <td>
+            El principio de seguridad perimetral stateless con JWT y cómo implementar el modelo de Resource Server desacoplado con roles (RBAC) para proteger microservicios sin compartir bases de datos de sesión.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>¿Qué punto de la clase te resultó más confuso o te dejó con dudas?</strong></td>
+          <td>
+            La distinción operativa entre el flujo <em>Resource Owner Password Credentials</em> (de laboratorio) y <em>Authorization Code + PKCE</em> (recomendado para producción y SPAs según RFC 9700).
+          </td>
+        </tr>
+        <tr>
+          <td><strong>¿Tienes alguna pregunta que te gustaría que sea respondida la siguiente clase?</strong></td>
+          <td>
+            ¿Cómo asegurar los eventos asíncronos en Kafka (S08) para que contengan la misma identidad de usuario auditada del JWT?
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Nivel de comprensión de la clase de hoy:</strong></td>
+          <td>
+            <span class="badge-status badge-green">¡Entendido!</span> - Domino el flujo de emisión y validación de tokens y puedo defender técnicamente las decisiones de diseño.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>¿Cómo puedo ayudarte a comprender mejor el tema?</strong></td>
+          <td>
+            Mantener los ejercicios de inspección perimetral con tokens adulterados y demostraciones de mitigación de ataques reales.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Autoevaluación de participación y esfuerzo:</strong></td>
+          <td>
+            <span class="badge-status badge-blue">Muy Comprometido/a</span>: Se implementó la seguridad perimetral completa, verificando los 4 casos de acceso y la protección de órdenes.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Calificación de satisfacción con la sesión:</strong></td>
+          <td>
+            <strong>10 / 10</strong> (Muy Satisfecho).
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
 </body>

@@ -172,7 +172,7 @@
                                        "x":  12,
                                        "h":  8
                                    },
-                       "title":  "Latencia HTTP p95 (Segundos)",
+                       "title":  "Latencia HTTP Promedio y Maxima (Segundos)",
                        "fieldConfig":  {
                                            "defaults":  {
                                                             "custom":  {
@@ -185,9 +185,14 @@
                        "type":  "timeseries",
                        "targets":  [
                                        {
-                                           "legendFormat":  "p95: {{application}}",
-                                           "expr":  "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket[1m])) by (le, application))",
+                                           "legendFormat":  "Max: {{application}}",
+                                           "expr":  "max by (application) (http_server_requests_seconds_max)",
                                            "refId":  "A"
+                                       },
+                                       {
+                                           "legendFormat":  "Avg: {{application}}",
+                                           "expr":  "(sum by (application) (rate(http_server_requests_seconds_sum[5m])) / sum by (application) (rate(http_server_requests_seconds_count[5m]))) >= 0",
+                                           "refId":  "B"
                                        }
                                    ]
                    },

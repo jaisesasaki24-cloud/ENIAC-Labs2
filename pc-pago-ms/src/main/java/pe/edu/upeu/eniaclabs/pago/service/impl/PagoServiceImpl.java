@@ -28,10 +28,16 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.dao.DataIntegrityViolationException;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class PagoServiceImpl implements PagoService {
+
+    private static final String PAGO_VALIDADO = "pago.validado";
+    private static final String PAGO_FALLIDO = "pago.fallido";
+    private static final String METODO_RECHAZADO = "TARJETA_RECHAZADA";
 
     private final TransaccionPagoRepository transaccionRepository;
     private final PagoRepository pagoRepository;
@@ -45,16 +51,35 @@ public class PagoServiceImpl implements PagoService {
     @Transactional
     public void procesar(OrdenCreadaEvento orden) {
         log.info("component=service ordenId={} status=processing", orden.getOrdenId());
-        Pago pago = pagoRepository.save(Pago.builder()
-                .ordenId(orden.getOrdenId())
-                .monto(orden.getTotal())
-                .metodoPago(orden.getMetodoPago() != null ? orden.getMetodoPago() : "TARJETA")
-                .estado(EstadoPago.VALIDADO)
-                .fechaPago(LocalDateTime.now())
-                .build());
 
+        // Capa 1 de Idempotencia: Verificación explícita de pago ya existente para este ordenId
+        if (pagoRepository.findByOrdenId(orden.getOrdenId()).isPresent()) {
+            log.warn("component=processor ordenId={} status=ignored motivo=\"pago ya procesado (evento duplicado)\"", orden.getOrdenId());
+            return;
+        }
+
+        // Bifurcación de fallo simulado (S09): TARJETA_RECHAZADA produce estado FALLIDO y evento pago.fallido
+        boolean rechazado = METODO_RECHAZADO.equalsIgnoreCase(orden.getMetodoPago());
+        EstadoPago estadoResultante = rechazado ? EstadoPago.FALLIDO : EstadoPago.VALIDADO;
+
+        // Capa 2 de Idempotencia: Respaldo de restricción UNIQUE en BD ante condiciones de carrera concurrentes
+        Pago pago;
+        try {
+            pago = pagoRepository.save(Pago.builder()
+                    .ordenId(orden.getOrdenId())
+                    .monto(orden.getTotal())
+                    .metodoPago(orden.getMetodoPago() != null ? orden.getMetodoPago() : "TARJETA")
+                    .estado(estadoResultante)
+                    .fechaPago(LocalDateTime.now())
+                    .build());
+        } catch (DataIntegrityViolationException ex) {
+            log.warn("component=processor ordenId={} status=ignored motivo=\"pago ya procesado (condicion de carrera)\"", orden.getOrdenId());
+            return;
+        }
+
+        String tipoEventoResultante = rechazado ? PAGO_FALLIDO : PAGO_VALIDADO;
         pagoEventosProducer.publicarTrasCommit(PagoValidadoEvento.builder()
-                .tipoEvento("pago.validado")
+                .tipoEvento(tipoEventoResultante)
                 .ordenId(pago.getOrdenId())
                 .pagoId(pago.getId())
                 .monto(pago.getMonto())

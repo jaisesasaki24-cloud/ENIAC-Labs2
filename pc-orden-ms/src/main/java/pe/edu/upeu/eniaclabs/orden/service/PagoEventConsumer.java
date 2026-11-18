@@ -18,13 +18,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PagoEventConsumer {
 
-    private final OrdenCompraRepository ordenRepository;
+    private final pe.edu.upeu.eniaclabs.orden.service.OrdenService ordenService;
 
-    @Transactional
-    @KafkaListener(topics = "${app.kafka.topic.pagos:pago-eventos}", groupId = "${spring.kafka.consumer.group-id:pc-orden-ms}")
+    // Listener delegado de forma centralizada en pe.edu.upeu.eniaclabs.orden.messaging.PagoEventosConsumer
     public void consumirPagoValidado(ConsumerRecord<String, PagoValidadoEvento> record) {
         PagoValidadoEvento evento = record.value();
-        if (evento == null || !"pago.validado".equalsIgnoreCase(evento.getTipoEvento())) {
+        if (evento == null || evento.getTipoEvento() == null) {
             log.warn("component=consumer status=ignored partition={} offset={}", record.partition(), record.offset());
             return;
         }
@@ -37,20 +36,12 @@ public class PagoEventConsumer {
                 record.partition(),
                 record.offset());
 
-        Optional<OrdenCompra> optionalOrden = ordenRepository.findById(evento.getOrdenId());
-        if (optionalOrden.isEmpty()) {
-            log.error("component=consumer ordenId={} status=order_not_found", evento.getOrdenId());
-            return;
+        if ("pago.validado".equalsIgnoreCase(evento.getTipoEvento())) {
+            ordenService.marcarPagada(evento.getOrdenId());
+        } else if ("pago.fallido".equalsIgnoreCase(evento.getTipoEvento())) {
+            ordenService.compensar(evento.getOrdenId());
+        } else {
+            log.warn("component=consumer eventType={} status=ignored", evento.getTipoEvento());
         }
-
-        OrdenCompra orden = optionalOrden.get();
-        if (orden.getEstado() == EstadoOrden.PAGADA) {
-            log.info("component=consumer ordenId={} status=already_paid", orden.getId());
-            return;
-        }
-
-        orden.setEstado(EstadoOrden.PAGADA);
-        ordenRepository.save(orden);
-        log.info("component=consumer ordenId={} status=order_marked_paid", orden.getId());
     }
 }

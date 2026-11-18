@@ -3,12 +3,10 @@ server:
 
 eureka:
   server:
-    enable-self-preservation: true
+    enable-self-preservation: false
   client:
     register-with-eureka: false
     fetch-registry: false
-    service-url:
-      defaultZone: http://eureka-server:8761/eureka/
 
 management:
   endpoints:
@@ -17,4 +15,6 @@ management:
         include: health,info,metrics,prometheus
   endpoint:
     health:
-      show-details: when-authorized
+      show-details: always
+      probes:
+        enabled: true

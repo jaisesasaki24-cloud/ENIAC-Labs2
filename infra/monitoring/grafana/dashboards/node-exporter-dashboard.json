@@ -76,7 +76,7 @@
                                        "x":  0,
                                        "h":  8
                                    },
-                       "title":  "TrÃ¡fico de Red I/O (Bytes/s)",
+                       "title":  "Tráfico de Red I/O (Bytes/s)",
                        "fieldConfig":  {
                                            "defaults":  {
                                                             "custom":  {

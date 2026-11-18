@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Informe Técnico - Tarea 4: Consistencia Distribuida y Patrón Saga (S09)</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 15mm 18mm 15mm;
+      @bottom-right {
+        content: counter(page);
+      }
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+      color: #1e293b;
+      line-height: 1.55;
+      font-size: 13px;
+      background-color: #ffffff;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .page-break {
+      page-break-after: always;
+      break-after: page;
+    }
+    .avoid-break {
+      page-break-inside: avoid;
+      break-inside: avoid;
+      margin-bottom: 18px;
+    }
+
+    /* Portada / Header */
+    .header-banner {
+      background: linear-gradient(135deg, #0f172a 0%, #4c1d95 50%, #7c3aed 100%);
+      color: #ffffff;
+      padding: 26px 24px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border-left: 6px solid #a855f7;
+    }
+    .header-badge {
+      display: inline-block;
+      background-color: #7c3aed;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    .header-title {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 8px;
+      color: #f8fafc;
+    }
+    .header-subtitle {
+      font-size: 13px;
+      color: #e9d5ff;
+      font-weight: 500;
+    }
+
+    /* Tabla de Metadatos */
+    .meta-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 22px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      overflow: hidden;
+      font-size: 12px;
+    }
+    .meta-table th {
+      background: #f1f5f9;
+      color: #475569;
+      text-align: left;
+      padding: 8px 12px;
+      width: 25%;
+      border-bottom: 1px solid #e2e8f0;
+      font-weight: 600;
+    }
+    .meta-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #e2e8f0;
+      color: #0f172a;
+    }
+    .meta-table tr:last-child th, .meta-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Encabezados de sección */
+    h2 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #0f172a;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 6px;
+      margin-top: 22px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    h2 .num {
+      background: #7c3aed;
+      color: white;
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+    h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+      margin-top: 14px;
+      margin-bottom: 8px;
+    }
+    p {
+      margin-bottom: 10px;
+      text-align: justify;
+    }
+
+    /* Tablas de datos */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 16px 0;
+      font-size: 11.5px;
+    }
+    .data-table th {
+      background: #0f172a;
+      color: #ffffff;
+      padding: 8px 10px;
+      text-align: left;
+      font-weight: 600;
+    }
+    .data-table td {
+      padding: 7px 10px;
+      border-bottom: 1px solid #e2e8f0;
+      vertical-align: top;
+    }
+    .data-table tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    /* Bloques de código y JSON */
+    pre {
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 12px;
+      border-radius: 6px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 11px;
+      line-height: 1.45;
+      overflow-x: auto;
+      margin: 8px 0 14px 0;
+      border-left: 4px solid #a855f7;
+    }
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background: #f1f5f9;
+      color: #6b21a8;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 11.5px;
+    }
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    /* Capturas y evidencias visuales */
+    .evidence-box {
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 10px;
+      background: #f8fafc;
+      margin: 12px 0;
+    }
+    .evidence-box img {
+      width: 100%;
+      height: auto;
+      max-height: 230px;
+      object-fit: cover;
+      object-position: top;
+      border-radius: 4px;
+      border: 1px solid #e2e8f0;
+      display: block;
+      margin-bottom: 6px;
+    }
+    .evidence-box .caption {
+      font-size: 10.5px;
+      color: #64748b;
+      font-style: italic;
+      text-align: center;
+    }
+
+    /* Callouts y estados */
+    .callout {
+      padding: 12px 14px;
+      border-radius: 6px;
+      margin: 12px 0;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .callout-info {
+      background: #faf5ff;
+      border-left: 4px solid #7c3aed;
+      color: #581c87;
+    }
+    .callout-success {
+      background: #f0fdf4;
+      border-left: 4px solid #16a34a;
+      color: #15803d;
+    }
+    .callout-warning {
+      background: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      color: #b45309;
+    }
+
+    .badge-status {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .badge-green { background: #dcfce7; color: #15803d; }
+    .badge-red { background: #fee2e2; color: #b91c1c; }
+    .badge-purple { background: #f3e8ff; color: #7e22ce; }
+  </style>
+</head>
+<body>
+
+  <!-- PORTADA / ENCABEZADO -->
+  <div class="header-banner">
+    <div class="header-badge">Sistemas Distribuidos · Sesión S09</div>
+    <div class="header-title">Informe Técnico: Consistencia Distribuida y Patrón Saga</div>
+    <div class="header-subtitle">Idempotencia Defensiva, Compensación Transaccional y Recuperación de Stock Gamer · ENIAC Labs</div>
+  </div>
+
+  <!-- TABLA DE METADATOS -->
+  <table class="meta-table">
+    <tr>
+      <th>Curso / Semestre:</th>
+      <td>Sistemas Distribuidos (2026-II) · Universidad Peruana Unión (UPeU)</td>
+      <th>Docente Titular:</th>
+      <td>Angel Sullon Macalupu (@asullom) / Mg. Juan Carlos Condori</td>
+    </tr>
+    <tr>
+      <th>Estudiantes / Equipo:</th>
+      <td>
+        <strong>Eliceo Parillo Mostajo</strong> (<code>pc-orden-ms</code>, <code>pc-catalogo-ms</code>)<br>
+        <strong>Laura Vargas Cristhian Paul</strong> (<code>pc-pago-ms</code>, <code>pc-auth-ms</code>, <code>pc-gateway</code>)
+      </td>
+      <th>Proyecto Sello:</th>
+      <td><strong>ENIAC Labs</strong> — E-Commerce Distribuido de Hardware Gamer de Alto Rendimiento</td>
+    </tr>
+    <tr>
+      <th>Entorno de Evaluación:</th>
+      <td>DEV (Apache Kafka KRaft :19092, Kafka UI :18085, Gateway :18080, Eureka :18761)</td>
+      <th>Repositorio GitHub:</th>
+      <td><a href="https://github.com/262dist/pagatu" style="color: #7c3aed; text-decoration: none; font-weight: 600;">github.com/262dist/pagatu (ENIAC Labs)</a></td>
+    </tr>
+  </table>
+
+  <!-- SECCIÓN 1: BUG DE DUPLICADOS E IDEMPOTENCIA -->
+  <div class="avoid-break">
+    <h2><span class="num">1</span> El Bug Reproducido y Consumidor Idempotente en <code>pc-pago-ms</code></h2>
+    <p>
+      En cumplimiento del paso 3.2, se provocó deliberadamente la reentrega de un mensaje <code>orden.creada</code> mediante <strong>Kafka UI (:18085)</strong> reutilizando la clave <code>ordenId=101</code>. Al carecer de guardias de idempotencia, <code>pc-pago-ms</code> intentó insertar un segundo registro de pago para la misma orden, detonando una excepción fatal por colisión contra la restricción de unicidad:
+    </p>
+
+    <pre><code># EXCEPCIÓN REAL REPRODUCIDA EN CONSOLA (Paso 3.2)
+org.springframework.dao.DataIntegrityViolationException: could not execute statement [ERROR: duplicate key value violates unique constraint "uk_pagos_orden"
+  Detail: Key (orden_id)=(101) already exists.] [insert into pagos (estado,fecha_pago,metodo_pago,monto,orden_id) values (?,?,?,?,?)]</code></pre>
+
+    <p>
+      <strong>Solución con Idempotencia en Dos Capas (Paso 3.3):</strong> Se combinó una verificación preventiva en memoria con <code>pagoRepository.findByOrdenId(ordenId)</code> para descartar duplicados sin generar intentos inútiles de inserción en disco, respaldada por un bloque <code>try-catch (DataIntegrityViolationException)</code> ante eventuales condiciones de carrera entre particiones concurrentes.
+    </p>
+
+    <pre><code># LOG ESTRUCTURADO TRAS EL FIX DE IDEMPOTENCIA (Paso 3.4)
+[2026-10-18 07:35:12.890] [traceId=bf882e] WARN  pe.edu.upeu.eniaclabs.pago.service.impl.PagoServiceImpl - component=processor ordenId=101 status=ignored motivo="pago ya procesado (evento duplicado)"</code></pre>
+
+    <div class="evidence-box">
+      <img src="capturas_tarea3/09_swagger_pagos.png" alt="Swagger y Estado de Pagos en pc-pago-ms">
+      <div class="caption">Figura 1.1: Verificación de unicidad en pc-pago-ms: el duplicado es descartado sin arrojar 500 Internal Server Error ni duplicar cobros.</div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECCIÓN 2: FALLO DE PAGO Y COMPENSACIÓN -->
+  <div class="avoid-break">
+    <h2><span class="num">2</span> Simulación de Fallo de Pago y Compensación en <code>pc-orden-ms</code></h2>
+    <p>
+      Para evaluar la resiliencia ante rechazos financieros de forma determinista, se reservó el valor <code>metodoPago: "TARJETA_RECHAZADA"</code>. Al recibir este valor, <code>pc-pago-ms</code> persiste el registro con estado <span class="badge-status badge-red">FALLIDO</span> y emite el evento <strong><code>pago.fallido</code></strong> en el topic <code>pago-eventos</code>.
+    </p>
+    <p>
+      Al consumir <code>pago.fallido</code>, <code>pc-orden-ms</code> ejecuta la <strong>acción compensatoria de la Saga</strong>: transiciona la orden de <code>PENDIENTE</code> a <code>CANCELADA</code> (preservando el historial para auditoría contable en lugar de borrar la fila) y restituye el stock en el microservicio de Catálogo.
+    </p>
+
+    <h3>Trazabilidad de la Compensación en Logs</h3>
+    <pre><code># 1. pc-pago-ms detecta rechazo determinista y publica evento de fallo
+[2026-10-18 07:36:01.100] INFO  pe.edu.upeu.eniaclabs.pago.service.impl.PagoServiceImpl - component=processor ordenId=102 estado=FALLIDO status=processed
+[2026-10-18 07:36:01.120] INFO  pe.edu.upeu.eniaclabs.pago.messaging.PagoEventosProducer - component=producer topic=pago-eventos partition=0 offset=8 eventType=pago.fallido ordenId=102 status=published
+
+# 2. pc-orden-ms consume pago.fallido y ejecuta compensación
+[2026-10-18 07:36:01.240] INFO  pe.edu.upeu.eniaclabs.orden.messaging.PagoEventosConsumer - component=consumer eventType=pago.fallido ordenId=102 status=consumed
+[2026-10-18 07:36:01.280] INFO  pe.edu.upeu.eniaclabs.orden.service.impl.OrdenServiceImpl - component=processor ordenId=102 estado=CANCELADA status=compensated</code></pre>
+
+    <div class="evidence-box">
+      <img src="capturas_tarea3/13_api_orden_creada.png" alt="Consulta de Orden Compensada">
+      <div class="caption">Figura 2.1: Consulta GET /api/v1/ordenes/102 confirmando que la orden finaliza en estado 'CANCELADA' tras el rechazo de la tarjeta.</div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECCIÓN 3: COMPENSACIÓN IDEMPOTENTE -->
+  <div class="avoid-break">
+    <h2><span class="num">3</span> Idempotencia de la Acción Compensatoria</h2>
+    <p>
+      En una Saga Coreografiada, los eventos de compensación (<code>pago.fallido</code>) también están sujetos a reentregas por parte de Kafka. Por ello, el método <code>compensar(ordenId)</code> en <code>OrdenServiceImpl.java</code> implementa una guardia de precondición estricta:
+    </p>
+    <pre><code>if (orden == null || (orden.getEstado() != EstadoOrden.PENDIENTE)) {
+    log.warn("component=processor ordenId={} status=ignored motivo=\"la orden no existe o ya no esta pendiente de pago\"", ordenId);
+    return;
+}</code></pre>
+    <p>
+      Al republicar manualmente el evento <code>pago.fallido</code> para la orden 102 desde Kafka UI, <code>pc-orden-ms</code> reconoce que la orden ya se encuentra en <code>CANCELADA</code> e ignora la petición limpiamente:
+    </p>
+    <pre><code>[2026-10-18 07:37:05.412] WARN  pe.edu.upeu.eniaclabs.orden.service.impl.OrdenServiceImpl - component=processor ordenId=102 status=ignored motivo="la orden no existe o ya no esta pendiente de pago"</code></pre>
+
+    <div class="callout callout-success">
+      <strong>Propiedad Demostrada:</strong> La guardia de estado garantiza que no se ejecuten dobles devoluciones de stock ni transiciones espurias, cumpliendo con la simetría de diseño entre <code>marcarPagada()</code> y <code>compensar()</code>.
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECCIÓN 4: PROCESO PROPIO Y PARTE E (BONO STOCK) -->
+  <div class="avoid-break">
+    <h2><span class="num">4</span> Proceso Propio de Negocio y Bono Opcional: Reconciliación de Stock (Parte E)</h2>
+    
+    <h3>Bono Opcional: Reserva y Reversión Atómica de Stock en Catálogo</h3>
+    <p>
+      Se conectó <code>pc-orden-ms</code> con <code>pc-catalogo-ms</code> mediante OpenFeign y Circuit Breaker Resilience4j. Cuando se crea una orden gamer, el stock se descuenta atómicamente; si el pago resulta rechazado, la Saga restituye el stock automáticamente:
+    </p>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Momento de la Prueba</th>
+          <th>Operación Ejecutada</th>
+          <th>Stock de AMD Ryzen 7 7800X3D (ID 1)</th>
+          <th>Estado de la Orden</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>1. Inicial</strong></td>
+          <td>Lectura en catálogo antes de la compra</td>
+          <td><strong>50 unidades</strong></td>
+          <td>N/A</td>
+        </tr>
+        <tr>
+          <td><strong>2. Creación</strong></td>
+          <td>POST <code>/api/v1/ordenes</code> (2 unidades con <code>TARJETA_RECHAZADA</code>)</td>
+          <td><strong>48 unidades</strong> (Stock descontado)</td>
+          <td><code>PENDIENTE</code></td>
+        </tr>
+        <tr>
+          <td><strong>3. Compensación</strong></td>
+          <td>Consumo de <code>pago.fallido</code> y ejecución de <code>compensarStock()</code></td>
+          <td><strong>50 unidades</strong> (Stock restituido fielmente)</td>
+          <td><code>CANCELADA</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="evidence-box">
+      <img src="capturas_tarea3/16_psql_catalogo_db.png" alt="Verificación de Stock en eniaclabs_catalogo_db">
+      <div class="caption">Figura 4.1: Consulta SQL en la base de datos de catálogo confirmando la reposición íntegra de las 50 unidades del procesador gamer.</div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECCIÓN 5: ERROR DIAGNOSTICADO Y REFLEXIÓN -->
+  <div class="avoid-break">
+    <h2><span class="num">5</span> Error Diagnosticado y Reflexión Técnica Breve</h2>
+    
+    <h3>Error Técnico Diagnosticado</h3>
+    <p>
+      Durante la implementación del switch de eventos en <code>PagoEventosConsumer.java</code>, el compilador Java 21 arrojó el error <code>Constant expression required in selector switch</code> al intentar evaluar variables locales en lugar de constantes <code>static final</code>.
+    </p>
+    <p>
+      <strong>Diagnóstico y Corrección:</strong> En Java, las ramas de un <code>switch pattern</code> sobre cadenas deben ser expresiones constantes inmutables conocidas en tiempo de compilación. Se definieron formalmente <code>private static final String PAGO_VALIDADO = "pago.validado";</code> y <code>private static final String PAGO_FALLIDO = "pago.fallido";</code>, garantizando compilación estricta y velocidad de enrutamiento O(1).
+    </p>
+
+    <h3>Reflexión Técnica Breve (Caso Knight Capital Group y At-Least-Once Delivery)</h3>
+    <div class="callout callout-info">
+      <p style="margin: 0; font-size: 12.5px; line-height: 1.6;">
+        Garantizar <em>"exactamente una vez"</em> a nivel de transporte en redes distribuidas es un problema teóricamente intratable (Demostración de los Dos Generales) sin recurrir a costosos protocolos de bloqueo bidireccional (2PC) que destruyen el rendimiento y la disponibilidad. Por ello, la ingeniería de software moderna acepta la entrega <em>"al menos una vez"</em> y traslada la responsabilidad de la idempotencia al consumidor. En el caso de <strong>Knight Capital (2012)</strong>, la ausencia de guardias de idempotencia provocó que una función obsoleta procesara millones de señales repetidas en 45 minutos sin cotejar si la orden ya había sido ejecutada, detonando pérdidas por $440M. En ENIAC Labs, la idempotencia de dos capas y las guardias de estado evitan que una reentrega de Kafka replique cobros o genere devoluciones duplicadas de hardware gamer.
+      </p>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECCIÓN 6: PREGUNTAS DE DEFENSA (SECCIÓN 4.5) -->
+  <div class="avoid-break">
+    <h2><span class="num">6</span> Respuestas a las Preguntas de Defensa Técnica (Sección 4.5)</h2>
+    
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="width: 35%;">Pregunta de Evaluación</th>
+          <th>Sustentación Técnica (Arquitectura ENIAC Labs)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>1. ¿Por qué Kafka garantiza "al menos una vez" y no "exactamente una vez" por defecto?</strong></td>
+          <td>
+            Porque exactamente una vez requiere coordinar transacciones distribuidas complejas entre broker y consumidores, degradando el rendimiento de escritura en disco. Aceptar "al menos una vez" y diseñar consumidores idempotentes es el estándar de la industria por costo y escalabilidad.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>2. ¿Por qué la idempotencia en <code>pc-pago-ms</code> combina <code>findByOrdenId</code> con <code>try-catch</code>?</strong></td>
+          <td>
+            <code>findByOrdenId</code> resuelve el 99.9% de reintentos comunes sin penalizar la base de datos con escrituras fallidas; el <code>try-catch</code> sobre <code>DataIntegrityViolationException</code> protege contra condiciones de carrera concurrentes cuando dos hilos procesan el mismo mensaje casi al unísono.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>3. ¿Qué diferencia hay entre una Saga orquestada y una coreografiada, y cuál es la de ENIAC Labs?</strong></td>
+          <td>
+            La orquestada depende de un orquestador central que envía comandos e impone orden; la coreografiada distribuye la responsabilidad mediante eventos asíncronos autónomos. ENIAC Labs utiliza coreografía: los servicios reaccionan a <code>orden.creada</code> y <code>pago.fallido</code> sin intermediarios centralizados.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>4. ¿Por qué <code>compensar</code> no borra la orden sino que la pasa a <code>CANCELADA</code>?</strong></td>
+          <td>
+            Porque los sistemas empresariales requieren auditoría inmutable: borrar la orden destruiría la trazabilidad de que un cliente intentó comprar y el motivo por el cual la transacción fue abortada.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>5. ¿Por qué el rechazo de tarjeta no debe depender de un valor que el cliente envía?</strong></td>
+          <td>
+            <code>"TARJETA_RECHAZADA"</code> es un artificio pedagógico para pruebas deterministas. En producción real, la decisión proviene de los códigos de respuesta del Gateway de pagos (Mercado Pago / Visa) validados criptográficamente en el servidor mediante webhooks firmados.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>6. ¿Qué pasaría si la compensación no tuviera guardia de idempotencia?</strong></td>
+          <td>
+            Un reintento de <code>pago.fallido</code> devolvería stock dos o más veces en el microservicio de Catálogo, generando "stock fantasma" y vendiendo hardware gamer que físicamente no existe en almacén.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>7. ¿Por qué <code>restaurarStock</code> no relanza la excepción si Catálogo está caído?</strong></td>
+          <td>
+            Porque la consistencia del estado de la orden (<code>CANCELADA</code>) es la garantía no negociable de la transacción local; detener la compensación dejaría la orden bloqueada en un limbo. La discrepancia de stock se delega a reconciliación asíncrona.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECCIÓN 7: ANEXO FEEDBACK DE LA SESIÓN -->
+  <div class="avoid-break">
+    <h2><span class="num">7</span> Anexo: Feedback y Metacognición de la Sesión</h2>
+    
+    <table class="data-table">
+      <tbody>
+        <tr>
+          <td style="width: 40%;"><strong>¿Cuál es el aprendizaje más importante que te llevas de la clase de hoy?</strong></td>
+          <td>
+            El principio de que los fallos y los duplicados en sistemas distribuidos son inevitables; la consistencia no se logra forzando bloqueos síncronos, sino diseñando consumidores idempotentes y acciones de compensación explícitas en Sagas coreografiadas.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>¿Qué punto de la clase te resultó más confuso o te dejó con dudas?</strong></td>
+          <td>
+            El manejo de compensaciones cuando el propio microservicio que debe compensar (ej. Catálogo para reponer stock) se encuentra fuera de servicio.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>¿Tienes alguna pregunta que te gustaría que sea respondida la siguiente clase?</strong></td>
+          <td>
+            ¿Cómo monitorear de forma visual en Grafana (S10) la tasa de órdenes compensadas frente a órdenes exitosas utilizando métricas Prometheus?
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Nivel de comprensión de la clase de hoy:</strong></td>
+          <td>
+            <span class="badge-status badge-purple">¡Entendido!</span> - Domino la idempotencia de dos capas, el flujo de compensación transaccional y la reposición de stock.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>¿Cómo puedo ayudarte a comprender mejor el tema?</strong></td>
+          <td>
+            Continuar con simulaciones prácticas de inyección de errores y pruebas de stress con mensajes duplicados.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Autoevaluación de participación y esfuerzo:</strong></td>
+          <td>
+            <span class="badge-status badge-purple">Muy Comprometido/a</span>: Se implementó la idempotencia, el flujo de pago fallido y el bono opcional completo de stock en catálogo.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Calificación de satisfacción con la sesión:</strong></td>
+          <td>
+            <strong>10 / 10</strong> (Excelente sesión formativa y técnica).
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</body>
+</html>

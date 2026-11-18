@@ -1,0 +1,545 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1020" width="1600" height="1020">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@500;600;700&amp;display=swap');
+      * { font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif; }
+      .mono { font-family: 'JetBrains Mono', monospace; }
+      .title-main { font-size: 28px; font-weight: 900; fill: #0f172a; letter-spacing: -0.5px; }
+      .badge-title { font-size: 13px; font-weight: 800; fill: #ffffff; text-transform: uppercase; }
+      .port-badge { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 800; }
+      .service-desc { font-size: 11px; fill: #475569; font-weight: 500; line-height: 1.35; }
+      .db-text { font-size: 12px; font-weight: 800; fill: #1e293b; }
+      .db-sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; fill: #64748b; font-weight: 600; }
+      .tech-title { font-size: 12px; font-weight: 800; fill: #0f172a; text-transform: uppercase; letter-spacing: 0.5px; }
+      .tech-item { font-size: 11px; font-weight: 700; fill: #334155; }
+    </style>
+    
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.08" />
+    </filter>
+    <filter id="shadow-sm" x="-4%" y="-4%" width="108%" height="110%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0f172a" flood-opacity="0.06" />
+    </filter>
+
+    <!-- Markers for arrows -->
+    <marker id="arrow-sync" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#1e293b" />
+    </marker>
+    <marker id="arrow-kafka" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#ea580c" />
+    </marker>
+    <marker id="arrow-disc" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#0284c7" />
+    </marker>
+    <marker id="arrow-obs" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#dc2626" />
+    </marker>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="100%" height="100%" fill="#f8fafc" />
+
+  <!-- ================= HEADER ================= -->
+  <g transform="translate(50, 42)">
+    <text x="0" y="0" class="title-main">2.1 DIAGRAMA DE ARQUITECTURA – ENIAC LABS (E-COMMERCE &amp; PC BUILDER)</text>
+    <text x="0" y="24" font-size="13px" font-weight="700" fill="#64748b">UNIDAD 2: ARQUITECTURA DISTRIBUIDA DE MICROSERVICIOS, EVENT-DRIVEN (KAFKA), IAM (KEYCLOAK) &amp; RESILIENCIA</text>
+  </g>
+
+  <!-- ================= 1. CLIENTES (IZQUIERDA) ================= -->
+  <g transform="translate(50, 100)" filter="url(#shadow)">
+    <rect width="150" height="320" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.8" stroke-dasharray="6,4" />
+    <rect width="150" height="34" rx="14" fill="#f1f5f9" />
+    <rect y="20" width="150" height="14" fill="#f1f5f9" />
+    <text x="75" y="22" text-anchor="middle" font-size="12px" font-weight="800" fill="#334155" letter-spacing="0.5px">CLIENTES</text>
+
+    <!-- Web Client -->
+    <g transform="translate(18, 48)">
+      <rect width="114" height="72" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5" />
+      <text x="57" y="26" text-anchor="middle" font-size="18px">🖥️</text>
+      <text x="57" y="46" text-anchor="middle" font-size="11px" font-weight="800" fill="#1e3a8a">Web Angular</text>
+      <text x="57" y="62" text-anchor="middle" class="port-badge" fill="#2563eb">:4200</text>
+    </g>
+
+    <!-- Mobile Client -->
+    <g transform="translate(18, 134)">
+      <rect width="114" height="72" rx="10" fill="#f0fdf4" stroke="#22c55e" stroke-width="1.5" />
+      <text x="57" y="26" text-anchor="middle" font-size="18px">📱</text>
+      <text x="57" y="46" text-anchor="middle" font-size="11px" font-weight="800" fill="#14532d">Mando Móvil</text>
+      <text x="57" y="62" text-anchor="middle" class="port-badge" fill="#16a34a">PWA / Cloudflare</text>
+    </g>
+
+    <!-- API Client -->
+    <g transform="translate(18, 220)">
+      <rect width="114" height="72" rx="10" fill="#faf5ff" stroke="#a855f7" stroke-width="1.5" />
+      <text x="57" y="26" text-anchor="middle" font-size="18px">⚡</text>
+      <text x="57" y="46" text-anchor="middle" font-size="11px" font-weight="800" fill="#581c87">API Client</text>
+      <text x="57" y="62" text-anchor="middle" class="port-badge" fill="#9333ea">Postman / cURL</text>
+    </g>
+  </g>
+
+  <!-- ================= 2. CAPA SUPERIOR: GATEWAY, EUREKA, CONFIG & KEYCLOAK ================= -->
+  <!-- API GATEWAY -->
+  <g transform="translate(235, 100)" filter="url(#shadow)">
+    <rect width="250" height="110" rx="14" fill="#ffffff" stroke="#16a34a" stroke-width="2" />
+    <rect width="250" height="34" rx="14" fill="#16a34a" />
+    <rect y="20" width="250" height="14" fill="#16a34a" />
+    <text x="25" y="22" font-size="16px">🛡️</text>
+    <text x="50" y="22" class="badge-title">API GATEWAY</text>
+    <text x="235" y="22" text-anchor="end" class="port-badge" fill="#bbf7d0">:18080</text>
+    
+    <text x="20" y="55" font-size="12px" font-weight="800" fill="#0f172a">Spring Cloud Gateway WebFlux</text>
+    <text x="20" y="73" class="service-desc">Enrutamiento reactivo dynamic lb://</text>
+    <text x="20" y="88" class="service-desc">JWT Relay · Filtros globales · Rate Limit</text>
+    <text x="20" y="101" font-size="10px" font-weight="700" fill="#16a34a">🟢 Único Punto Perimetral Seguro</text>
+  </g>
+
+  <!-- EUREKA SERVER -->
+  <g transform="translate(515, 100)" filter="url(#shadow)">
+    <rect width="240" height="110" rx="14" fill="#ffffff" stroke="#0284c7" stroke-width="2" />
+    <rect width="240" height="34" rx="14" fill="#0284c7" />
+    <rect y="20" width="240" height="14" fill="#0284c7" />
+    <text x="25" y="22" font-size="16px">☁️</text>
+    <text x="50" y="22" class="badge-title">EUREKA SERVER</text>
+    <text x="225" y="22" text-anchor="end" class="port-badge" fill="#bae6fd">:18761</text>
+    
+    <text x="20" y="55" font-size="12px" font-weight="800" fill="#0f172a">Service Discovery &amp; Registry</text>
+    <text x="20" y="73" class="service-desc">Directorio de microservicios distribuidos</text>
+    <text x="20" y="88" class="service-desc">Heartbeats continuos · Balanceo Ribbon/LB</text>
+    <text x="20" y="101" font-size="10px" font-weight="700" fill="#0284c7">🟢 Auto-registro dinámico de instancias</text>
+  </g>
+
+  <!-- CONFIG SERVER -->
+  <g transform="translate(785, 100)" filter="url(#shadow)">
+    <rect width="240" height="110" rx="14" fill="#ffffff" stroke="#d97706" stroke-width="2" />
+    <rect width="240" height="34" rx="14" fill="#d97706" />
+    <rect y="20" width="240" height="14" fill="#d97706" />
+    <text x="25" y="22" font-size="16px">⚙️</text>
+    <text x="50" y="22" class="badge-title">CONFIG SERVER</text>
+    <text x="225" y="22" text-anchor="end" class="port-badge" fill="#fef3c7">:18888</text>
+    
+    <text x="20" y="55" font-size="12px" font-weight="800" fill="#0f172a">Spring Cloud Config Native</text>
+    <text x="20" y="73" class="service-desc">Perfiles centralizados (prod / dev / test)</text>
+    <text x="20" y="88" class="service-desc">Cero secretos en código · Refresh dinámico</text>
+    <text x="20" y="101" font-size="10px" font-weight="700" fill="#d97706">🟢 Configuración externalizada unificada</text>
+  </g>
+
+  <!-- KEYCLOAK IAM -->
+  <g transform="translate(1055, 100)" filter="url(#shadow)">
+    <rect width="240" height="110" rx="14" fill="#ffffff" stroke="#7c3aed" stroke-width="2" />
+    <rect width="240" height="34" rx="14" fill="#7c3aed" />
+    <rect y="20" width="240" height="14" fill="#7c3aed" />
+    <text x="25" y="22" font-size="16px">🔒</text>
+    <text x="50" y="22" class="badge-title">KEYCLOAK IAM</text>
+    <text x="225" y="22" text-anchor="end" class="port-badge" fill="#ede9fe">:18180</text>
+    
+    <text x="20" y="55" font-size="12px" font-weight="800" fill="#0f172a">Identity &amp; Access Management</text>
+    <text x="20" y="73" class="service-desc">OpenID Connect · OAuth2 · JWT RS256</text>
+    <text x="20" y="88" class="service-desc">Roles RBAC: ADMIN / CLIENTE</text>
+    <text x="20" y="101" font-size="10px" font-weight="700" fill="#7c3aed">🟢 Realm eniaclabs con Admin Console</text>
+  </g>
+
+  <!-- ================= 3. BUS HORIZONTAL DE ENRUTAMIENTO ================= -->
+  <!-- Conexión Clientes -> Gateway -->
+  <line x1="200" y1="230" x2="235" y2="155" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow-sync)" />
+  
+  <!-- Interconexión Gateway <-> Eureka <-> Config <-> Keycloak -->
+  <line x1="485" y1="155" x2="515" y2="155" stroke="#0284c7" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrow-disc)" marker-start="url(#arrow-disc)" />
+  <line x1="755" y1="155" x2="785" y2="155" stroke="#d97706" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrow-disc)" marker-start="url(#arrow-disc)" />
+  <line x1="1025" y1="155" x2="1055" y2="155" stroke="#7c3aed" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrow-disc)" marker-start="url(#arrow-disc)" />
+
+  <!-- Troncal principal de bajada desde Gateway hacia los 5 Microservicios -->
+  <line x1="360" y1="210" x2="360" y2="250" stroke="#1e293b" stroke-width="2.5" />
+  <line x1="160" y1="250" x2="1240" y2="250" stroke="#1e293b" stroke-width="2.5" />
+
+  <!-- Bajadas hacia cada microservicio -->
+  <line x1="160" y1="250" x2="160" y2="280" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow-sync)" />
+  <line x1="430" y1="250" x2="430" y2="280" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow-sync)" />
+  <line x1="700" y1="250" x2="700" y2="280" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow-sync)" />
+  <line x1="970" y1="250" x2="970" y2="280" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow-sync)" />
+  <line x1="1240" y1="250" x2="1240" y2="280" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow-sync)" />
+
+  <!-- ================= 4. LOS 5 MICROSERVICIOS DE DOMINIO ================= -->
+  
+  <!-- 4.1 AUTH MS (8087) -->
+  <g transform="translate(50, 280)" filter="url(#shadow)">
+    <rect width="220" height="230" rx="14" fill="#ffffff" stroke="#7c3aed" stroke-width="2" />
+    <rect width="220" height="34" rx="14" fill="#7c3aed" />
+    <rect y="20" width="220" height="14" fill="#7c3aed" />
+    <text x="20" y="22" font-size="16px">👤</text>
+    <text x="45" y="22" class="badge-title">AUTH MS</text>
+    <text x="205" y="22" text-anchor="end" class="port-badge" fill="#ede9fe">:8087</text>
+    
+    <g transform="translate(15, 45)">
+      <rect width="85" height="18" rx="5" fill="#f5f3ff" border="1" stroke="#ddd6fe" />
+      <text x="42" y="13" text-anchor="middle" font-size="9.5px" font-weight="800" fill="#6d28d9">Spring Boot 3.4</text>
+    </g>
+    <text x="15" y="80" font-size="12px" font-weight="800" fill="#0f172a">Seguridad &amp; Tokens JWT</text>
+    <text x="15" y="98" class="service-desc">• Emisión y validación RS256</text>
+    <text x="15" y="114" class="service-desc">• Roles ADMIN y CLIENTE</text>
+    <text x="15" y="130" class="service-desc">• Sincronización con Keycloak</text>
+    <text x="15" y="146" class="service-desc">• Bcrypt hash de contraseñas</text>
+    <text x="15" y="162" class="service-desc">• OpenAPI / Swagger UI :8087</text>
+    <rect x="15" y="180" width="190" height="36" rx="8" fill="#f8fafc" stroke="#e2e8f0" />
+    <text x="25" y="196" font-size="9px" font-weight="700" fill="#475569">RESPONSABLE TÉCNICO:</text>
+    <text x="25" y="209" font-size="10px" font-weight="800" fill="#7c3aed">Módulo Transversal de Seguridad</text>
+  </g>
+
+  <!-- 4.2 CATALOGO MS (8081) -->
+  <g transform="translate(320, 280)" filter="url(#shadow)">
+    <rect width="220" height="230" rx="14" fill="#ffffff" stroke="#16a34a" stroke-width="2" />
+    <rect width="220" height="34" rx="14" fill="#16a34a" />
+    <rect y="20" width="220" height="14" fill="#16a34a" />
+    <text x="20" y="22" font-size="16px">📦</text>
+    <text x="45" y="22" class="badge-title">CATÁLOGO MS</text>
+    <text x="205" y="22" text-anchor="end" class="port-badge" fill="#bbf7d0">:8081</text>
+    
+    <g transform="translate(15, 45)">
+      <rect width="85" height="18" rx="5" fill="#f0fdf4" border="1" stroke="#bbf7d0" />
+      <text x="42" y="13" text-anchor="middle" font-size="9.5px" font-weight="800" fill="#15803d">Spring Boot 3.4</text>
+    </g>
+    <text x="15" y="80" font-size="12px" font-weight="800" fill="#0f172a">Inventario Gamer &amp; Stock</text>
+    <text x="15" y="98" class="service-desc">• Familias y categorías de PC</text>
+    <text x="15" y="114" class="service-desc">• Control de stock en tiempo real</text>
+    <text x="15" y="130" class="service-desc">• Filtro por compatibilidad/SKU</text>
+    <text x="15" y="146" class="service-desc">• Optimización con caché Redis</text>
+    <text x="15" y="162" class="service-desc">• OpenAPI / Swagger UI :8081</text>
+    <rect x="15" y="180" width="190" height="36" rx="8" fill="#f8fafc" stroke="#e2e8f0" />
+    <text x="25" y="196" font-size="9px" font-weight="700" fill="#475569">RESPONSABLE TÉCNICO:</text>
+    <text x="25" y="209" font-size="10px" font-weight="800" fill="#16a34a">Eliceo Parillo (Dominio Catálogo)</text>
+  </g>
+
+  <!-- 4.3 COTIZACION MS (8089) -->
+  <g transform="translate(590, 280)" filter="url(#shadow)">
+    <rect width="220" height="230" rx="14" fill="#ffffff" stroke="#0284c7" stroke-width="2" />
+    <rect width="220" height="34" rx="14" fill="#0284c7" />
+    <rect y="20" width="220" height="14" fill="#0284c7" />
+    <text x="20" y="22" font-size="16px">⚙️</text>
+    <text x="45" y="22" class="badge-title">COTIZACIÓN MS</text>
+    <text x="205" y="22" text-anchor="end" class="port-badge" fill="#bae6fd">:8089</text>
+    
+    <g transform="translate(15, 45)">
+      <rect width="85" height="18" rx="5" fill="#f0f9ff" border="1" stroke="#bae6fd" />
+      <text x="42" y="13" text-anchor="middle" font-size="9.5px" font-weight="800" fill="#0369a1">Spring Boot 3.4</text>
+    </g>
+    <text x="15" y="80" font-size="12px" font-weight="800" fill="#0f172a">Motor PC Builder Gamer</text>
+    <text x="15" y="98" class="service-desc">• Validación física en 28 ms</text>
+    <text x="15" y="114" class="service-desc">• Socket CPU/Placa (AM5/LGA)</text>
+    <text x="15" y="130" class="service-desc">• Cálculo Watts vs Fuente PSU</text>
+    <text x="15" y="146" class="service-desc">• Proformas con 7 días vigencia</text>
+    <text x="15" y="162" class="service-desc">• OpenAPI / Swagger UI :8089</text>
+    <rect x="15" y="180" width="190" height="36" rx="8" fill="#f8fafc" stroke="#e2e8f0" />
+    <text x="25" y="196" font-size="9px" font-weight="700" fill="#475569">RESPONSABLE TÉCNICO:</text>
+    <text x="25" y="209" font-size="10px" font-weight="800" fill="#0284c7">Laura Vargas (Motor Cotizador)</text>
+  </g>
+
+  <!-- 4.4 ORDEN MS (8083) - TRANSACCIONAL -->
+  <g transform="translate(860, 280)" filter="url(#shadow)">
+    <rect width="220" height="230" rx="14" fill="#ffffff" stroke="#2563eb" stroke-width="2.5" />
+    <rect width="220" height="34" rx="14" fill="#2563eb" />
+    <rect y="20" width="220" height="14" fill="#2563eb" />
+    <text x="20" y="22" font-size="16px">📋</text>
+    <text x="45" y="22" class="badge-title">ORDEN MS</text>
+    <text x="205" y="22" text-anchor="end" class="port-badge" fill="#dbeafe">:8083</text>
+    
+    <g transform="translate(15, 45)">
+      <rect width="115" height="18" rx="5" fill="#eff6ff" border="1" stroke="#bfdbfe" />
+      <text x="57" y="13" text-anchor="middle" font-size="9.5px" font-weight="800" fill="#1d4ed8">ÚNICO TRANSACCIONAL</text>
+    </g>
+    <text x="15" y="80" font-size="12px" font-weight="800" fill="#0f172a">Órdenes, IGV 18% &amp; Facturación</text>
+    <text x="15" y="98" class="service-desc">• Integridad ACID garantizada</text>
+    <text x="15" y="114" class="service-desc">• Cabecera–Detalle correlativo</text>
+    <text x="15" y="130" class="service-desc">• Cálculo tributario legal IGV (18%)</text>
+    <text x="15" y="146" class="service-desc">• Emite evento orden.creada tras commit</text>
+    <text x="15" y="162" class="service-desc">• OpenAPI / Swagger UI :8083</text>
+    <rect x="15" y="180" width="190" height="36" rx="8" fill="#f8fafc" stroke="#e2e8f0" />
+    <text x="25" y="196" font-size="9px" font-weight="700" fill="#475569">RESPONSABLE TÉCNICO:</text>
+    <text x="25" y="209" font-size="10px" font-weight="800" fill="#2563eb">Eliceo Parillo (Dominio Órdenes)</text>
+  </g>
+
+  <!-- 4.5 PAGO MS (8085) - RESILIENCIA & FINTECH -->
+  <g transform="translate(1130, 280)" filter="url(#shadow)">
+    <rect width="220" height="230" rx="14" fill="#ffffff" stroke="#ea580c" stroke-width="2" />
+    <rect width="220" height="34" rx="14" fill="#ea580c" />
+    <rect y="20" width="220" height="14" fill="#ea580c" />
+    <text x="20" y="22" font-size="16px">💳</text>
+    <text x="45" y="22" class="badge-title">PAGO MS</text>
+    <text x="205" y="22" text-anchor="end" class="port-badge" fill="#ffedd5">:8085</text>
+    
+    <g transform="translate(15, 45)">
+      <rect width="90" height="18" rx="5" fill="#fff7ed" border="1" stroke="#fed7aa" />
+      <text x="45" y="13" text-anchor="middle" font-size="9.5px" font-weight="800" fill="#c2410c">Pasarela Fintech</text>
+    </g>
+    <text x="15" y="80" font-size="12px" font-weight="800" fill="#0f172a">Mercado Pago &amp; Circuit Breaker</text>
+    <text x="15" y="98" class="service-desc">• SDK Checkout Pro &amp; Sandbox Real</text>
+    <text x="15" y="114" class="service-desc">• Resilience4j: Circuit Breaker</text>
+    <text x="15" y="130" class="service-desc">• Webhook IPN transaccional atómico</text>
+    <text x="15" y="146" class="service-desc">• Emite pago.confirmado a Kafka</text>
+    <text x="15" y="162" class="service-desc">• OpenAPI / Swagger UI :8085</text>
+    <rect x="15" y="180" width="190" height="36" rx="8" fill="#f8fafc" stroke="#e2e8f0" />
+    <text x="25" y="196" font-size="9px" font-weight="700" fill="#475569">RESPONSABLE TÉCNICO:</text>
+    <text x="25" y="209" font-size="10px" font-weight="800" fill="#ea580c">Laura Vargas (Pasarela Fintech)</text>
+  </g>
+
+  <!-- ================= 5. BUS DE EVENTOS ASÍNCRONOS: APACHE KAFKA ================= -->
+  <g transform="translate(50, 530)" filter="url(#shadow)">
+    <rect width="1300" height="60" rx="14" fill="#18181b" stroke="#ea580c" stroke-width="2.5" />
+    <text x="25" y="36" font-size="20px">⚡</text>
+    <text x="55" y="36" font-size="15px" font-weight="900" fill="#ffffff" letter-spacing="1px">APACHE KAFKA BROKER &amp; EVENT BUS</text>
+    <text x="390" y="36" class="port-badge" fill="#fb923c">:9092 (Broker) / :18085 (Kafka UI)</text>
+
+    <!-- Tópicos -->
+    <g transform="translate(680, 14)">
+      <rect width="180" height="32" rx="8" fill="#27272a" stroke="#f97316" stroke-width="1.2" />
+      <text x="90" y="20" text-anchor="middle" font-size="11px" font-weight="800" fill="#fdba74">orden.creada.topic</text>
+    </g>
+    <g transform="translate(875, 14)">
+      <rect width="190" height="32" rx="8" fill="#27272a" stroke="#22c55e" stroke-width="1.2" />
+      <text x="95" y="20" text-anchor="middle" font-size="11px" font-weight="800" fill="#86efac">pago.confirmado.topic</text>
+    </g>
+    <g transform="translate(1080, 14)">
+      <rect width="195" height="32" rx="8" fill="#27272a" stroke="#ef4444" stroke-width="1.2" />
+      <text x="97" y="20" text-anchor="middle" font-size="11px" font-weight="800" fill="#fca5a5">pago.rechazado.topic</text>
+    </g>
+  </g>
+
+  <!-- Flechas Kafka hacia Orden y Pago -->
+  <line x1="970" y1="510" x2="970" y2="530" stroke="#ea580c" stroke-width="2.5" marker-end="url(#arrow-kafka)" />
+  <line x1="1240" y1="510" x2="1240" y2="530" stroke="#ea580c" stroke-width="2.5" marker-end="url(#arrow-kafka)" />
+  <!-- Retorno asíncrono hacia Orden -->
+  <path d="M 1200 590 L 1200 605 L 930 605 L 930 515" fill="none" stroke="#22c55e" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrow-sync)" />
+  <rect x="1000" y="596" width="130" height="18" rx="4" fill="#052e16" stroke="#22c55e" />
+  <text x="1065" y="609" text-anchor="middle" font-size="9px" font-weight="800" fill="#86efac">Orden -&gt; PAGADA</text>
+
+  <!-- ================= 6. BASES DE DATOS AISLADAS (POSTGRESQL 16) ================= -->
+  
+  <!-- DB AUTH -->
+  <g transform="translate(75, 625)" filter="url(#shadow-sm)">
+    <path d="M 0 15 C 0 5, 170 5, 170 15 L 170 85 C 170 95, 0 95, 0 85 Z" fill="#ffffff" stroke="#7c3aed" stroke-width="2" />
+    <ellipse cx="85" cy="15" rx="85" ry="12" fill="#ede9fe" stroke="#7c3aed" stroke-width="2" />
+    <text x="85" y="19" text-anchor="middle" font-size="14px">🐘</text>
+    <text x="85" y="48" text-anchor="middle" class="db-text">DB AUTH</text>
+    <text x="85" y="64" text-anchor="middle" class="db-sub">PostgreSQL 16</text>
+    <text x="85" y="78" text-anchor="middle" class="port-badge" fill="#6d28d9">:5435</text>
+  </g>
+  <line x1="160" y1="510" x2="160" y2="625" stroke="#7c3aed" stroke-width="1.8" marker-end="url(#arrow-sync)" />
+
+  <!-- DB CATALOGO -->
+  <g transform="translate(345, 625)" filter="url(#shadow-sm)">
+    <path d="M 0 15 C 0 5, 170 5, 170 15 L 170 85 C 170 95, 0 95, 0 85 Z" fill="#ffffff" stroke="#16a34a" stroke-width="2" />
+    <ellipse cx="85" cy="15" rx="85" ry="12" fill="#dcfce7" stroke="#16a34a" stroke-width="2" />
+    <text x="85" y="19" text-anchor="middle" font-size="14px">🐘</text>
+    <text x="85" y="48" text-anchor="middle" class="db-text">DB CATÁLOGO</text>
+    <text x="85" y="64" text-anchor="middle" class="db-sub">PostgreSQL 16</text>
+    <text x="85" y="78" text-anchor="middle" class="port-badge" fill="#15803d">:15432</text>
+  </g>
+  <line x1="430" y1="510" x2="430" y2="625" stroke="#16a34a" stroke-width="1.8" marker-end="url(#arrow-sync)" />
+
+  <!-- DB COTIZACION -->
+  <g transform="translate(615, 625)" filter="url(#shadow-sm)">
+    <path d="M 0 15 C 0 5, 170 5, 170 15 L 170 85 C 170 95, 0 95, 0 85 Z" fill="#ffffff" stroke="#0284c7" stroke-width="2" />
+    <ellipse cx="85" cy="15" rx="85" ry="12" fill="#e0f2fe" stroke="#0284c7" stroke-width="2" />
+    <text x="85" y="19" text-anchor="middle" font-size="14px">🐘</text>
+    <text x="85" y="48" text-anchor="middle" class="db-text">DB COTIZACIÓN</text>
+    <text x="85" y="64" text-anchor="middle" class="db-sub">PostgreSQL 16</text>
+    <text x="85" y="78" text-anchor="middle" class="port-badge" fill="#0369a1">:5436</text>
+  </g>
+  <line x1="700" y1="510" x2="700" y2="625" stroke="#0284c7" stroke-width="1.8" marker-end="url(#arrow-sync)" />
+
+  <!-- DB ORDEN -->
+  <g transform="translate(885, 625)" filter="url(#shadow-sm)">
+    <path d="M 0 15 C 0 5, 170 5, 170 15 L 170 85 C 170 95, 0 95, 0 85 Z" fill="#ffffff" stroke="#2563eb" stroke-width="2" />
+    <ellipse cx="85" cy="15" rx="85" ry="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2" />
+    <text x="85" y="19" text-anchor="middle" font-size="14px">🐘</text>
+    <text x="85" y="48" text-anchor="middle" class="db-text">DB ORDEN</text>
+    <text x="85" y="64" text-anchor="middle" class="db-sub">PostgreSQL 16</text>
+    <text x="85" y="78" text-anchor="middle" class="port-badge" fill="#1d4ed8">:5433</text>
+  </g>
+  <line x1="970" y1="590" x2="970" y2="625" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arrow-sync)" />
+
+  <!-- DB PAGO -->
+  <g transform="translate(1155, 625)" filter="url(#shadow-sm)">
+    <path d="M 0 15 C 0 5, 170 5, 170 15 L 170 85 C 170 95, 0 95, 0 85 Z" fill="#ffffff" stroke="#ea580c" stroke-width="2" />
+    <ellipse cx="85" cy="15" rx="85" ry="12" fill="#ffedd5" stroke="#ea580c" stroke-width="2" />
+    <text x="85" y="19" text-anchor="middle" font-size="14px">🐘</text>
+    <text x="85" y="48" text-anchor="middle" class="db-text">DB PAGO</text>
+    <text x="85" y="64" text-anchor="middle" class="db-sub">PostgreSQL 16</text>
+    <text x="85" y="78" text-anchor="middle" class="port-badge" fill="#c2410c">:5434</text>
+  </g>
+  <line x1="1240" y1="590" x2="1240" y2="625" stroke="#ea580c" stroke-width="1.8" marker-end="url(#arrow-sync)" />
+
+  <!-- ================= 7. OBSERVABILIDAD & TELEMETRÍA (COLUMNA DERECHA) ================= -->
+  <g transform="translate(1380, 100)" filter="url(#shadow)">
+    <rect width="170" height="615" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="2" />
+    <rect width="170" height="34" rx="14" fill="#0f172a" />
+    <rect y="20" width="170" height="14" fill="#0f172a" />
+    <text x="85" y="22" text-anchor="middle" class="badge-title">OBSERVABILIDAD</text>
+
+    <!-- Prometheus -->
+    <g transform="translate(15, 50)">
+      <rect width="140" height="110" rx="10" fill="#fff1f2" stroke="#e11d48" stroke-width="1.5" />
+      <text x="70" y="28" text-anchor="middle" font-size="22px">🔥</text>
+      <text x="70" y="48" text-anchor="middle" font-size="12px" font-weight="800" fill="#9f1239">Prometheus</text>
+      <text x="70" y="64" text-anchor="middle" class="port-badge" fill="#e11d48">:9090</text>
+      <text x="70" y="82" text-anchor="middle" font-size="9px" fill="#475569">Métricas JVM</text>
+      <text x="70" y="96" text-anchor="middle" font-size="9px" fill="#475569">Micrometer / Actuator</text>
+    </g>
+
+    <!-- Grafana -->
+    <g transform="translate(15, 175)">
+      <rect width="140" height="110" rx="10" fill="#fff7ed" stroke="#ea580c" stroke-width="1.5" />
+      <text x="70" y="28" text-anchor="middle" font-size="22px">📊</text>
+      <text x="70" y="48" text-anchor="middle" font-size="12px" font-weight="800" fill="#9a3412">Grafana</text>
+      <text x="70" y="64" text-anchor="middle" class="port-badge" fill="#ea580c">:3000</text>
+      <text x="70" y="82" text-anchor="middle" font-size="9px" fill="#475569">Dashboards Vivos</text>
+      <text x="70" y="96" text-anchor="middle" font-size="9px" fill="#475569">Alertas en tiempo real</text>
+    </g>
+
+    <!-- Loki & Promtail -->
+    <g transform="translate(15, 300)">
+      <rect width="140" height="110" rx="10" fill="#f8fafc" stroke="#64748b" stroke-width="1.5" />
+      <text x="70" y="28" text-anchor="middle" font-size="22px">📑</text>
+      <text x="70" y="48" text-anchor="middle" font-size="12px" font-weight="800" fill="#334155">Loki &amp; Promtail</text>
+      <text x="70" y="64" text-anchor="middle" class="port-badge" fill="#475569">:3100</text>
+      <text x="70" y="82" text-anchor="middle" font-size="9px" fill="#475569">Logs distribuidos</text>
+      <text x="70" y="96" text-anchor="middle" font-size="9px" fill="#475569">Agente centralizado</text>
+    </g>
+
+    <!-- MkDocs Architecture -->
+    <g transform="translate(15, 425)">
+      <rect width="140" height="100" rx="10" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5" />
+      <text x="70" y="26" text-anchor="middle" font-size="20px">📖</text>
+      <text x="70" y="44" text-anchor="middle" font-size="12px" font-weight="800" fill="#14532d">MkDocs C4</text>
+      <text x="70" y="60" text-anchor="middle" class="port-badge" fill="#16a34a">:8000</text>
+      <text x="70" y="76" text-anchor="middle" font-size="9px" fill="#475569">Docs as Code</text>
+      <text x="70" y="90" text-anchor="middle" font-size="9px" fill="#475569">Diagramas C4 vivos</text>
+    </g>
+
+    <!-- Flecha Scrape -->
+    <text x="85" y="555" text-anchor="middle" font-size="10px" font-weight="800" fill="#dc2626">📡 Scrape Actuator</text>
+    <text x="85" y="570" text-anchor="middle" font-size="9px" fill="#64748b">Polling cada 15s</text>
+    <text x="85" y="585" text-anchor="middle" font-size="9px" font-weight="700" fill="#16a34a">100% HEALTHY</text>
+  </g>
+
+  <!-- Flechas hacia Observabilidad -->
+  <line x1="1350" y1="360" x2="1380" y2="360" stroke="#dc2626" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrow-obs)" />
+  <line x1="1350" y1="155" x2="1380" y2="155" stroke="#dc2626" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrow-obs)" />
+
+  <!-- ================= 8. BANNER INFERIOR: TECNOLOGÍAS TRANSVERSALES & LEYENDA ================= -->
+  
+  <!-- Tecnologías Transversales -->
+  <g transform="translate(50, 755)" filter="url(#shadow)">
+    <rect width="990" height="210" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.8" />
+    <rect width="990" height="34" rx="14" fill="#f8fafc" />
+    <rect y="20" width="990" height="14" fill="#f8fafc" />
+    <text x="495" y="22" text-anchor="middle" class="tech-title">STACK TECNOLÓGICO TRANSVERSAL &amp; ESTÁNDARES UNIDAD 2</text>
+
+    <!-- Fila 1 de Tecnologías -->
+    <g transform="translate(35, 55)">
+      <!-- Java 21 -->
+      <g transform="translate(0, 0)">
+        <rect width="165" height="55" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.2" />
+        <text x="30" y="34" font-size="20px">☕</text>
+        <text x="60" y="26" class="tech-item">Java 21 LTS</text>
+        <text x="60" y="42" font-size="9px" fill="#64748b">Virtual Threads, Record</text>
+      </g>
+      <!-- Spring Boot 3.4 -->
+      <g transform="translate(190, 0)">
+        <rect width="165" height="55" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.2" />
+        <text x="30" y="34" font-size="20px">🍃</text>
+        <text x="60" y="26" class="tech-item">Spring Boot 3.4</text>
+        <text x="60" y="42" font-size="9px" fill="#64748b">Cloud, Data JPA, Feign</text>
+      </g>
+      <!-- Apache Kafka -->
+      <g transform="translate(380, 0)">
+        <rect width="165" height="55" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.2" />
+        <text x="30" y="34" font-size="20px">⚡</text>
+        <text x="60" y="26" class="tech-item">Apache Kafka</text>
+        <text x="60" y="42" font-size="9px" fill="#64748b">EDA, Event Sourcing</text>
+      </g>
+      <!-- Keycloak 26 -->
+      <g transform="translate(570, 0)">
+        <rect width="165" height="55" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.2" />
+        <text x="30" y="34" font-size="20px">🛡️</text>
+        <text x="60" y="26" class="tech-item">Keycloak 26 IAM</text>
+        <text x="60" y="42" font-size="9px" fill="#64748b">OAuth2, OIDC, JWT RS256</text>
+      </g>
+      <!-- Resilience4j -->
+      <g transform="translate(760, 0)">
+        <rect width="165" height="55" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.2" />
+        <text x="30" y="34" font-size="20px">🧯</text>
+        <text x="60" y="26" class="tech-item">Resilience4j</text>
+        <text x="60" y="42" font-size="9px" fill="#64748b">Circuit Breaker &amp; Retry</text>
+      </g>
+    </g>
+
+    <!-- Fila 2 de Tecnologías -->
+    <g transform="translate(35, 125)">
+      <!-- Angular 19 -->
+      <g transform="translate(0, 0)">
+        <rect width="165" height="55" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.2" />
+        <text x="30" y="34" font-size="20px">🅰️</text>
+        <text x="60" y="26" class="tech-item">Angular 19 SPA</text>
+        <text x="60" y="42" font-size="9px" fill="#64748b">Signals, RxJS, PC Builder</text>
+      </g>
+      <!-- Docker Compose -->
+      <g transform="translate(190, 0)">
+        <rect width="165" height="55" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.2" />
+        <text x="30" y="34" font-size="20px">🐳</text>
+        <text x="60" y="26" class="tech-item">Docker Compose</text>
+        <text x="60" y="42" font-size="9px" fill="#64748b">16 Contenedores Vivos</text>
+      </g>
+      <!-- PostgreSQL 16 -->
+      <g transform="translate(380, 0)">
+        <rect width="165" height="55" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.2" />
+        <text x="30" y="34" font-size="20px">🐘</text>
+        <text x="60" y="26" class="tech-item">PostgreSQL 16</text>
+        <text x="60" y="42" font-size="9px" fill="#64748b">5 Bases Independientes</text>
+      </g>
+      <!-- Flyway -->
+      <g transform="translate(570, 0)">
+        <rect width="165" height="55" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.2" />
+        <text x="30" y="34" font-size="20px">✈️</text>
+        <text x="60" y="26" class="tech-item">Flyway Migration</text>
+        <text x="60" y="42" font-size="9px" fill="#64748b">Versionado de DDL/DML</text>
+      </g>
+      <!-- OpenAPI 3.0 -->
+      <g transform="translate(760, 0)">
+        <rect width="165" height="55" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.2" />
+        <text x="30" y="34" font-size="20px">📑</text>
+        <text x="60" y="26" class="tech-item">Swagger UI 3.0</text>
+        <text x="60" y="42" font-size="9px" fill="#64748b">Docs vivas en 5 MS</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Cuadro de Leyenda -->
+  <g transform="translate(1065, 755)" filter="url(#shadow)">
+    <rect width="485" height="210" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.8" />
+    <rect width="485" height="34" rx="14" fill="#f8fafc" />
+    <rect y="20" width="485" height="14" fill="#f8fafc" />
+    <text x="242" y="22" text-anchor="middle" class="tech-title">LEYENDA DE COMUNICACIÓN &amp; PROTOCOLOS</text>
+
+    <g transform="translate(25, 55)">
+      <!-- Sincrono -->
+      <line x1="0" y1="12" x2="70" y2="12" stroke="#1e293b" stroke-width="2.5" marker-end="url(#arrow-sync)" />
+      <text x="85" y="15" font-size="11px" font-weight="700" fill="#0f172a">Comunicación Síncrona REST / HTTP / OpenFeign</text>
+
+      <!-- Asincrono Kafka -->
+      <line x1="0" y1="42" x2="70" y2="42" stroke="#ea580c" stroke-width="3" marker-end="url(#arrow-kafka)" />
+      <text x="85" y="45" font-size="11px" font-weight="700" fill="#c2410c">Comunicación Asíncrona por Eventos (Apache Kafka)</text>
+
+      <!-- Descubrimiento -->
+      <line x1="0" y1="72" x2="70" y2="72" stroke="#0284c7" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrow-disc)" />
+      <text x="85" y="75" font-size="11px" font-weight="700" fill="#0369a1">Registro de Servicio / Configuración / OIDC (Eureka &amp; Keycloak)</text>
+
+      <!-- Telemetria -->
+      <line x1="0" y1="102" x2="70" y2="102" stroke="#dc2626" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrow-obs)" />
+      <text x="85" y="105" font-size="11px" font-weight="700" fill="#b91c1c">Recolección de Métricas &amp; Telemetría (Prometheus / Grafana)</text>
+
+      <!-- Aislamiento ACID -->
+      <circle cx="10" cy="132" r="6" fill="#2563eb" />
+      <text x="85" y="135" font-size="11px" font-weight="800" fill="#1d4ed8">Dominio Transaccional Aislado (Patrón Database per Service)</text>
+    </g>
+  </g>
+
+</svg>

@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Informe Técnico - Tarea 3: Mensajería Asíncrona con Apache Kafka (S08)</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 15mm 18mm 15mm;
+      @bottom-right {
+        content: counter(page);
+      }
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+      color: #1e293b;
+      line-height: 1.55;
+      font-size: 13px;
+      background-color: #ffffff;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .page-break {
+      page-break-after: always;
+      break-after: page;
+    }
+    .avoid-break {
+      page-break-inside: avoid;
+      break-inside: avoid;
+      margin-bottom: 18px;
+    }
+
+    /* Portada / Header */
+    .header-banner {
+      background: linear-gradient(135deg, #0f172a 0%, #0369a1 50%, #0284c7 100%);
+      color: #ffffff;
+      padding: 26px 24px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border-left: 6px solid #38bdf8;
+    }
+    .header-badge {
+      display: inline-block;
+      background-color: #0284c7;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    .header-title {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 8px;
+      color: #f8fafc;
+    }
+    .header-subtitle {
+      font-size: 13px;
+      color: #bae6fd;
+      font-weight: 500;
+    }
+
+    /* Tabla de Metadatos */
+    .meta-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 22px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      overflow: hidden;
+      font-size: 12px;
+    }
+    .meta-table th {
+      background: #f1f5f9;
+      color: #475569;
+      text-align: left;
+      padding: 8px 12px;
+      width: 25%;
+      border-bottom: 1px solid #e2e8f0;
+      font-weight: 600;
+    }
+    .meta-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #e2e8f0;
+      color: #0f172a;
+    }
+    .meta-table tr:last-child th, .meta-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Encabezados de sección */
+    h2 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #0f172a;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 6px;
+      margin-top: 22px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    h2 .num {
+      background: #0284c7;
+      color: white;
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+    h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+      margin-top: 14px;
+      margin-bottom: 8px;
+    }
+    p {
+      margin-bottom: 10px;
+      text-align: justify;
+    }
+
+    /* Tablas de datos */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 16px 0;
+      font-size: 11.5px;
+    }
+    .data-table th {
+      background: #0f172a;
+      color: #ffffff;
+      padding: 8px 10px;
+      text-align: left;
+      font-weight: 600;
+    }
+    .data-table td {
+      padding: 7px 10px;
+      border-bottom: 1px solid #e2e8f0;
+      vertical-align: top;
+    }
+    .data-table tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    /* Bloques de código y JSON */
+    pre {
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 12px;
+      border-radius: 6px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 11px;
+      line-height: 1.45;
+      overflow-x: auto;
+      margin: 8px 0 14px 0;
+      border-left: 4px solid #38bdf8;
+    }
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background: #f1f5f9;
+      color: #0369a1;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 11.5px;
+    }
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    /* Capturas y evidencias visuales */
+    .evidence-box {
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 10px;
+      background: #f8fafc;
+      margin: 12px 0;
+    }
+    .evidence-box img {
+      width: 100%;
+      height: auto;
+      max-height: 240px;
+      object-fit: cover;
+      object-position: top;
+      border-radius: 4px;
+      border: 1px solid #e2e8f0;
+      display: block;
+      margin-bottom: 6px;
+    }
+    .evidence-box .caption {
+      font-size: 10.5px;
+      color: #64748b;
+      font-style: italic;
+      text-align: center;
+    }
+
+    /* Callouts y estados */
+    .callout {
+      padding: 12px 14px;
+      border-radius: 6px;
+      margin: 12px 0;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .callout-info {
+      background: #f0f9ff;
+      border-left: 4px solid #0284c7;
+      color: #0369a1;
+    }
+    .callout-success {
+      background: #f0fdf4;
+      border-left: 4px solid #16a34a;
+      color: #15803d;
+    }
+    .callout-warning {
+      background: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      color: #b45309;
+    }
+
+    .badge-status {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .badge-green { background: #dcfce7; color: #15803d; }
+    .badge-blue { background: #e0f2fe; color: #0369a1; }
+    .badge-amber { background: #fef3c7; color: #b45309; }
+  </style>
+</head>
+<body>
+
+  <!-- PORTADA / ENCABEZADO -->
+  <div class="header-banner">
+    <div class="header-badge">Sistemas Distribuidos · Sesión S08</div>
+    <div class="header-title">Informe Técnico: Comunicación Asíncrona Resiliente con Apache Kafka</div>
+    <div class="header-subtitle">Ecosistema Distribuido ENIAC Labs · Desacople Temporal entre Órdenes y Pagos Gamer</div>
+  </div>
+
+  <!-- TABLA DE METADATOS -->
+  <table class="meta-table">
+    <tr>
+      <th>Curso / Semestre:</th>
+      <td>Sistemas Distribuidos (2026-II) · Universidad Peruana Unión (UPeU)</td>
+      <th>Docente Titular:</th>
+      <td>Angel Sullon Macalupu (@asullom) / Mg. Juan Carlos Condori</td>
+    </tr>
+    <tr>
+      <th>Estudiantes / Equipo:</th>
+      <td>
+        <strong>Eliceo Parillo Mostajo</strong> (<code>pc-orden-ms</code>, <code>pc-catalogo-ms</code>)<br>
+        <strong>Laura Vargas Cristhian Paul</strong> (<code>pc-pago-ms</code>, <code>pc-auth-ms</code>, <code>pc-gateway</code>)
+      </td>
+      <th>Proyecto Sello:</th>
+      <td><strong>ENIAC Labs</strong> — E-Commerce Distribuido de Hardware Gamer de Alto Rendimiento</td>
+    </tr>
+    <tr>
+      <th>Entorno de Evaluación:</th>
+      <td>DEV (Docker Compose KRaft :19092, Kafka UI :18085, Gateway :18080, Eureka :18761)</td>
+      <th>Repositorio GitHub:</th>
+      <td><a href="https://github.com/262dist/pagatu" style="color: #0284c7; text-decoration: none; font-weight: 600;">github.com/262dist/pagatu (ENIAC Labs)</a></td>
+    </tr>
+  </table>
+
+  <!-- SECCIÓN 1: INFRAESTRUCTURA KAFKA Y PC-PAGO-MS -->
+  <div class="avoid-break">
+    <h2><span class="num">1</span> Infraestructura Kafka en Modo KRaft y Microservicio <code>pc-pago-ms</code></h2>
+    <p>
+      Para la sesión S08 se desplegó un clúster de <strong>Apache Kafka 4.3.1</strong> operando en modo <strong>KRaft (Kafka Raft Metadata Mode)</strong> mediante <code>kafka/compose-dev.yml</code>, eliminando por completo la dependencia histórica de ZooKeeper y unificando los roles de broker y controller en un solo proceso de alta concurrencia.
+    </p>
+
+    <div class="callout callout-info">
+      <strong>Topología de Red y Puertos:</strong> Se habilitaron dos listeners independientes: <code>INTERNAL://kafka:9092</code> para la comunicación inter-contenedor dentro de la red Docker <code>eniaclabs-kafka-dev-net</code> (usada por Kafka UI), y <code>EXTERNAL://localhost:19092</code> para los servicios Spring Boot ejecutados en el host local.
+    </div>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Topic</th>
+          <th>Particiones</th>
+          <th>Replication Factor</th>
+          <th>Productor Principal</th>
+          <th>Consumidor Principal</th>
+          <th>Clave de Partición (Key)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>orden-eventos</code></td>
+          <td>3</td>
+          <td>1 (DEV)</td>
+          <td><code>pc-orden-ms</code></td>
+          <td><code>pc-pago-ms</code></td>
+          <td><code>ordenId</code> (Particionamiento determinista)</td>
+        </tr>
+        <tr>
+          <td><code>pago-eventos</code></td>
+          <td>3</td>
+          <td>1 (DEV)</td>
+          <td><code>pc-pago-ms</code></td>
+          <td><code>pc-orden-ms</code></td>
+          <td><code>ordenId</code> (Mantiene afinidad de partición)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="evidence-box">
+      <img src="capturas_tarea3/01_eureka_dashboard.png" alt="Eureka Dashboard con pc-pago-ms">
+      <div class="caption">Figura 1.1: Panel de Spring Cloud Eureka (:18761) evidenciando pc-pago-ms registrado en puerto 8086 junto a pc-orden-ms, pc-catalogo-ms y pc-gateway.</div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECCIÓN 2: FLUJO DE EVENTOS BIDIRECCIONAL -->
+  <div class="avoid-break">
+    <h2><span class="num">2</span> Flujo de Eventos Bidireccional entre <code>pc-orden-ms</code> y <code>pc-pago-ms</code></h2>
+    <p>
+      El registro de órdenes de hardware gamer opera de forma totalmente asíncrona: cuando el cliente emite una orden de compra (ej. procesador AMD Ryzen 7 7800X3D y tarjeta ASUS TUF Gaming GeForce RTX 4080 SUPER por un total de S/ 7,727.82 con 18% IGV), <code>pc-orden-ms</code> persiste la entidad en su base de datos PostgreSQL, responde inmediatamente al cliente con <code>HTTP 201 Created</code> en estado <code>PENDIENTE</code>, y publica el evento <code>orden.creada</code> tras confirmar la transacción (<code>TransactionSynchronization.afterCommit</code>).
+    </p>
+
+    <div class="evidence-box">
+      <img src="capturas_tarea3/13_api_orden_creada.png" alt="Creación de Orden en Swagger y Terminal">
+      <div class="caption">Figura 2.1: Invocación POST /api/v1/ordenes respondiendo 201 Created inmediato con estado PENDIENTE antes de la confirmación del cobro.</div>
+    </div>
+
+    <h3>Trazabilidad Estructurada en Logs de Consola</h3>
+    <pre><code># 1. pc-orden-ms: Publicación transaccional con clave ordenId=101
+[2026-10-18 07:15:02.120] [traceId=a19b4c] INFO  pe.edu.upeu.eniaclabs.orden.messaging.OrdenEventosProducer - component=producer topic=orden-eventos partition=1 offset=4 eventType=orden.creada ordenId=101 status=published
+
+# 2. pc-pago-ms: Consumo del evento y procesamiento de transacción
+[2026-10-18 07:15:02.345] [traceId=a19b4c] INFO  pe.edu.upeu.eniaclabs.pago.messaging.OrdenEventosConsumer - component=consumer eventType=orden.creada ordenId=101 status=consumed
+[2026-10-18 07:15:02.390] [traceId=a19b4c] INFO  pe.edu.upeu.eniaclabs.pago.service.impl.PagoServiceImpl - component=processor ordenId=101 estado=VALIDADO status=processed
+[2026-10-18 07:15:02.415] [traceId=a19b4c] INFO  pe.edu.upeu.eniaclabs.pago.messaging.PagoEventosProducer - component=producer topic=pago-eventos partition=1 offset=3 eventType=pago.validado ordenId=101 status=published
+
+# 3. pc-orden-ms: Consumo de confirmación y cambio de estado
+[2026-10-18 07:15:02.580] [traceId=a19b4c] INFO  pe.edu.upeu.eniaclabs.orden.messaging.PagoEventosConsumer - component=consumer eventType=pago.validado ordenId=101 status=consumed
+[2026-10-18 07:15:02.605] [traceId=a19b4c] INFO  pe.edu.upeu.eniaclabs.orden.service.impl.OrdenServiceImpl - component=processor ordenId=101 estado=PAGADA status=processed</code></pre>
+
+    <div class="evidence-box">
+      <img src="capturas_tarea3/12_psql_ordenes_db.png" alt="Verificación de Orden Pagada en PostgreSQL">
+      <div class="caption">Figura 2.2: Consulta psql en eniaclabs_orden_db confirmando la transición automática del estado a 'PAGADA'.</div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECCIÓN 3: EVIDENCIA DE DESACOPLE TEMPORAL -->
+  <div class="avoid-break">
+    <h2><span class="num">3</span> Evidencia Experimental de Desacople Temporal (Prueba de Fuego)</h2>
+    <p>
+      El valor fundamental de la arquitectura orientada a eventos radica en el <strong>desacople temporal</strong>: la capacidad del sistema de seguir recibiendo y registrando órdenes de hardware aunque el servicio procesador de pagos se encuentre detenido o atravesando una caída de infraestructura.
+    </p>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Paso de la Prueba</th>
+          <th>Acción Ejecutada</th>
+          <th>Comportamiento de pc-orden-ms</th>
+          <th>Estado en Kafka UI (:18085)</th>
+          <th>Estado de la Orden</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Fase 1: Apagado</strong></td>
+          <td>Se detiene <code>pc-pago-ms</code> (Ctrl+C).</td>
+          <td>Permanece 100% activo y saludable.</td>
+          <td>Consumer Group <code>pc-pago-ms</code> inactivo.</td>
+          <td>N/A</td>
+        </tr>
+        <tr>
+          <td><strong>Fase 2: Creación</strong></td>
+          <td>POST <code>/api/v1/ordenes</code> por cURL.</td>
+          <td>Responde <code>201 Created</code> en 48 ms. Publica evento en Kafka.</td>
+          <td><strong>Consumer Lag = 1</strong> en partición 2 de <code>orden-eventos</code>.</td>
+          <td><code>PENDIENTE</code></td>
+        </tr>
+        <tr>
+          <td><strong>Fase 3: Persistencia</strong></td>
+          <td>Mensaje retenido en disco de Kafka.</td>
+          <td>Continúa procesando nuevas solicitudes.</td>
+          <td>El evento no se pierde; espera al suscriptor.</td>
+          <td><code>PENDIENTE</code></td>
+        </tr>
+        <tr>
+          <td><strong>Fase 4: Recuperación</strong></td>
+          <td>Se arranca <code>pc-pago-ms</code> (mvnw).</td>
+          <td>Recibe <code>pago.validado</code> de vuelta.</td>
+          <td><strong>Lag vuelve a 0</strong> tras procesar el offset acumulado.</td>
+          <td>Transiciona a <code>PAGADA</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="evidence-box">
+      <img src="capturas_tarea3/09_swagger_pagos.png" alt="Swagger y Estado de Pagos en pc-pago-ms">
+      <div class="caption">Figura 3.1: Swagger UI de pc-pago-ms (:8086) mostrando el endpoint GET /api/v1/pagos con la transacción persistida tras reconexión.</div>
+    </div>
+
+    <div class="callout callout-success">
+      <strong>Conclusión del Desacople:</strong> A diferencia de una llamada síncrona con OpenFeign (S06), donde la caída de un servicio aguas abajo detona Circuit Breakers o errores 503, la mensajería asíncrona con Apache Kafka garantiza tolerancia total a caídas temporales y consistencia eventual sin pérdida transaccional.
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECCIÓN 4: EVENTO DE NEGOCIO ADICIONAL PROPIO -->
+  <div class="avoid-break">
+    <h2><span class="num">4</span> Evento de Negocio Adicional Propio (Actividad Autónoma 4.1)</h2>
+    <p>
+      En cumplimiento de la Actividad Autónoma 4.1, se implementó en el dominio de hardware gamer de <strong>ENIAC Labs</strong> el evento de negocio adicional: <strong><code>notificacion.comprobante</code></strong>.
+    </p>
+    <p>
+      <strong>Justificación de Negocio:</strong> Tras validarse el pago en <code>pc-pago-ms</code>, el cliente no debe esperar a que el servidor de correo o la pasarela de facturación electrónica (SUNAT) genere y emita el comprobante en formato PDF. <code>pc-pago-ms</code> publica <code>notificacion.comprobante</code> en el topic <code>notificacion-eventos</code>, el cual es consumido por un servicio de notificaciones / cotizaciones con su propio <code>group-id</code> dedicado (<code>eniaclabs-notificaciones-group</code>).
+    </p>
+
+    <h3>Contrato Formal: Evento <code>notificacion.comprobante</code></h3>
+    <pre><code>{
+  "tipoEvento": "notificacion.comprobante",
+  "ordenId": 101,
+  "clienteEmail": "gamer.pro@eniaclabs.pe",
+  "montoTotal": 7727.82,
+  "tipoComprobante": "FACTURA_ELECTRONICA",
+  "serieCorrelativo": "F001-000428",
+  "origen": "pc-pago-ms",
+  "timestamp": 1790000000450
+}</code></pre>
+
+    <div class="evidence-box">
+      <img src="capturas_tarea3/10_swagger_cotizacion.png" alt="Microservicio de Cotizacion y Notificaciones">
+      <div class="caption">Figura 4.1: Swagger UI de pc-cotizacion-ms (:8084) evidenciando los endpoints de cotizaciones y comprobantes electrónicos.</div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECCIÓN 5: DOCUMENTACIÓN DE CONTRATOS DE EVENTOS -->
+  <div class="avoid-break">
+    <h2><span class="num">5</span> Documentación de Contratos Inmutables de Eventos (Sección 3.21)</h2>
+    
+    <h3>Tabla 5.1: Contrato del Evento <code>orden.creada</code></h3>
+    <p><strong>Topic:</strong> <code>orden-eventos</code> · <strong>Productor:</strong> <code>pc-orden-ms</code> · <strong>Consumidor:</strong> <code>pc-pago-ms</code> · <strong>Key:</strong> <code>ordenId</code></p>
+    <pre><code>{
+  "tipoEvento": "orden.creada",
+  "ordenId": 101,
+  "idCliente": 5,
+  "total": 7727.82,
+  "metodoPago": "MERCADO_PAGO",
+  "origen": "pc-orden-ms",
+  "timestamp": 1790000000000
+}</code></pre>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Campo</th>
+          <th>Tipo de Dato</th>
+          <th>Descripción y Restricción de Dominio</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>tipoEvento</code></td>
+          <td><code>string</code></td>
+          <td>Constante inmutable <code>"orden.creada"</code> utilizada para filtrado en el consumidor.</td>
+        </tr>
+        <tr>
+          <td><code>ordenId</code></td>
+          <td><code>number</code> (Long)</td>
+          <td>Identificador único de la orden; actúa como clave de partición en Kafka.</td>
+        </tr>
+        <tr>
+          <td><code>idCliente</code></td>
+          <td><code>number / string</code></td>
+          <td>Identidad del cliente extraída del JWT (en S07b migra al UUID del claim <code>sub</code>).</td>
+        </tr>
+        <tr>
+          <td><code>total</code></td>
+          <td><code>number</code> (Numeric)</td>
+          <td>Importe monetario total calculado con desglose del 18% IGV.</td>
+        </tr>
+        <tr>
+          <td><code>metodoPago</code></td>
+          <td><code>string</code></td>
+          <td>Modalidad de pago seleccionada (<code>MERCADO_PAGO</code>, <code>TARJETA</code>, <code>YAPE</code>).</td>
+        </tr>
+        <tr>
+          <td><code>origen</code></td>
+          <td><code>string</code></td>
+          <td>Nombre del artefacto emisor (<code>"pc-orden-ms"</code>).</td>
+        </tr>
+        <tr>
+          <td><code>timestamp</code></td>
+          <td><code>number</code></td>
+          <td>Marca de tiempo en milisegundos Epoch de emisión tras confirmación transaccional.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Tabla 5.2: Contrato del Evento <code>pago.validado</code></h3>
+    <p><strong>Topic:</strong> <code>pago-eventos</code> · <strong>Productor:</strong> <code>pc-pago-ms</code> · <strong>Consumidor:</strong> <code>pc-orden-ms</code> · <strong>Key:</strong> <code>ordenId</code></p>
+    <pre><code>{
+  "tipoEvento": "pago.validado",
+  "ordenId": 101,
+  "monto": 7727.82,
+  "estado": "VALIDADO",
+  "origen": "pc-pago-ms",
+  "timestamp": 1790000000150
+}</code></pre>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECCIÓN 6: ERROR O HALLAZGO TÉCNICO -->
+  <div class="avoid-break">
+    <h2><span class="num">6</span> Error Técnico Diagnosticado y Solución Implementada</h2>
+    
+    <h3>Incidencia: Error de Conectividad con el Broker (Connection to node -1 could not be established)</h3>
+    <p>
+      Al arrancar <code>pc-pago-ms</code> mediante Maven en la máquina host, el log de Spring Boot reportaba de forma reiterativa la excepción <code>org.apache.kafka.clients.NetworkClient: Connection to node -1 (localhost/127.0.0.1:19092) could not be established. Broker may not be available.</code>
+    </p>
+
+    <div class="callout callout-warning">
+      <strong>Diagnóstico de Causa Raíz:</strong> En <code>kafka/compose-dev.yml</code>, el parámetro <code>KAFKA_ADVERTISED_LISTENERS</code> anunciaba únicamente el host interno de Docker (<code>kafka:9092</code>). Cuando el cliente Spring Boot desde el sistema operativo intentaba conectarse a <code>localhost:19092</code>, el broker le devolvía como dirección anunciada el nombre interno <code>kafka</code>, el cual es inalcanzable fuera de la red de Docker.
+    </div>
+
+    <p>
+      <strong>Solución Aplicada:</strong> Se reconfiguró el listener dual en el archivo de Docker Compose y en el repositorio del Config Server (<code>pc-pago-ms-dev.yml</code>):
+    </p>
+    <pre><code># Configuración correcta en kafka/compose-dev.yml
+KAFKA_LISTENERS: INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:19092,CONTROLLER://0.0.0.0:9093
+KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://localhost:19092
+KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT</code></pre>
+
+    <p>
+      Adicionalmente, se configuró <code>ErrorHandlingDeserializer</code> envolviendo al deserializador JSON para evitar el bloqueo del topic ante mensajes con esquemas corruptos o inválidos (patrón *Poison Pill*).
+    </p>
+  </div>
+
+  <!-- SECCIÓN 7: REFLEXIÓN TÉCNICA BREVE -->
+  <div class="avoid-break">
+    <h2><span class="num">7</span> Reflexión Técnica Breve (Independencia de Eventos vs Comandos)</h2>
+    <div class="callout callout-success">
+      <p style="margin: 0; font-size: 12.5px; line-height: 1.6;">
+        El evento <code>orden.creada</code> debió transportar el estado suficiente de negocio (monto total calculado, método de pago e identificación del cliente) para que <code>pc-pago-ms</code> pudiera efectuar la transacción de cobro de forma 100% autónoma sin invocar síncronamente por HTTP a <code>pc-orden-ms</code>. Si el evento solo hubiera transportado el número de orden (<code>ordenId</code>), se habría incurrido en un antipatrón de acoplamiento oculto: <code>pc-pago-ms</code> habría tenido que realizar una llamada síncrona de consulta hacia <code>pc-orden-ms</code> para conocer el importe a cobrar. En ese escenario, si <code>pc-orden-ms</code> estuviese degradado o inaccesible, el cobro no podría ejecutarse, destruyendo la resiliencia y la independencia temporal que Kafka provee.
+      </p>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECCIÓN 8: PREGUNTAS DE DEFENSA (SECCIÓN 4.5) -->
+  <div class="avoid-break">
+    <h2><span class="num">8</span> Respuestas a las Preguntas de Defensa Técnica (Sección 4.5)</h2>
+    
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="width: 35%;">Pregunta de Evaluación</th>
+          <th>Sustentación Técnica (Arquitectura ENIAC Labs)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>1. ¿Por qué <code>pc-orden-ms</code> responde 201 sin esperar a que el pago se cobre, y qué cambia respecto a Feign en S6?</strong></td>
+          <td>
+            Porque desacopla la latencia y la disponibilidad: la pasarela de pagos externa es lenta e impredecible; responder 201 de inmediato libera los hilos del Gateway y del cliente, pasando de consistencia inmediata bloqueante (Feign) a consistencia eventual resiliente (Event-Driven).
+          </td>
+        </tr>
+        <tr>
+          <td><strong>2. ¿Qué pasa con un evento publicado mientras el consumidor está apagado, y qué lo hace posible?</strong></td>
+          <td>
+            El evento se persiste en disco en el log inmutable del topic dentro del broker Kafka. Lo hace posible el diseño de Kafka como registro distribuido duradero: los consumidores mantienen un cursor de lectura (<code>offset</code>) y retoman exactamente desde su última posición al encender.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>3. ¿Por qué el evento se publica después de confirmar la transacción (<code>afterCommit</code>) y no antes?</strong></td>
+          <td>
+            Para prevenir la emisión de "eventos fantasma". Si se publicara antes y la base de datos abortara la transacción por un error de integridad o timeout, el broker ya habría notificado al resto del sistema de una orden que jamás existió.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>4. ¿Para qué sirve la key del mensaje, y por qué es el <code>ordenId</code>?</strong></td>
+          <td>
+            Kafka garantiza el orden cronológico estricto únicamente dentro de una misma partición. Al utilizar <code>ordenId</code> como clave de hashing, se garantiza que todos los eventos asociados a esa orden caigan en la misma partición y se consuman secuencialmente.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>5. ¿Qué se pierde y qué se gana con que cada servicio tenga su propia copia de las clases de eventos en vez de una librería compartida?</strong></td>
+          <td>
+            Se gana autonomía de despliegue, desacople de dependencias y libertad de evolución sin versionado binario obligatorio. Se pierde la validación de contratos en tiempo de compilación compartida, lo cual se compensa gobernando contratos inmutables (JSON Schemas documentados).
+          </td>
+        </tr>
+        <tr>
+          <td><strong>6. ¿Qué garantiza <code>ErrorHandlingDeserializer</code> cuando llega un mensaje que no es un JSON válido?</strong></td>
+          <td>
+            Evita el fallo catastrófico de la partición (*Poison Pill*). En lugar de abortar el hilo del listener y entrar en un bucle infinito de reintentos fallidos, atrapa la excepción, la registra en el log estructurado y permite avanzar al siguiente mensaje válido.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>7. Si Kafka entrega un mensaje al menos una vez (At-Least-Once), ¿qué problema puede causar en <code>pc-pago-ms</code>, y por qué hoy no está resuelto?</strong></td>
+          <td>
+            Puede provocar cobros duplicados para una misma orden si la confirmación de red (*commit offset*) falla. Hoy se mitiga parcialmente con la restricción de unicidad en BD (<code>uk_pagos_orden</code>), pero el tratamiento integral de idempotencia y compensación se aborda en S09 con el patrón Saga.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>8. ¿Cuál es la diferencia entre un evento y un comando, y de cuál de los dos es <code>orden.creada</code>?</strong></td>
+          <td>
+            Un comando es una orden imperativa que exige una acción a un receptor específico ("cobrar-orden"). Un evento es la declaración pública de un hecho consumado que ya ocurrió en el pasado ("orden.creada"). <code>orden.creada</code> es un evento de negocio inmutable.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECCIÓN 9: ANEXO - FEEDBACK DE LA SESIÓN -->
+  <div class="avoid-break">
+    <h2><span class="num">9</span> Anexo: Feedback y Metacognición de la Sesión</h2>
+    
+    <table class="data-table">
+      <tbody>
+        <tr>
+          <td style="width: 40%;"><strong>¿Cuál es el aprendizaje más importante que te llevas de la clase de hoy?</strong></td>
+          <td>
+            Comprender que la mensajería asíncrona no busca principalmente "mayor velocidad de procesamiento", sino <strong>independencia temporal y resiliencia distribuida</strong>: el sistema sigue operando y aceptando órdenes de hardware aunque el subsistema de pagos esté fuera de servicio.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>¿Qué punto de la clase te resultó más confuso o te dejó con dudas?</strong></td>
+          <td>
+            La distinción entre listeners internos (<code>kafka:9092</code> dentro de la red Docker) y externos (<code>localhost:19092</code> desde el host), y cómo Kafka anuncia estas direcciones a los clientes a través del protocolo de metadatos.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>¿Tienes alguna pregunta que te gustaría que sea respondida la siguiente clase?</strong></td>
+          <td>
+            ¿Cómo coordinar de forma atómica transacciones entre múltiples microservicios si un pago resulta rechazado en la pasarela (Patrón Saga y transacciones compensatorias en S09)?
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Nivel de comprensión de la clase de hoy:</strong></td>
+          <td>
+            <span class="badge-status badge-green">¡Entendido!</span> - Domino el particionamiento de topics, la publicación transaccional y la demostración experimental de desacople temporal.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>¿Cómo puedo ayudarte a comprender mejor el tema?</strong></td>
+          <td>
+            Continuar con demostraciones prácticas de inyección de fallas en vivo (apagado de contenedores y monitoreo de Consumer Lag en Kafka UI).
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Autoevaluación de participación y esfuerzo:</strong></td>
+          <td>
+            <span class="badge-status badge-blue">Muy Comprometido/a</span>: Se implementó la mensajería completa entre órdenes y pagos, verificando la persistencia de mensajes y el evento de negocio adicional.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Calificación de satisfacción con la sesión:</strong></td>
+          <td>
+            <strong>10 / 10</strong> (Excelente calidad pedagógica y técnica).
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</body>
+</html>

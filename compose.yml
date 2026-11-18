@@ -13,7 +13,7 @@ services:
     environment:
       POSTGRES_DB: eniaclabs_catalogo_db
       POSTGRES_USER: eniaclabs
-      POSTGRES_PASSWORD: ${DB_PASSWORD:eniaclabs}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-eniaclabs}
     volumes:
       - eniaclabs_catalogo_pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -41,7 +41,7 @@ services:
     environment:
       POSTGRES_DB: eniaclabs_orden_db
       POSTGRES_USER: eniaclabs
-      POSTGRES_PASSWORD: ${DB_PASSWORD:eniaclabs}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-eniaclabs}
     volumes:
       - eniaclabs_orden_pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -69,7 +69,7 @@ services:
     environment:
       POSTGRES_DB: eniaclabs_pago_db
       POSTGRES_USER: eniaclabs
-      POSTGRES_PASSWORD: ${DB_PASSWORD:eniaclabs}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-eniaclabs}
     volumes:
       - eniaclabs_pago_pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -97,7 +97,7 @@ services:
     environment:
       POSTGRES_DB: eniaclabs_cotizacion_db
       POSTGRES_USER: eniaclabs
-      POSTGRES_PASSWORD: ${DB_PASSWORD:eniaclabs}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-eniaclabs}
     volumes:
       - eniaclabs_cotizacion_pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -125,7 +125,7 @@ services:
     environment:
       POSTGRES_DB: eniaclabs_auth_db
       POSTGRES_USER: eniaclabs
-      POSTGRES_PASSWORD: ${DB_PASSWORD:eniaclabs}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-eniaclabs}
     volumes:
       - eniaclabs_auth_pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -168,6 +168,45 @@ services:
         reservations:
           cpus: "0.1"
           memory: 128M
+
+  # ==========================================
+  # MENSAJERÍA ASÍNCRONA KAFKA (S08)
+  # ==========================================
+  eniaclabs-kafka:
+    image: apache/kafka:latest
+    container_name: eniaclabs-kafka
+    restart: unless-stopped
+    ports:
+      - "29092:29092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:29092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://eniaclabs-kafka:9092,EXTERNAL://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@eniaclabs-kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    networks:
+      - eniaclabs-network
+
+  eniaclabs-kafka-ui:
+    image: ghcr.io/kafbat/kafka-ui:v1.5.0
+    container_name: eniaclabs-kafka-ui
+    restart: unless-stopped
+    ports:
+      - "18085:8080"
+      - "28085:8080"
+    depends_on:
+      - eniaclabs-kafka
+    environment:
+      KAFKA_CLUSTERS_0_NAME: eniaclabs-prod
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: eniaclabs-kafka:9092
+    networks:
+      - eniaclabs-network
 
   # ==========================================
   # SERVIDORES DE INFRAESTRUCTURA SPRING CLOUD
@@ -239,6 +278,8 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: prod
       CONFIG_SERVER_URL: http://pc-config:8888
+      SPRING_MAIN_ALLOW_BEAN_DEFINITION_OVERRIDING: "true"
+      JDK_JAVA_OPTIONS: "--add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/sun.net.www.protocol.http=ALL-UNNAMED"
     depends_on:
       - pc-eureka
     networks:
@@ -270,8 +311,8 @@ services:
       DB_HOST: eniaclabs-db-catalogo
       DB_PORT: 5432
       DB_USER: eniaclabs
-      DB_PASS: ${DB_PASSWORD:eniaclabs}
-      JWT_SECRET: ${JWT_SECRET:}
+      DB_PASS: ${DB_PASSWORD:-eniaclabs}
+      JWT_SECRET: ${JWT_SECRET:-}
     depends_on:
       eniaclabs-db-catalogo:
         condition: service_healthy
@@ -303,8 +344,8 @@ services:
       DB_HOST: eniaclabs-db-orden
       DB_PORT: 5432
       DB_USER: eniaclabs
-      DB_PASS: ${DB_PASSWORD:eniaclabs}
-      JWT_SECRET: ${JWT_SECRET:}
+      DB_PASS: ${DB_PASSWORD:-eniaclabs}
+      JWT_SECRET: ${JWT_SECRET:-}
     depends_on:
       eniaclabs-db-orden:
         condition: service_healthy
@@ -333,11 +374,12 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: prod
       CONFIG_SERVER_URL: http://pc-config:8888
+      FRONTEND_URL: https://localhost:4200
       DB_HOST: eniaclabs-db-pago
       DB_PORT: 5432
       DB_USER: eniaclabs
-      DB_PASS: ${DB_PASSWORD:eniaclabs}
-      JWT_SECRET: ${JWT_SECRET:}
+      DB_PASS: ${DB_PASSWORD:-eniaclabs}
+      JWT_SECRET: ${JWT_SECRET:-}
     depends_on:
       eniaclabs-db-pago:
         condition: service_healthy
@@ -369,8 +411,8 @@ services:
       DB_HOST: eniaclabs-db-cotizacion
       DB_PORT: 5432
       DB_USER: eniaclabs
-      DB_PASS: ${DB_PASSWORD:eniaclabs}
-      JWT_SECRET: ${JWT_SECRET:}
+      DB_PASS: ${DB_PASSWORD:-eniaclabs}
+      JWT_SECRET: ${JWT_SECRET:-}
     depends_on:
       eniaclabs-db-cotizacion:
         condition: service_healthy
@@ -402,8 +444,8 @@ services:
       DB_HOST: eniaclabs-db-auth
       DB_PORT: 5432
       DB_USER: eniaclabs
-      DB_PASS: ${DB_PASSWORD:eniaclabs}
-      JWT_SECRET: ${JWT_SECRET:}
+      DB_PASS: ${DB_PASSWORD:-eniaclabs}
+      JWT_SECRET: ${JWT_SECRET:-}
     depends_on:
       eniaclabs-db-auth:
         condition: service_healthy
@@ -459,7 +501,7 @@ services:
       - "3000:3000"
     environment:
       - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin

@@ -1,0 +1,177 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 900" width="1400" height="900">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@500;600;700&amp;display=swap');
+      * { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+      .mono { font-family: 'JetBrains Mono', monospace; }
+      .c4-title { font-size: 26px; font-weight: 900; fill: #0f172a; }
+      .box-person { fill: #08427b; stroke: #052c53; stroke-width: 2; }
+      .box-system { fill: #1168bd; stroke: #0b4884; stroke-width: 2; }
+      .box-external { fill: #686868; stroke: #4d4d4d; stroke-width: 2; }
+      .box-title { font-size: 15px; font-weight: 800; fill: #ffffff; text-anchor: middle; }
+      .box-type { font-size: 10px; font-weight: 700; fill: #dbeafe; text-anchor: middle; text-transform: uppercase; letter-spacing: 0.5px; }
+      .box-desc { font-size: 11px; font-weight: 500; fill: #ffffff; text-anchor: middle; opacity: 0.95; }
+      .rel-text { font-size: 11px; font-weight: 700; fill: #1e293b; text-anchor: middle; }
+      .rel-tech { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; font-weight: 600; fill: #64748b; text-anchor: middle; }
+    </style>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.1" />
+    </filter>
+    <marker id="c4-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#475569" />
+    </marker>
+  </defs>
+
+  <rect width="100%" height="100%" fill="#f8fafc" />
+
+  <!-- HEADER -->
+  <g transform="translate(60, 45)">
+    <text x="0" y="0" class="c4-title">C4 MODEL - NIVEL 1: DIAGRAMA DE CONTEXTO DEL SISTEMA</text>
+    <text x="0" y="24" font-size="13px" font-weight="700" fill="#64748b">[System Context] Ecosistema Distribuido ENIAC Labs PC Gamer E-Commerce</text>
+  </g>
+
+  <!-- ================= PERSONAS / ACTORES ================= -->
+  
+  <!-- Cliente Gamer -->
+  <g transform="translate(60, 140)" filter="url(#shadow)">
+    <circle cx="110" cy="-20" r="18" fill="#08427b" stroke="#052c53" stroke-width="2" />
+    <rect width="220" height="120" rx="14" class="box-person" />
+    <text x="110" y="32" class="box-title">Cliente Gamer</text>
+    <text x="110" y="48" class="box-type">[Persona]</text>
+    <text x="110" y="70" class="box-desc">Usuario final que explora catálogo,</text>
+    <text x="110" y="86" class="box-desc">arma proformas y realiza órdenes</text>
+    <text x="110" y="102" class="box-desc">de compra de hardware gamer.</text>
+  </g>
+
+  <!-- Administrador -->
+  <g transform="translate(60, 370)" filter="url(#shadow)">
+    <circle cx="110" cy="-20" r="18" fill="#08427b" stroke="#052c53" stroke-width="2" />
+    <rect width="220" height="120" rx="14" class="box-person" />
+    <text x="110" y="32" class="box-title">Administrador / Auditor</text>
+    <text x="110" y="48" class="box-type">[Persona]</text>
+    <text x="110" y="70" class="box-desc">Personal de ENIAC Labs que gestiona</text>
+    <text x="110" y="86" class="box-desc">el stock, concilia transacciones</text>
+    <text x="110" y="102" class="box-desc">y supervisa métricas de negocio.</text>
+  </g>
+
+  <!-- Docente / Evaluador -->
+  <g transform="translate(60, 600)" filter="url(#shadow)">
+    <circle cx="110" cy="-20" r="18" fill="#08427b" stroke="#052c53" stroke-width="2" />
+    <rect width="220" height="120" rx="14" class="box-person" />
+    <text x="110" y="32" class="box-title">Docente / Evaluador UPeU</text>
+    <text x="110" y="48" class="box-type">[Persona]</text>
+    <text x="110" y="70" class="box-desc">Auditor académico que fiscaliza la</text>
+    <text x="110" y="86" class="box-desc">tolerancia a fallos, resiliencia,</text>
+    <text x="110" y="102" class="box-desc">eventos Kafka y telemetría en vivo.</text>
+  </g>
+
+  <!-- ================= SISTEMA PRINCIPAL ENIAC LABS ================= -->
+  <g transform="translate(480, 260)" filter="url(#shadow)">
+    <!-- Boundary Frame -->
+    <rect x="-30" y="-45" width="460" height="420" rx="20" fill="none" stroke="#0284c7" stroke-width="2" stroke-dasharray="8,6" />
+    <text x="-15" y="-22" font-size="12px" font-weight="900" fill="#0284c7" letter-spacing="0.5px">LÍMITE DEL SISTEMA: ENIAC LABS E-COMMERCE</text>
+
+    <!-- System Box -->
+    <rect width="400" height="330" rx="18" class="box-system" />
+    <text x="200" y="45" class="box-title" font-size="18px">ENIAC Labs E-Commerce</text>
+    <text x="200" y="66" class="box-type" font-size="12px">[Sistema de Software Distribuido]</text>
+    <text x="200" y="105" class="box-desc" font-size="12px">Plataforma distribuida completa de comercio</text>
+    <text x="200" y="125" class="box-desc" font-size="12px">electrónico especializado en hardware gamer,</text>
+    <text x="200" y="145" class="box-desc" font-size="12px">PC Builder inteligente con validación física/watts,</text>
+    <text x="200" y="165" class="box-desc" font-size="12px">gestión transaccional ACID de órdenes con IGV 18%,</text>
+    <text x="200" y="185" class="box-desc" font-size="12px">pasarela fintech y telemetría distribuida.</text>
+
+    <!-- Componentes Clave dentro del sistema -->
+    <g transform="translate(25, 215)">
+      <rect width="165" height="42" rx="8" fill="#0d4e92" />
+      <text x="82" y="20" font-size="10.5px" font-weight="800" fill="#ffffff" text-anchor="middle">5 Microservicios</text>
+      <text x="82" y="34" font-size="9px" fill="#93c5fd" text-anchor="middle">Spring Boot 3.4.3</text>
+    </g>
+    <g transform="translate(210, 215)">
+      <rect width="165" height="42" rx="8" fill="#0d4e92" />
+      <text x="82" y="20" font-size="10.5px" font-weight="800" fill="#ffffff" text-anchor="middle">Apache Kafka</text>
+      <text x="82" y="34" font-size="9px" fill="#93c5fd" text-anchor="middle">Event Bus :9092</text>
+    </g>
+    <g transform="translate(25, 268)">
+      <rect width="165" height="42" rx="8" fill="#0d4e92" />
+      <text x="82" y="20" font-size="10.5px" font-weight="800" fill="#ffffff" text-anchor="middle">5 Bases PostgreSQL</text>
+      <text x="82" y="34" font-size="9px" fill="#93c5fd" text-anchor="middle">Database per Service</text>
+    </g>
+    <g transform="translate(210, 268)">
+      <rect width="165" height="42" rx="8" fill="#0d4e92" />
+      <text x="82" y="20" font-size="10.5px" font-weight="800" fill="#ffffff" text-anchor="middle">Frontend Angular</text>
+      <text x="82" y="34" font-size="9px" fill="#93c5fd" text-anchor="middle">SPA Gamer :4200</text>
+    </g>
+  </g>
+
+  <!-- ================= SISTEMAS EXTERNOS ================= -->
+
+  <!-- Mercado Pago -->
+  <g transform="translate(1080, 140)" filter="url(#shadow)">
+    <rect width="250" height="120" rx="14" class="box-external" />
+    <text x="125" y="32" class="box-title">Mercado Pago API</text>
+    <text x="125" y="48" class="box-type">[Sistema Externo]</text>
+    <text x="125" y="70" class="box-desc">Pasarela de cobros fintech internacional.</text>
+    <text x="125" y="86" class="box-desc">Checkout Pro, Sandbox, tarjetas</text>
+    <text x="125" y="102" class="box-desc">y notificaciones webhook IPN.</text>
+  </g>
+
+  <!-- Keycloak IAM -->
+  <g transform="translate(1080, 370)" filter="url(#shadow)">
+    <rect width="250" height="120" rx="14" class="box-external" />
+    <text x="125" y="32" class="box-title">Keycloak 26 IAM Server</text>
+    <text x="125" y="48" class="box-type">[Sistema Externo / IAM]</text>
+    <text x="125" y="70" class="box-desc">Servidor de Identidad &amp; Accesos (OIDC).</text>
+    <text x="125" y="86" class="box-desc">Emisión de tokens JWT firmados RS256</text>
+    <text x="125" y="102" class="box-desc">y gestión de roles ADMIN / CLIENTE.</text>
+  </g>
+
+  <!-- SUNAT / Facturación Legal -->
+  <g transform="translate(1080, 600)" filter="url(#shadow)">
+    <rect width="250" height="120" rx="14" class="box-external" />
+    <text x="125" y="32" class="box-title">SUNAT / Facturación Perú</text>
+    <text x="125" y="48" class="box-type">[Sistema Externo]</text>
+    <text x="125" y="70" class="box-desc">Entidad tributaria oficial del Perú.</text>
+    <text x="125" y="86" class="box-desc">Cumplimiento fiscal con cálculo</text>
+    <text x="125" y="102" class="box-desc">obligatorio de IGV 18% por orden.</text>
+  </g>
+
+  <!-- ================= RELACIONES / FLECHAS ================= -->
+  
+  <!-- Cliente -> Sistema -->
+  <line x1="280" y1="200" x2="480" y2="340" stroke="#475569" stroke-width="2" marker-end="url(#c4-arrow)" />
+  <rect x="300" y="245" width="160" height="34" rx="6" fill="#ffffff" stroke="#cbd5e1" />
+  <text x="380" y="260" class="rel-text">Cotiza y compra</text>
+  <text x="380" y="272" class="rel-tech">[HTTPS / Angular :4200]</text>
+
+  <!-- Admin -> Sistema -->
+  <line x1="280" y1="430" x2="480" y2="430" stroke="#475569" stroke-width="2" marker-end="url(#c4-arrow)" />
+  <rect x="300" y="413" width="160" height="34" rx="6" fill="#ffffff" stroke="#cbd5e1" />
+  <text x="380" y="428" class="rel-text">Gestiona stock y concilia</text>
+  <text x="380" y="440" class="rel-tech">[HTTPS / REST JSON]</text>
+
+  <!-- Docente -> Sistema -->
+  <line x1="280" y1="660" x2="480" y2="520" stroke="#475569" stroke-width="2" marker-end="url(#c4-arrow)" />
+  <rect x="300" y="580" width="160" height="34" rx="6" fill="#ffffff" stroke="#cbd5e1" />
+  <text x="380" y="595" class="rel-text">Audita telemetría</text>
+  <text x="380" y="607" class="rel-tech">[Grafana, Swagger, Kafka]</text>
+
+  <!-- Sistema -> Mercado Pago -->
+  <line x1="880" y1="340" x2="1080" y2="200" stroke="#475569" stroke-width="2" marker-end="url(#c4-arrow)" />
+  <rect x="915" y="245" width="150" height="34" rx="6" fill="#ffffff" stroke="#cbd5e1" />
+  <text x="990" y="260" class="rel-text">Genera cobros y webhooks</text>
+  <text x="990" y="272" class="rel-tech">[HTTPS / REST JSON]</text>
+
+  <!-- Sistema -> Keycloak -->
+  <line x1="880" y1="430" x2="1080" y2="430" stroke="#475569" stroke-width="2" marker-end="url(#c4-arrow)" />
+  <rect x="915" y="413" width="150" height="34" rx="6" fill="#ffffff" stroke="#cbd5e1" />
+  <text x="990" y="428" class="rel-text">Valida tokens e identidades</text>
+  <text x="990" y="440" class="rel-tech">[OIDC / OAuth 2.0]</text>
+
+  <!-- Sistema -> SUNAT -->
+  <line x1="880" y1="520" x2="1080" y2="660" stroke="#475569" stroke-width="2" marker-end="url(#c4-arrow)" />
+  <rect x="915" y="580" width="150" height="34" rx="6" fill="#ffffff" stroke="#cbd5e1" />
+  <text x="990" y="595" class="rel-text">Valida desglose IGV 18%</text>
+  <text x="990" y="607" class="rel-tech">[Formato Legal SUNAT]</text>
+
+</svg>

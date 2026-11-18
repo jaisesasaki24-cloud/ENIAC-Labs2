@@ -1,6 +1,15 @@
 server:
   port: 8085
 
+frontend:
+  url: ${FRONTEND_URL:https://localhost:4200}
+
+mercadopago:
+  access-token: ${MP_ACCESS_TOKEN:APP_USR-7709062323770834-102620-22d3ad8bb4a98ca436917a52a528a8a1-3796765560}
+  public-key: ${MP_PUBLIC_KEY:APP_USR-62bf1793-3203-48e6-b913-2da50ee22fe7}
+  currency: PEN
+  auto-return: approved
+
 spring:
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:eniaclabs_pago_db;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH}
@@ -14,11 +23,17 @@ spring:
   flyway:
     enabled: false
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:18180/realms/eniaclabs
+
   kafka:
     bootstrap-servers: localhost:19092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
         spring.json.add.type.headers: false
     consumer:
@@ -27,7 +42,7 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       properties:
-        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
         spring.json.value.default.type: pe.edu.upeu.eniaclabs.pago.event.OrdenCreadaEvento
         spring.json.trusted.packages: pe.edu.upeu.eniaclabs.pago.event
         spring.json.use.type.headers: false
@@ -54,11 +69,19 @@ management:
   endpoint:
     health:
       show-details: always
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState, db
 
 eureka:
   instance:
     hostname: localhost
-    instance-id: ${spring.application.name}:${server.port}
+    instance-id: ${spring.application.name}:${random.uuid}
+    prefer-ip-address: true
   client:
     service-url:
       defaultZone: http://localhost:18761/eureka

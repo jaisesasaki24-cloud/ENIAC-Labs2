@@ -24,3 +24,27 @@ scrape_configs:
         labels:
           job: eniaclabs-apps
           __path__: /var/log/eniaclabs/*.log
+
+  - job_name: eniaclabs-keycloak
+    static_configs:
+      - targets: [localhost]
+        labels:
+          application: pc-keycloak
+          job: pc-keycloak
+          __path__: /var/log/eniaclabs-keycloak/*.log
+
+  - job_name: eniaclabs-gateway
+    static_configs:
+      - targets: [localhost]
+        labels:
+          application: pc-gateway
+          job: pc-gateway
+          __path__: /var/log/eniaclabs-gateway/*.log
+
+  - job_name: eniaclabs-pago
+    static_configs:
+      - targets: [localhost]
+        labels:
+          application: pc-pago-ms
+          job: pc-pago-ms
+          __path__: /var/log/eniaclabs-pago/*.log

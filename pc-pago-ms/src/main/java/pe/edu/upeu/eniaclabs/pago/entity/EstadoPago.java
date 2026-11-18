@@ -6,5 +6,6 @@ public enum EstadoPago {
     APROBADO,
     EN_PROCESO,
     RECHAZADO,
+    FALLIDO,
     REEMBOLSADO
 }

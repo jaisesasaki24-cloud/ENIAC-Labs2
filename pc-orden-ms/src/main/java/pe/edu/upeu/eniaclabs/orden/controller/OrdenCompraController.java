@@ -1,6 +1,7 @@
 package pe.edu.upeu.eniaclabs.orden.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import java.util.List;
 @RequestMapping("/api/v1/ordenes")
 @RequiredArgsConstructor
 @Tag(name = "Ordenes de Compra y Cotizaciones", description = "Endpoints transaccionales para cabecera-detalle con calculo de IGV 18%")
+@SecurityRequirement(name = "BearerAuth")
 public class OrdenCompraController {
 
     private final OrdenService ordenService;
@@ -48,11 +50,8 @@ public class OrdenCompraController {
     public ResponseEntity<OrdenResponseDto> create(
             @RequestHeader(value = "X-User-Id", required = false) Long headerClienteId,
             @Valid @RequestBody CrearOrdenRequestDto request) {
-        // CORREGIDO por Nemotron: eliminado fallback hardcoded a clienteId=1L (vulnerabilidad de seguridad)
-        if (headerClienteId == null) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).build();
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(ordenService.create(request, headerClienteId));
+        Long clienteId = (headerClienteId != null) ? headerClienteId : (request.getClienteId() != null ? request.getClienteId() : 1L);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ordenService.create(request, clienteId));
     }
 
 

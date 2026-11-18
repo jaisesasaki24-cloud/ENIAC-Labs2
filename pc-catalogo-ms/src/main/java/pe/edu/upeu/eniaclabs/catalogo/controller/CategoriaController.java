@@ -1,6 +1,7 @@
 package pe.edu.upeu.eniaclabs.catalogo.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.List;
 @RequestMapping("/api/v1/categorias")
 @RequiredArgsConstructor
 @Tag(name = "Categorias de Hardware", description = "Endpoints para gestion del catalogo gamer por categorias")
+@SecurityRequirement(name = "BearerAuth")
 public class CategoriaController {
 
     private final CategoriaService categoriaService;

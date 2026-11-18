@@ -20,6 +20,7 @@ public class CrearOrdenRequestDto {
     @Email(message = "Formato de email invalido")
     private String clienteEmail;
 
+    private Long clienteId;
     private String metodoPago;
     private String direccionEnvio;
     private String observaciones;

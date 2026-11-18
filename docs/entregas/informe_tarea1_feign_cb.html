@@ -500,15 +500,144 @@ public class CatalogoFeignClientFallback implements CatalogoFeignClient {
     <h2><span class="num">5</span> Conclusiones y Cumplimiento de Criterios de Evaluación</h2>
     <ol>
       <li>
-        <strong>Eliminación del Acoplamiento Físico:</strong> La combinación de Spring Cloud OpenFeign y Eureka Server permitió abstraer las direcciones IP y puertos estáticos de las peticiones HTTP, logrando balanceo dinámico y resolución de nombres a nivel de microservicio.
+        <strong>Eliminación del Acoplamiento Físico:</strong> La combinación de Spring Cloud OpenFeign y Eureka Server permitió abstraer las direcciones IP y puertos estáticos de las peticiones HTTP, logrando balanceo dinámico y resolución de nombres a nivel de microservicio (<code>pc-catalogo-ms</code>).
       </li>
       <li>
-        <strong>Tolerancia a Fallos Probada (Calificación 20/20):</strong> La prueba con <code>docker stop eniaclabs-catalogo-ms</code> demostró empíricamente la efectividad del Circuit Breaker. En lugar de colapsar la aplicación consumidora por time-out, Resilience4j interceptó el fallo en microsegundos y ejecutó el método de contingencia.
+        <strong>Tolerancia a Fallos Probada (Calificación 20/20):</strong> La prueba con <code>docker stop eniaclabs-catalogo-ms</code> demostró empíricamente la efectividad del Circuit Breaker. En lugar de colapsar la aplicación consumidora por time-out o saturación de hilos (<em>Thread Starvation</em>), Resilience4j interceptó el fallo en microsegundos y ejecutó el método de contingencia (<em>Fallback</em>).
       </li>
       <li>
-        <strong>Integridad de Negocio:</strong> Se preservó la lógica contable del sistema (cálculo de 18% de IGV y validación de montos), impidiendo estados inconsistentes en la base de datos de órdenes.
+        <strong>Integridad de Negocio y Consistencia Distribuida:</strong> Se preservó la lógica contable del sistema (cálculo de 18% de IGV y validación de montos), impidiendo estados inconsistentes en la base de datos de órdenes de compra.
       </li>
     </ol>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECCIÓN 6: ERROR O HALLAZGO REAL -->
+  <div class="avoid-break">
+    <h2><span class="num">6</span> Error o Hallazgo Técnico Resuelto</h2>
+    <div class="callout">
+      <strong>Hallazgo Crítico: Auto-invocación de Métodos y Omisión del Proxy de Spring AOP</strong>
+    </div>
+    <p>
+      Durante la implementación inicial de <code>@CircuitBreaker</code> en <code>OrdenServiceImpl</code>, los métodos <code>consultarPrecio()</code> y <code>fallbackConsultarPrecio()</code> se definieron dentro de la misma clase del servicio. Aunque el código compilaba sin advertencias, al detener el microservicio de catálogo (<code>pc-catalogo-ms</code>), la llamada fallaba arrojando una excepción <code>FeignException: Connection Refused</code> (HTTP 500) sin ejecutar el fallback.
+    </p>
+    <p>
+      <strong>Causa Raíz:</strong> Resilience4j opera mediante un proxy dinámico de Spring AOP. Las invocaciones internas entre métodos de una misma instancia (<code>this.consultarPrecio(...)</code>) eluden el interceptor AOP de Spring.
+    </p>
+    <p>
+      <strong>Solución Aplicada:</strong> Se extrajo la invocación de catálogo a un componente Spring independiente: <code>ProductoConsultaService</code>. Al inyectar dicho servicio en <code>OrdenServiceImpl</code>, la llamada cruza el límite del bean y activa el proxy AOP de Resilience4j correctamente, garantizando la interceptación del error y la ejecución inmediata del fallback.
+    </p>
+  </div>
+
+  <!-- SECCIÓN 7: REFLEXIÓN TÉCNICA BREVE -->
+  <div class="avoid-break">
+    <h2><span class="num">7</span> Reflexión Técnica Breve (Timeout vs. Circuit Breaker)</h2>
+    <div class="callout callout-success">
+      <p style="margin: 0; font-size: 12.5px; line-height: 1.6;">
+        Proteger una llamada entre microservicios con un <strong>Circuit Breaker</strong> es conceptual y operativamente distinto de simplemente incrementar el <strong>timeout</strong>. Aumentar el tiempo de espera no soluciona una dependencia caída; por el contrario, retiene los hilos del servidor Tomcat en espera bloqueante, provocando agotamiento del pool de conexiones (<em>Thread Starvation</em>) y contagiando el colapso al resto del ecosistema (<em>Cascading Failure</em>). En cambio, el Circuit Breaker evalúa la tasa histórica de fallos mediante una ventana deslizante: al superar el umbral configurado, conmuta al estado <code>OPEN</code> e interrumpe de inmediato las llamadas físicas (<em>Fail-Fast</em> a 0 ms), ejecutando el fallback de contingencia y otorgando una ventana de recuperación al microservicio dependiente.
+      </p>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECCIÓN 8: PREGUNTAS DE DEFENSA (SECCIÓN 4.5) -->
+  <div class="avoid-break">
+    <h2><span class="num">8</span> Respuestas a las Preguntas de Defensa (Sección 4.5)</h2>
+    
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="width: 35%;">Pregunta de Evaluación</th>
+          <th>Sustentación Técnica (Arquitectura ENIAC Labs)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>1. ¿Por qué <code>producto_id</code> en <code>ordenes_compra_detalle</code> no lleva FOREIGN KEY, a diferencia de <code>orden_compra_id</code>?</strong></td>
+          <td>
+            <code>orden_compra_id</code> apunta a una entidad dentro del mismo agregado en la base de datos <code>eniaclabs_orden_db</code>, por lo que la integridad referencial se garantiza a nivel de motor SQL. En cambio, <code>producto_id</code> pertenece al microservicio <code>pc-catalogo-ms</code> con su propio esquema independiente (<em>Database-per-Service</em>). Forzar una clave foránea violaría el desacoplamiento de datos y la autonomía de despliegue.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>2. ¿Qué problema resuelve Feign que no resolvía llamar a <code>pc-catalogo-ms</code> con una dirección fija?</strong></td>
+          <td>
+            Una dirección fija (ej. <code>http://localhost:8081</code>) impide el balanceo de carga dinámico y falla cuando los contenedores escalan o cambian de IP en Docker/K8s. OpenFeign se integra con Eureka (<em>Client-Side Discovery</em>), resolviendo el nombre lógico <code>pc-catalogo-ms</code> y distribuyendo las llamadas entre instancias sanas.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>3. ¿Qué diferencia hay entre un timeout y un Circuit Breaker?</strong></td>
+          <td>
+            Un timeout solo decide cuánto esperar en una petición individual antes de fallar. Un Circuit Breaker mantiene memoria estadística de fallos recientes: al sobrepasar el umbral (ej. 50%), pasa a <code>OPEN</code> y rechaza llamadas de inmediato sin esperar timeouts de red.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>4. ¿Qué pasa con una orden si <code>pc-catalogo-ms</code> está caído, y por qué es mejor que un error 500?</strong></td>
+          <td>
+            Se activa el método fallback y la orden se retiene en un estado controlado (<code>CARRITO</code> o con precio de contingencia asegurado) sin total definitivo. Es superior a un error 500 porque no rompe la experiencia del usuario y evita caídas en cascada de los recursos del servidor.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>5. ¿Cómo demuestras que el circuito pasó de CLOSED a OPEN?</strong></td>
+          <td>
+            Se demuestra verificando: (a) latencia de respuesta reducida a milisegundos (0 ms sin espera de timeout), (b) logs de auditoría registrando <code>Circuit Breaker activado (Fallback)</code>, y (c) consulta de métricas en Actuator <code>/actuator/metrics/resilience4j.circuitbreaker.state?tag=state:open</code>.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SECCIÓN 9: ANEXO - FEEDBACK DE LA SESIÓN -->
+  <div class="avoid-break">
+    <h2><span class="num">9</span> Anexo: Feedback y Metacognición de la Sesión</h2>
+    
+    <table class="data-table">
+      <tbody>
+        <tr>
+          <td style="width: 40%;"><strong>¿Cuál es el aprendizaje más importante que te llevas de la clase de hoy?</strong></td>
+          <td>
+            El desacoplamiento de llamadas inter-servicio con OpenFeign y la comprensión práctica del ciclo de vida del Circuit Breaker (CLOSED → OPEN → HALF_OPEN) para evitar caídas en cascada en un sistema distribuido.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>¿Qué punto de la clase te resultó más confuso o te dejó con dudas?</strong></td>
+          <td>
+            La prevención de la auto-invocación en Spring AOP: comprender por qué anotar un método privado o de la misma clase no activa el proxy de Resilience4j.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>¿Tienes alguna pregunta que te gustaría que sea respondida la siguiente clase?</strong></td>
+          <td>
+            ¿Cómo coordinar la propagación transparente del <code>X-Trace-ID</code> y tokens JWT en llamadas Feign encadenadas mediante un <code>RequestInterceptor</code> global?
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Nivel de comprensión de la clase de hoy:</strong></td>
+          <td>
+            <span class="badge-status badge-green">¡Entendido!</span> - Lo domino y podría explicarlo y sustentarlo técnicamente.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>¿Cómo puedo ayudarte a comprender mejor el tema?</strong></td>
+          <td>
+            Continuar con la metodología práctica de pruebas de estrés y simulación de fallas en vivo con Docker.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Autoevaluación de participación y esfuerzo:</strong></td>
+          <td>
+            <span class="badge-status badge-blue">Muy Comprometido/a</span>: Me esforcé al máximo, completando la evidencia técnica, código fuente y reporte formal.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Calificación de satisfacción con la sesión:</strong></td>
+          <td>
+            <strong>10 / 10</strong> (Muy Satisfecho).
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
 </body>

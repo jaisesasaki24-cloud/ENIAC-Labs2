@@ -2,6 +2,7 @@ package pe.edu.upeu.eniaclabs.pago.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import java.util.List;
 @RequestMapping("/api/v1/pagos")
 @RequiredArgsConstructor
 @Tag(name = "Pasarela Mercado Pago Sandbox y Webhooks", description = "Endpoints transaccionales para procesamiento de pagos y recepcion de IPN Webhooks")
+@SecurityRequirement(name = "BearerAuth")
 public class PagoController {
 
     private final PagoService pagoService;
@@ -42,6 +44,16 @@ public class PagoController {
     @Operation(summary = "Consultar pagos asociados a una orden de compra")
     public ResponseEntity<List<PagoResponseDto>> findByOrdenId(@PathVariable Long ordenId) {
         return ResponseEntity.ok(pagoService.findByOrdenId(ordenId));
+    }
+
+    @GetMapping("/por-orden/{ordenId}")
+    @Operation(summary = "Consultar pago individual por orden de compra para frontend Angular (S11)")
+    public ResponseEntity<PagoResponseDto> findSingleByOrdenId(@PathVariable Long ordenId) {
+        List<PagoResponseDto> pagos = pagoService.findByOrdenId(ordenId);
+        if (pagos == null || pagos.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(pagos.get(0));
     }
 
     @PostMapping("/checkout")

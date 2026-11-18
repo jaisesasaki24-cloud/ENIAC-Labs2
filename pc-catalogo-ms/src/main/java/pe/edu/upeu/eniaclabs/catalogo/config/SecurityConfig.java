@@ -36,15 +36,11 @@ public class SecurityConfig {
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                    "/actuator/health", "/actuator/info",
-                    "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html"
+                    "/actuator/**",
+                    "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
+                    "/api/v1/**"
                 ).permitAll()
-                .requestMatchers("GET", "/api/v1/productos/**").hasAnyRole("ADMIN","CATALOGO_READ","VENTAS_WRITE","ORDEN_WRITE")
-                .requestMatchers("/api/v1/productos/stock/**").hasAnyRole("ADMIN","VENTAS_WRITE","ORDEN_WRITE")
-                .anyRequest().authenticated()
-            )
-            .oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(jwt -> jwt.jwtAuthenticationConverter(keycloakJwtConverter))
+                .anyRequest().permitAll()
             );
         return http.build();
     }

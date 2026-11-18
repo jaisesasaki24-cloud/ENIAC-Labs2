@@ -39,7 +39,8 @@ management:
 eureka:
   instance:
     hostname: host.docker.internal
-    instance-id: ${spring.application.name}:${server.port}
+    instance-id: ${spring.application.name}:${random.uuid}
+    prefer-ip-address: true
   client:
     register-with-eureka: true
     fetch-registry: true

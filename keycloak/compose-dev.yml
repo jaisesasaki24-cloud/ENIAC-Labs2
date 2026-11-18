@@ -1,0 +1,62 @@
+name: eniaclabs-keycloak-dev
+
+services:
+  keycloak-db:
+    image: postgres:17-alpine
+    container_name: eniaclabs-keycloak-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: eniaclabs_keycloak
+      POSTGRES_USER: eniaclabs_keycloak
+      POSTGRES_PASSWORD: eniaclabs
+    ports:
+      - "15436:5432"
+    volumes:
+      - eniaclabs_keycloak_db_dev_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eniaclabs_keycloak -d eniaclabs_keycloak"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.8.0
+    container_name: eniaclabs-keycloak
+    restart: unless-stopped
+    command: start-dev
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin123
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/eniaclabs_keycloak
+      KC_DB_USERNAME: eniaclabs_keycloak
+      KC_DB_PASSWORD: eniaclabs
+      KC_METRICS_ENABLED: "true"
+      KC_HEALTH_ENABLED: "true"
+      KC_LOG: console,file
+      KC_LOG_FILE: /opt/keycloak/data/log/keycloak.log
+      KC_HTTP_MANAGEMENT_PORT: 9000
+    ports:
+      - "18180:8080"
+      - "19000:9000"
+    volumes:
+      - eniaclabs_keycloak_dev_data:/opt/keycloak/data
+      - ./logs:/opt/keycloak/data/log
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    networks:
+      - default
+      - eniaclabs-network
+
+volumes:
+  eniaclabs_keycloak_db_dev_data:
+  eniaclabs_keycloak_dev_data:
+
+networks:
+  default:
+  eniaclabs-network:
+    name: eniaclabs-network
+    external: true
+

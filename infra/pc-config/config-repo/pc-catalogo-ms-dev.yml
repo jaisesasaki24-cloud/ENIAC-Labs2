@@ -30,11 +30,19 @@ management:
   endpoint:
     health:
       show-details: always
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState, db
 
 eureka:
   instance:
     hostname: localhost
-    instance-id: ${spring.application.name}:${server.port}
+    instance-id: ${spring.application.name}:${random.uuid}
+    prefer-ip-address: true
   client:
     service-url:
       defaultZone: http://localhost:18761/eureka

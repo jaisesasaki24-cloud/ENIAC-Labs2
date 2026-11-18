@@ -31,6 +31,7 @@ import webbrowser
 import urllib.request
 import urllib.error
 import argparse
+import socket
 from typing import List, Dict, Any, Optional
 
 # Configuracion de la consola en Windows para colores ANSI y codificacion UTF-8
@@ -56,6 +57,18 @@ C_GRAY = "\033[90m"
 
 WORKSPACE_DIR = os.path.dirname(os.path.abspath(__file__))
 PID_FILE = os.path.join(WORKSPACE_DIR, ".mkdocs.pid")
+
+def get_local_ip():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return "127.0.0.1"
+
+LOCAL_IP = get_local_ip()
 
 # Definicion de los servicios y sus URLs
 SERVICES: List[Dict[str, Any]] = [
@@ -150,6 +163,24 @@ SERVICES: List[Dict[str, Any]] = [
         "browser": True,
     },
     {
+        "id": "keycloak",
+        "name": "Keycloak IAM (Realm eniaclabs)",
+        "category": "Seguridad",
+        "url": "http://localhost:18180",
+        "check_url": "http://127.0.0.1:18180/realms/eniaclabs/.well-known/openid-configuration",
+        "desc": "Servidor OIDC/OAuth2 con PKCE y Roles (ADMIN/CLIENTE) (S07b/S11)",
+        "browser": True,
+    },
+    {
+        "id": "frontend",
+        "name": "Frontend Gamer SPA (Angular 22)",
+        "category": "Frontend",
+        "url": "http://localhost:4200",
+        "check_url": "http://localhost:4200",
+        "desc": "Portal Gamer, PC Builder, Carrito, Ordenes y Keycloak (S11)",
+        "browser": True,
+    },
+    {
         "id": "grafana",
         "name": "Grafana Server",
         "category": "Observabilidad",
@@ -193,7 +224,7 @@ def check_url(url: str, timeout: float = 2.5) -> bool:
         with urllib.request.urlopen(req, timeout=timeout) as response:
             return response.status in [200, 201, 204, 301, 302, 307, 308]
     except urllib.error.HTTPError as e:
-        return e.code in [200, 201, 204, 301, 302, 307, 308]
+        return e.code in [200, 201, 204, 301, 302, 307, 308, 401, 403]
     except Exception:
         return False
 
@@ -212,12 +243,12 @@ def is_docker_running() -> bool:
         return False
 
 
-def ensure_docker_daemon():
-    """Verifica y asegura que Docker Engine este iniciado."""
+def ensure_docker_daemon() -> bool:
+    """Verifica si Docker Engine esta disponible. Si no lo esta, intenta iniciarlo. Retorna True si esta activo, False si no."""
     print(f"{C_BOLD}[1/4] Verificando Docker Engine...{C_RESET}")
     if is_docker_running():
         print(f"  {C_GREEN}[OK] Docker Engine esta activo y respondiendo.{C_RESET}")
-        return
+        return True
 
     print(f"  {C_YELLOW}[!] Docker no esta respondiendo. Intentando iniciar Docker Desktop...{C_RESET}")
 
@@ -239,37 +270,63 @@ def ensure_docker_daemon():
                 print(f"  {C_GRAY}Error al intentar {path}: {e}{C_RESET}")
 
     if not started:
-        print(f"  {C_RED}[ERROR] No se encontro Docker Desktop en las rutas habituales.{C_RESET}")
-        print(f"    Por favor, inicia Docker Desktop manualmente y vuelve a ejecutar este script.")
-        sys.exit(1)
+        print(f"  {C_YELLOW}[AVISO] Docker Desktop no esta instalado o no se encuentra en las rutas habituales.{C_RESET}")
+        print(f"  {C_CYAN}--> Continuando en Modo Local sin Docker.{C_RESET}")
+        return False
 
-    print(f"  {C_YELLOW}[...] Esperando a que el daemon de Docker termine de iniciar (hasta 45s)...{C_RESET}")
+    print(f"  {C_YELLOW}[...] Esperando a que el daemon de Docker termine de iniciar (hasta 60s)...{C_RESET}")
     max_wait = 60
     start_time = time.time()
     while time.time() - start_time < max_wait:
         if is_docker_running():
             print(f"\n  {C_GREEN}[OK] Docker Engine inicio exitosamente.{C_RESET}")
-            return
+            return True
         print(".", end="", flush=True)
-        time.sleep(3)
+        time.sleep(2)
 
-    print(f"\n  {C_RED}[ERROR] Tiempo de espera agotado esperando a Docker Engine.{C_RESET}")
-    print(f"    Verifica la aplicacion Docker Desktop y ejecuta el script nuevamente.")
-    sys.exit(1)
+    print(f"\n  {C_YELLOW}[AVISO] Docker no respondio en el tiempo limite.{C_RESET}")
+    print(f"  {C_CYAN}--> Continuando en Modo Portatil Autonomo sin Docker.{C_RESET}")
+    return False
 
 
 def start_docker_compose():
     """Ejecuta docker compose up -d y garantiza el orden de arranque."""
     print(f"\n{C_BOLD}[2/4] Iniciando contenedores Docker Compose...{C_RESET}")
-    compose_cmd = ["docker", "compose", "up", "-d"]
+
+    # Carga automática de imágenes si existe el archivo empaquetado para nueva PC
+    cache_tar = os.path.join(WORKSPACE_DIR, "docker-images-cache.tar")
+    if os.path.exists(cache_tar):
+        try:
+            check_img = subprocess.run(["docker", "images", "-q", "apache/kafka:latest"], capture_output=True, text=True)
+            if not check_img.stdout.strip():
+                print(f"  {C_CYAN}[NUEVA PC] Detectado 'docker-images-cache.tar'. Cargando imagenes pre-empaquetadas...{C_RESET}")
+                subprocess.run(["docker", "load", "-i", cache_tar], cwd=WORKSPACE_DIR)
+                print(f"  {C_GREEN}[OK] Imagenes cargadas exitosamente sin descargar de internet.{C_RESET}")
+        except Exception as e:
+            print(f"  {C_GRAY}[AVISO] No se pudo cargar el cache de imagenes: {e}{C_RESET}")
+
+    compose_cmd = ["docker", "compose", "up", "-d", "--build"]
     try:
         res = subprocess.run(compose_cmd, cwd=WORKSPACE_DIR, capture_output=True, text=True)
+        if res.returncode != 0:
+            print(f"  {C_YELLOW}[AVISO] Reintentando docker compose up -d con imagenes locales en cache...{C_RESET}")
+            res = subprocess.run(["docker", "compose", "up", "-d"], cwd=WORKSPACE_DIR, capture_output=True, text=True)
         if res.returncode == 0:
             print(f"  {C_GREEN}[OK] Contenedores iniciados correctamente via Docker Compose.{C_RESET}")
         else:
             print(f"  {C_RED}[ERROR] Error al ejecutar docker compose up:{C_RESET}\n{res.stderr}")
     except Exception as e:
         print(f"  {C_RED}[ERROR] Error al invocar docker compose: {e}{C_RESET}")
+
+    # Iniciar Keycloak IAM (S07b/S11)
+    keycloak_dir = os.path.join(WORKSPACE_DIR, "keycloak")
+    if os.path.exists(os.path.join(keycloak_dir, "compose-dev.yml")):
+        try:
+            res_kc = subprocess.run(["docker", "compose", "-f", "compose-dev.yml", "up", "-d"], cwd=keycloak_dir, capture_output=True, text=True)
+            if res_kc.returncode == 0:
+                print(f"  {C_GREEN}[OK] Keycloak IAM iniciado correctamente (Puerto 18180).{C_RESET}")
+        except Exception as e:
+            print(f"  {C_GRAY}[AVISO] Error al iniciar Keycloak: {e}{C_RESET}")
 
     # Chequeo inteligente de Config Server y Eureka
     print(f"  {C_BLUE}[INFO] Esperando estabilizacion del Config Server y Eureka...{C_RESET}")
@@ -339,6 +396,44 @@ def start_mkdocs():
         print(f"  {C_RED}[ERROR] No se pudo iniciar MkDocs: {e}{C_RESET}")
 
 
+def start_frontend():
+    """Inicia el servidor de Frontend Angular si no esta activo."""
+    print(f"\n{C_BOLD}[4/4] Verificando Frontend Gamer SPA (Puerto 4200)...{C_RESET}")
+    if check_url("http://127.0.0.1:4200", timeout=1.0) or check_url("https://127.0.0.1:4200", timeout=1.0):
+        print(f"  {C_GREEN}[OK] Frontend Angular ya se encuentra activo en http://localhost:4200{C_RESET}")
+        return
+
+    frontend_dir = os.path.join(WORKSPACE_DIR, "clients", "eniaclabs-frontend")
+    dist_dir = os.path.join(frontend_dir, "dist", "app", "browser")
+    serve_py = os.path.join(WORKSPACE_DIR, "serve_frontend.py")
+
+    # 1. Si existe build pre-compilado en dist/app/browser, lanzar con Python (Modo Instantáneo 0.1s, Cero npm)
+    if os.path.exists(dist_dir) and os.path.exists(serve_py):
+        print(f"  {C_CYAN}[PORTATIL] Iniciando Frontend Angular pre-compilado en http://localhost:4200...{C_RESET}")
+        try:
+            flags = subprocess.CREATE_NEW_PROCESS_GROUP if sys.platform == "win32" else 0
+            subprocess.Popen([sys.executable, serve_py], cwd=WORKSPACE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=flags)
+            for _ in range(6):
+                if check_url("http://127.0.0.1:4200", timeout=0.8):
+                    print(f"  {C_GREEN}[OK] Frontend Angular activo de inmediato en http://localhost:4200 (Modo Instantaneo).{C_RESET}")
+                    return
+                time.sleep(0.5)
+        except Exception as e:
+            print(f"  {C_GRAY}[AVISO] Fallback a npm: {e}{C_RESET}")
+
+    # 2. Fallback a npm start si el build no estaba
+    if not os.path.exists(frontend_dir):
+        return
+
+    print(f"  {C_BLUE}[INFO] Lanzando Frontend Angular con npm start...{C_RESET}")
+    try:
+        if sys.platform == "win32":
+            subprocess.Popen(["cmd.exe", "/c", "start", "cmd.exe", "/k", "cd /d clients\\eniaclabs-frontend && npm start"], cwd=WORKSPACE_DIR, shell=True)
+            print(f"  {C_GREEN}[OK] Ventana de Frontend Angular lanzada con exito.{C_RESET}")
+    except Exception as e:
+        print(f"  {C_GRAY}[AVISO] No se pudo lanzar el frontend: {e}{C_RESET}")
+
+
 def stop_mkdocs():
     """Detiene el proceso de MkDocs si esta registrado en .mkdocs.pid."""
     if os.path.exists(PID_FILE):
@@ -357,11 +452,14 @@ def stop_mkdocs():
             pass
 
 
-def wait_for_services(max_retries: int = 15, delay: float = 2.0):
+def wait_for_services(max_retries: int = 15, delay: float = 2.0, docker_active: bool = True):
     """Espera a que los servicios principales alcancen estado activo."""
-    print(f"\n{C_BOLD}[4/4] Verificando estado y disponibilidad de los servicios...{C_RESET}")
+    print(f"\n{C_BOLD}[VERIFICACION] Comprobando disponibilidad de endpoints...{C_RESET}")
 
-    key_services = [s for s in SERVICES if s["id"] in ["mkdocs", "eureka", "gateway", "catalogo", "orden", "cotizacion", "pago", "grafana", "prometheus"]]
+    if docker_active:
+        key_services = [s for s in SERVICES if s["id"] in ["mkdocs", "eureka", "gateway", "catalogo", "orden", "cotizacion", "pago", "grafana", "prometheus"]]
+    else:
+        key_services = [s for s in SERVICES if s.get("browser", False)]
 
     for attempt in range(1, max_retries + 1):
         all_up = True
@@ -374,7 +472,7 @@ def wait_for_services(max_retries: int = 15, delay: float = 2.0):
                 pending.append(s["name"])
 
         if all_up:
-            print(f"  {C_GREEN}[OK] Todos los servicios clave estan respondiendo.{C_RESET}")
+            print(f"  {C_GREEN}[OK] Todos los servicios requeridos estan respondiendo.{C_RESET}")
             break
 
         if attempt < max_retries:
@@ -398,11 +496,11 @@ def display_status_table():
     print("=" * 90)
 
 
-def open_all_pages():
+def open_all_pages(docker_active: bool = True):
     """Abre cada pagina web relevante en el navegador predeterminado."""
     pages_to_open = [s for s in SERVICES if s.get("browser", False)]
 
-    print(f"\n{C_BOLD}{C_CYAN}[NAVEGADOR] Abriendo {len(pages_to_open)} paginas en el navegador predeterminado...{C_RESET}")
+    print(f"\n{C_BOLD}{C_CYAN}[NAVEGADOR] Abriendo {len(pages_to_open)} paginas en el navegador...{C_RESET}")
 
     for idx, s in enumerate(pages_to_open, 1):
         print(f"  {C_GRAY}[{idx}/{len(pages_to_open)}]{C_RESET} Abriendo: {C_BOLD}{s['name']}{C_RESET} -> {C_BLUE}{s['url']}{C_RESET}")
@@ -410,31 +508,42 @@ def open_all_pages():
             webbrowser.open(s["url"], new=2)
         except Exception as e:
             print(f"    {C_RED}[ERROR] al abrir {s['url']}: {e}{C_RESET}")
-        time.sleep(0.7)  # Pausa suave para evitar que el navegador colapse
+        time.sleep(0.7)
 
-    print(f"\n{C_GREEN}{C_BOLD}[OK] Todas las paginas han sido enviadas al navegador.{C_RESET}")
+    print(f"\n{C_GREEN}{C_BOLD}[OK] Paginas abiertas en el navegador.{C_RESET}")
 
 
 def stop_everything():
-    """Detiene Docker Compose y MkDocs."""
-    print(f"\n{C_YELLOW}{C_BOLD}[DETENER] Deteniendo todos los servicios del ecosistema...{C_RESET}")
+    """Detiene MkDocs y Docker Compose."""
+    print(f"\n{C_YELLOW}{C_BOLD}[DETENER] Deteniendo servicios del ecosistema...{C_RESET}")
     stop_mkdocs()
-    try:
-        subprocess.run(["docker", "compose", "down"], cwd=WORKSPACE_DIR)
-        print(f"{C_GREEN}[OK] Contenedores Docker detenidos y limpiados.{C_RESET}")
-    except Exception as e:
-        print(f"{C_RED}[ERROR] Error al detener contenedores: {e}{C_RESET}")
+
+    if is_docker_running():
+        try:
+            subprocess.run(["docker", "compose", "down"], cwd=WORKSPACE_DIR)
+            print(f"{C_GREEN}[OK] Contenedores Docker principales detenidos.{C_RESET}")
+        except Exception as e:
+            print(f"{C_RED}[ERROR] Error al detener contenedores: {e}{C_RESET}")
+
+        keycloak_dir = os.path.join(WORKSPACE_DIR, "keycloak")
+        if os.path.exists(os.path.join(keycloak_dir, "compose-dev.yml")):
+            try:
+                subprocess.run(["docker", "compose", "-f", "compose-dev.yml", "down"], cwd=keycloak_dir, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                print(f"{C_GREEN}[OK] Keycloak IAM detenido.{C_RESET}")
+            except Exception:
+                pass
+    else:
+        print(f"{C_GREEN}[OK] Servidores locales detenidos.{C_RESET}")
 
 
-def interactive_menu():
+def interactive_menu(docker_active: bool = True):
     """Bucle de menu interactivo para conveniencia del usuario."""
     menu_text = f"""
 {C_BOLD}Acciones rapidas disponibles:{C_RESET}
-  {C_CYAN}[1 / o]{C_RESET} Reabrir todas las paginas en el navegador
-  {C_CYAN}[2 / s]{C_RESET} Actualizar y verificar estado de salud
-  {C_CYAN}[3 / r]{C_RESET} Reiniciar microservicios de negocio
-  {C_CYAN}[4 / d]{C_RESET} Detener todo (docker compose down + cerrar mkdocs)
-  {C_CYAN}[q / Ctrl+C]{C_RESET} Salir (manteniendo los contenedores encendidos)
+  {C_CYAN}[1 / o]{C_RESET} Reabrir paginas en el navegador
+  {C_CYAN}[2 / s]{C_RESET} Actualizar y verificar estado de servicios
+  {C_CYAN}[3 / d]{C_RESET} Detener todo y salir
+  {C_CYAN}[x / Ctrl+C]{C_RESET} Salir (manteniendo los servidores encendidos)
 """
     print(menu_text)
 
@@ -442,30 +551,19 @@ def interactive_menu():
         try:
             choice = input(f"{C_BOLD}ENIAC-Labs > {C_RESET}").strip().lower()
             if choice in ["1", "o", "open"]:
-                open_all_pages()
+                open_all_pages(docker_active=docker_active)
             elif choice in ["2", "s", "status"]:
                 display_status_table()
-            elif choice in ["3", "r", "restart"]:
-                print(f"{C_YELLOW}Reiniciando microservicios...{C_RESET}")
-                subprocess.run([
-                    "docker", "restart",
-                    "eniaclabs-catalogo-ms",
-                    "eniaclabs-orden-ms",
-                    "eniaclabs-pago-ms",
-                    "eniaclabs-cotizacion-ms"
-                ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                time.sleep(5)
-                display_status_table()
-            elif choice in ["4", "d", "down", "stop"]:
+            elif choice in ["3", "d", "down", "stop"]:
                 stop_everything()
                 break
-            elif choice in ["q", "exit", "quit"]:
-                print(f"{C_GREEN}Saliendo del asistente. Los servicios continuaran ejecutandose en segundo plano.{C_RESET}")
+            elif choice in ["x", "exit", "quit"]:
+                print(f"{C_GREEN}Saliendo de consola. Los servidores continuaran ejecutandose en segundo plano.{C_RESET}")
                 break
             else:
-                print(f"{C_GRAY}Opcion no reconocida. Opciones validas: [1=abrir, 2=estado, 3=reiniciar, 4=detener, q=salir]{C_RESET}")
+                print(f"{C_GRAY}Opcion no valida. Opciones: [1=abrir, 2=estado, 3=detener, x=salir]{C_RESET}")
         except (KeyboardInterrupt, EOFError):
-            print(f"\n{C_GREEN}Saliendo del asistente. Los servicios continuaran ejecutandose en segundo plano.{C_RESET}")
+            print(f"\n{C_GREEN}Saliendo de consola. Los servidores continuaran ejecutandose en segundo plano.{C_RESET}")
             break
 
 
@@ -492,18 +590,26 @@ def main():
         open_all_pages()
         return
 
-    # Flujo completo de inicio
-    ensure_docker_daemon()
-    start_docker_compose()
-    start_mkdocs()
-    wait_for_services()
+    # 1. Verificar Docker Engine de forma segura (sin fallar si no esta instalado)
+    docker_active = ensure_docker_daemon()
+
+    if docker_active:
+        start_docker_compose()
+        start_mkdocs()
+        start_frontend()
+        wait_for_services(docker_active=True)
+    else:
+        print(f"\n{C_YELLOW}{C_BOLD}[MODO AUTONOMO]{C_RESET}")
+        print(f"  {C_GRAY}✓ Funcionando sin Docker en esta computadora.{C_RESET}")
+
     display_status_table()
 
     if not args.no_browser:
-        open_all_pages()
+        open_all_pages(docker_active=docker_active)
 
-    interactive_menu()
+    interactive_menu(docker_active=docker_active)
 
 
 if __name__ == "__main__":
     main()
+

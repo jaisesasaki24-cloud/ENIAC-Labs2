@@ -1,6 +1,7 @@
 package pe.edu.upeu.eniaclabs.cotizacion.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import java.util.List;
 @RequestMapping("/api/v1/cotizaciones")
 @RequiredArgsConstructor
 @Tag(name = "Cotizador PC Builder y Proformas Comerciales", description = "Endpoints para cotizaciones de computadoras gamer, validacion de compatibilidad y conversion en ordenes de compra")
+@SecurityRequirement(name = "BearerAuth")
 public class CotizacionController {
 
     private final CotizacionService cotizacionService;

@@ -1,6 +1,7 @@
 package pe.edu.upeu.eniaclabs.auth.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import java.util.List;
 @RequestMapping("/api/v1/usuarios")
 @RequiredArgsConstructor
 @Tag(name = "Gestion de Usuarios", description = "Endpoints para consulta y gestion de perfiles de usuario")
+@SecurityRequirement(name = "BearerAuth")
 public class UsuarioController {
 
     private final UsuarioService usuarioService;

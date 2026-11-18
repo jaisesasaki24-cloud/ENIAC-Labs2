@@ -1,7 +1,17 @@
 server:
   port: 18080
 
+eniaclabs:
+  cors:
+    allowed-origins: http://localhost:4200,http://127.0.0.1:4200,https://localhost:4200,https://127.0.0.1:4200
+
+
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:18180/realms/eniaclabs
   cloud:
     gateway:
       server:
@@ -23,6 +33,10 @@ spring:
               uri: lb://PC-PAGO-MS
               predicates:
                 - Path=/api/v1/pagos/**
+            - id: pc-payments-ms
+              uri: lb://PC-PAGO-MS
+              predicates:
+                - Path=/api/payments/**
             - id: pc-cotizacion-ms
               uri: lb://PC-COTIZACION-MS
               predicates:
@@ -31,11 +45,16 @@ spring:
               uri: lb://PC-AUTH-MS
               predicates:
                 - Path=/api/v1/auth/**
+            - id: pc-auth-usuarios
+              uri: lb://PC-AUTH-MS
+              predicates:
+                - Path=/api/v1/usuarios/**
 
 eureka:
   instance:
     hostname: localhost
-    instance-id: ${spring.application.name}:${server.port}
+    instance-id: ${spring.application.name}:${random.uuid}
+    prefer-ip-address: true
   client:
     register-with-eureka: true
     fetch-registry: true

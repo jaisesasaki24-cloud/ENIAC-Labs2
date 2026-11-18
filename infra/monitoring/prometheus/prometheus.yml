@@ -86,3 +86,12 @@ scrape_configs:
         labels:
           application: "pc-config"
           environment: "production"
+
+  - job_name: "pc-keycloak"
+    metrics_path: "/metrics"
+    scrape_interval: 5s
+    static_configs:
+      - targets: ["keycloak:9000"]
+        labels:
+          application: "pc-keycloak"
+          environment: "production"

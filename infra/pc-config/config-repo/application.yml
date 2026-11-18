@@ -1,0 +1,14 @@
+management:
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+      validate-group-membership: false
+      group:
+        liveness:
+          include: livenessState
+          show-details: always
+        readiness:
+          include: readinessState, db
+          show-details: always

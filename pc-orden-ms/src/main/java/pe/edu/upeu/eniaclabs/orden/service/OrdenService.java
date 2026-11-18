@@ -15,5 +15,6 @@ public interface OrdenService {
     OrdenResponseDto create(CrearOrdenRequestDto request, Long clienteId);
     OrdenResponseDto updateStatus(Long id, ActualizarEstadoOrdenDto request);
     void marcarPagada(Long ordenId);
+    void compensar(Long ordenId);
     void cancel(Long id);
 }

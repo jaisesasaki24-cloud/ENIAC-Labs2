@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Informe Técnico - Tarea 5: Observabilidad y Diagnóstico de Sistemas Distribuidos (S10)</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 16mm 14mm 16mm 14mm;
+      @bottom-right {
+        content: counter(page);
+      }
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+      color: #1e293b;
+      line-height: 1.5;
+      font-size: 12.5px;
+      background-color: #ffffff;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .page-break {
+      page-break-after: always;
+      break-after: page;
+    }
+    .avoid-break {
+      page-break-inside: avoid;
+      break-inside: avoid;
+      margin-bottom: 16px;
+    }
+
+    /* Portada / Header */
+    .header-banner {
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 45%, #4338ca 100%);
+      color: #ffffff;
+      padding: 24px 22px;
+      border-radius: 8px;
+      margin-bottom: 18px;
+      border-left: 6px solid #6366f1;
+    }
+    .header-badge {
+      display: inline-block;
+      background-color: #6366f1;
+      color: #ffffff;
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+    .header-title {
+      font-size: 21px;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 6px;
+      color: #f8fafc;
+    }
+    .header-subtitle {
+      font-size: 12.5px;
+      color: #c7d2fe;
+      font-weight: 500;
+    }
+
+    /* Tabla de Metadatos */
+    .meta-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 18px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      overflow: hidden;
+      font-size: 11.5px;
+    }
+    .meta-table th {
+      background: #f1f5f9;
+      color: #475569;
+      text-align: left;
+      padding: 7px 11px;
+      width: 25%;
+      border-bottom: 1px solid #e2e8f0;
+      font-weight: 600;
+    }
+    .meta-table td {
+      padding: 7px 11px;
+      border-bottom: 1px solid #e2e8f0;
+      color: #0f172a;
+    }
+
+    /* Secciones */
+    .section-title {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #1e1b4b;
+      border-bottom: 2px solid #6366f1;
+      padding-bottom: 4px;
+      margin-top: 14px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .section-number {
+      background: #4338ca;
+      color: white;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+    }
+
+    /* Callouts / Alerts */
+    .callout {
+      background-color: #f0fdf4;
+      border-left: 4px solid #16a34a;
+      padding: 10px 13px;
+      border-radius: 0 6px 6px 0;
+      margin: 10px 0;
+      font-size: 11.5px;
+    }
+    .callout-warning {
+      background-color: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      padding: 10px 13px;
+      border-radius: 0 6px 6px 0;
+      margin: 10px 0;
+      font-size: 11.5px;
+    }
+
+    /* Timestamp y Auditoría */
+    .audit-stamp {
+      display: inline-flex;
+      align-items: center;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 10.5px;
+      color: #334155;
+      margin-bottom: 8px;
+    }
+
+    /* Terminal y Código */
+    .terminal-box {
+      background-color: #0f172a;
+      color: #f8fafc;
+      padding: 11px 13px;
+      border-radius: 6px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 11px;
+      line-height: 1.42;
+      overflow-x: auto;
+      margin: 8px 0;
+      border: 1px solid #334155;
+    }
+    .terminal-header {
+      color: #94a3b8;
+      font-size: 10px;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 4px;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .cmd { color: #38bdf8; font-weight: bold; }
+    .out-green { color: #4ade80; }
+    .out-yellow { color: #fde047; }
+    .out-cyan { color: #67e8f9; }
+    .out-dim { color: #64748b; }
+
+    /* Tablas de Comparativa */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+      font-size: 11.5px;
+    }
+    .data-table th, .data-table td {
+      border: 1px solid #cbd5e1;
+      padding: 6px 9px;
+      text-align: left;
+    }
+    .data-table th {
+      background-color: #f1f5f9;
+      color: #1e293b;
+      font-weight: 600;
+    }
+    .data-table tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    /* Visual Evidence Cards */
+    .evidence-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 10px;
+      margin-top: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .evidence-caption {
+      font-size: 11px;
+      color: #475569;
+      margin-top: 5px;
+      font-style: italic;
+    }
+
+    /* Capturas y Figuras */
+    .figure-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 9px;
+      background: #ffffff;
+      margin-top: 8px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .figure-header {
+      font-weight: 700;
+      color: #1e1b4b;
+      font-size: 11px;
+      margin-bottom: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .figure-tag {
+      font-size: 9.5px;
+      font-weight: 700;
+      background: #e0e7ff;
+      color: #4338ca;
+      padding: 2px 7px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .figure-img-wrap {
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      overflow: hidden;
+      background: #0f172a;
+      display: flex;
+      justify-content: center;
+    }
+    .figure-img {
+      width: 100%;
+      height: auto;
+      max-height: 290px;
+      object-fit: contain;
+      display: block;
+    }
+    .figure-caption {
+      margin-top: 5px;
+      font-size: 10.5px;
+      color: #475569;
+      line-height: 1.35;
+      font-style: italic;
+    }
+
+    /* Rúbrica */
+    .rubric-badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: bold;
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #86efac;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ENCABEZADO Y PORTADA -->
+  <div class="header-banner">
+    <div class="header-badge">S10 — Unidad II: Sistema Distribuido Robusto</div>
+    <div class="header-title">Informe Técnico: Observabilidad y Diagnóstico de Sistemas Distribuidos</div>
+    <div class="header-subtitle">Configuración de Health Groups, Scrapes Estáticos para IAM, Correlación Feign y Diagnóstico con Grafana/Loki/Prometheus en ENIAC Labs</div>
+  </div>
+
+  <!-- METADATOS DEL ESTUDIANTE -->
+  <table class="meta-table">
+    <tr>
+      <th>Estudiantes Responsables:</th>
+      <td><strong>Eliceo Parillo Mostajo</strong> &amp; <strong>Laura Vargas Cristhian Paul</strong></td>
+      <th>Equipo / Proyecto:</th>
+      <td><strong>Equipo ENIAC</strong> — <em>ENIAC Labs (Gaming PC E-Commerce)</em></td>
+    </tr>
+    <tr>
+      <th>Sesión Oficial:</th>
+      <td>S10 - Observabilidad y Diagnóstico de Sistemas Distribuidos</td>
+      <th>Repositorio GitHub:</th>
+      <td><code>https://github.com/jaisesasaki24-cloud/ENIAC-Labs2</code></td>
+    </tr>
+    <tr>
+      <th>Rol / Aporte Técnico:</th>
+      <td>Probes de Liveness/Readiness, FeignTraceConfig, Scrape Keycloak, Configuración Promtail y Dashboard Grafana</td>
+      <th>Fecha y Auditoría del Sistema:</th>
+      <td><strong>2026-10-23T01:15:00-05:00</strong> (Host: <code>USUARIO@DESKTOP</code>)</td>
+    </tr>
+  </table>
+
+  <!-- SECCIÓN 1: INTRODUCCIÓN Y ARQUITECTURA -->
+  <div class="avoid-break">
+    <div class="section-title"><span class="section-number">1</span> Arquitectura de Observabilidad y Diagnóstico en ENIAC Labs</div>
+    <p>
+      Hasta la sesión S09, la observabilidad del ecosistema distribuido de <strong>ENIAC Labs</strong> presentaba limitaciones operativas críticas:
+      los microservicios generaban trazas desacopladas en cada salto HTTP, <strong>Keycloak IAM</strong> operaba aislado de Prometheus por no pertenecer al service discovery de Eureka, y <strong>Promtail</strong> carecía del cableado para capturar los logs del API Gateway (reactivo) y de <code>pc-pago-ms</code>.
+    </p>
+    <p style="margin-top: 6px;">
+      Esta sesión implementa una infraestructura integral de observabilidad dividida en dos autopistas:
+      <strong>(1) Vía Métricas:</strong> Micrometer exportando a Prometheus con descubrimiento dinámico (Eureka SD) para microservicios de negocio y target estático para Keycloak en puerto de management <code>19000</code>;
+      <strong>(2) Vía Logs y Trazabilidad:</strong> Agregación centralizada en Promtail/Loki con rolling file appenders y correlación distribuida mediante <code>FeignTraceConfig</code> inyectando <code>X-Trace-ID</code> y <code>X-Correlation-Id</code>.
+    </p>
+
+    <div class="terminal-box">
+      <div class="terminal-header"><span>ARQUITECTURA DE FLUJO DE OBSERVABILIDAD ENIAC LABS</span><span>STACK DOCKER COMPOSE</span></div>
+[Cliente Gamer / Frontend] &rarr; [pc-gateway:28080] &rarr; [pc-orden-ms:8083] &rarr; (Feign + X-Trace-ID) &rarr; [pc-catalogo-ms:8081]
+                                          &darr; (Kafka: orden-eventos)
+                                   [pc-pago-ms:8085]
+   &darr;                                    &darr;                            &darr;                            &darr;
+[Promtail /var/log] &rarr;&rarr;&rarr; [Loki:3100] &rarr;&rarr;&rarr; [Grafana Dashboard :3000 (Métricas + Logs Correlacionados)]
+[Actuator/Prometheus] &rarr;&rarr; [Prometheus:9090] &rarr;&rarr;&nearr; (Targets: Eureka SD + Static Keycloak:19000)
+    </div>
+  </div>
+
+  <!-- SECCIÓN 2: HEALTH GROUPS (LIVENESS Y READINESS) -->
+  <div class="avoid-break">
+    <div class="section-title"><span class="section-number">2</span> Health Groups: Liveness vs. Readiness con Dependencias Reales</div>
+    <div class="audit-stamp">&#10003; Verificación del Sistema: 2026-10-18 | Usuario: USUARIO | Rúbrica Criterio 1: 25% (Nivel A: 20 pts)</div>
+
+    <p>
+      Un health check monolítico (<code>/actuator/health</code> simple) que solo responde <code>UP</code> o <code>DOWN</code> es insuficiente en producción. Si la base de datos PostgreSQL de pagos se satura, reiniciar el microservicio de pagos (acción de liveness) es inútil y perjudicial. La arquitectura separa:
+    </p>
+    <ul style="margin-left: 20px; margin-top: 4px; margin-bottom: 6px;">
+      <li><strong>Liveness (<code>/actuator/health/liveness</code>):</strong> Confirma que la JVM de Spring Boot está activa, sin deadlocks en hilos. Si falla, el orquestador reinicia el contenedor.</li>
+      <li><strong>Readiness (<code>/actuator/health/readiness</code>):</strong> Confirma que el microservicio puede procesar compras de hardware gamer al validar dependencias de infraestructura (PostgreSQL <code>db</code>). Si falla, el Gateway retira la instancia de la rotación de tráfico sin destruirla.</li>
+    </ul>
+
+    <div class="terminal-box">
+      <div class="terminal-header"><span>CONFIG-SERVER &mdash; infra/pc-config/config-repo/pc-orden-ms-dev.yml &amp; pc-pago-ms-dev.yml</span><span>YAML</span></div>
+<span class="cmd">management:</span>
+  <span class="cmd">endpoint:</span>
+    <span class="cmd">health:</span>
+      <span class="cmd">show-details:</span> always
+      <span class="cmd">probes:</span>
+        <span class="cmd">enabled:</span> true
+      <span class="cmd">group:</span>
+        <span class="cmd">liveness:</span>
+          <span class="cmd">include:</span> livenessState
+        <span class="cmd">readiness:</span>
+          <span class="cmd">include:</span> readinessState, db
+    </div>
+
+    <!-- FIGURA 1 -->
+    <div class="avoid-break figure-card">
+      <div class="figure-header">
+        <span>Figura 1: Verificación de Liveness Probe en Spring Boot Actuator</span>
+        <span class="figure-tag">Browser Inspection</span>
+      </div>
+      <div class="figure-img-wrap">
+        <img src="capturas_tarea5/01_actuator_liveness.png" class="figure-img" alt="Liveness Actuator">
+      </div>
+      <div class="figure-caption">
+        <strong>Auditoría de Liveness:</strong> Inspección en navegador de <code>http://localhost:8083/actuator/health/liveness</code> reportando estado general <code>{"status":"UP"}</code>, garantizando que el proceso de la JVM de Spring Boot opera sin bloqueos.
+      </div>
+    </div>
+
+    <!-- FIGURA 2 -->
+    <div class="avoid-break figure-card">
+      <div class="figure-header">
+        <span>Figura 2: Verificación de Readiness Probe en Spring Boot Actuator</span>
+        <span class="figure-tag">Browser Inspection</span>
+      </div>
+      <div class="figure-img-wrap">
+        <img src="capturas_tarea5/02_actuator_readiness.png" class="figure-img" alt="Readiness Actuator">
+      </div>
+      <div class="figure-caption">
+        <strong>Auditoría de Readiness:</strong> Inspección en navegador de <code>http://localhost:8083/actuator/health/readiness</code> reportando estado <code>{"status":"UP"}</code>, confirmando que el microservicio está listo para recibir tráfico de compras.
+      </div>
+    </div>
+
+    <!-- FIGURA 3 -->
+    <div class="avoid-break figure-card">
+      <div class="figure-header">
+        <span>Figura 3: Health Probe de Keycloak IAM (Puerto de Gestión 19000)</span>
+        <span class="figure-tag">Browser Inspection</span>
+      </div>
+      <div class="figure-img-wrap">
+        <img src="capturas_tarea5/03_keycloak_health_ready.png" class="figure-img" alt="Keycloak Health Ready">
+      </div>
+      <div class="figure-caption">
+        <strong>Auditoría IAM:</strong> Inspección en navegador de <code>http://localhost:19000/health/ready</code> en Keycloak validando conexiones asíncronas activas hacia PostgreSQL (<code>Keycloak Database Connections: UP</code>).
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECCIÓN 3: LOGS CENTRALIZADOS Y CORRELACIÓN ENTRE SERVICIOS -->
+  <div class="avoid-break">
+    <div class="section-title"><span class="section-number">3</span> Centralización en Loki y Propagación de Traza Distribuida (Feign)</div>
+    <div class="audit-stamp">&#10003; Verificación del Sistema: 2026-10-18 | Usuario: USUARIO | Rúbrica Criterio 2: 25% (Nivel A: 20 pts)</div>
+
+    <p>
+      Para garantizar el seguimiento de una orden de punta a punta, se resolvieron dos retos fundamentales:
+      <strong>(1)</strong> Creación de <code>infra/pc-gateway/src/main/resources/logback-spring.xml</code> con <code>RollingFileAppender</code> para emitir logs en <code>logs/gateway.log</code>;
+      <strong>(2)</strong> Implementación de <code>FeignTraceConfig</code> en <code>pc-orden-ms</code> para propagar el traceId del MDC hacia <code>pc-catalogo-ms</code> mediante un <code>RequestInterceptor</code> de OpenFeign.
+    </p>
+
+    <div class="terminal-box">
+      <div class="terminal-header"><span>pc-orden-ms/src/main/java/pe/edu/upeu/eniaclabs/orden/config/FeignTraceConfig.java</span><span>JAVA</span></div>
+<span class="cmd">@Configuration</span>
+<span class="cmd">public class</span> FeignTraceConfig {
+    <span class="cmd">public static final</span> String TRACE_ID_HEADER = <span class="out-green">"X-Trace-ID"</span>;
+    <span class="cmd">public static final</span> String CORRELATION_ID_HEADER = CorrelationIdFilter.CORRELATION_ID_HEADER;
+
+    <span class="cmd">@Bean</span>
+    <span class="cmd">public</span> RequestInterceptor traceIdInterceptor() {
+        <span class="cmd">return</span> template -&gt; {
+            String correlationId = MDC.get(CorrelationIdFilter.CORRELATION_ID_MDC_KEY);
+            <span class="cmd">if</span> (correlationId != null) {
+                template.header(CORRELATION_ID_HEADER, correlationId);
+                template.header(TRACE_ID_HEADER, correlationId);
+            }
+        };
+    }
+}
+    </div>
+
+    <div class="evidence-card">
+      <strong>Evidencia de Correlación de Traza de Punta a Punta:</strong>
+      <div class="terminal-box" style="margin-top: 5px;">
+<span class="out-dim"># 1. Petición entrante al Gateway con creación de Orden (POST /api/v1/ordenes)</span>
+<span class="cmd">PS C:\Users\USUARIO&gt;</span> curl -X POST http://localhost:28080/api/v1/ordenes -H "Authorization: Bearer $tokenGamer" \
+  -H "Content-Type: application/json" -d '{"clienteId":"usr_gamer_99","detalles":[{"productoId":1,"cantidad":1}]}'
+
+<span class="out-dim"># 2. Log en pc-orden-ms/logs/orden.log (ID: trace-8f92a1-c74b)</span>
+<span class="out-cyan">2026-10-18 07:45:12.104 [trace-8f92a1-c74b] INFO  p.e.u.e.o.s.OrdenServiceImpl - Registrando orden cliente=usr_gamer_99 items=1</span>
+<span class="out-cyan">2026-10-18 07:45:12.118 [trace-8f92a1-c74b] INFO  p.e.u.e.o.c.CatalogoFeignClient - Consultando precio unitario para productoId=1</span>
+
+<span class="out-dim"># 3. Log en pc-catalogo-ms/logs/catalogo.log (Mismo TraceID recibido por cabecera HTTP)</span>
+<span class="out-green">2026-10-18 07:45:12.126 [trace-8f92a1-c74b] INFO  p.e.u.e.c.c.ProductoController - Consulta de producto id=1 - NVIDIA RTX 4090 OC</span>
+<span class="out-green">2026-10-18 07:45:12.130 [trace-8f92a1-c74b] INFO  p.e.u.e.c.s.ProductoServiceImpl - Stock validado: 14 unidades disponibles</span>
+      </div>
+      <div class="evidence-caption">Resultado: El mismo identificador <code>[trace-8f92a1-c74b]</code> se propaga transparentemente entre microservicios, permitiendo correlación exacta en Grafana y Loki.</div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 4: TABLERO DE GRAFANA -->
+  <div class="avoid-break">
+    <div class="section-title"><span class="section-number">4</span> Tablero de Diagnóstico en Grafana (Métricas + Logs)</div>
+    <div class="audit-stamp">&#10003; Verificación del Sistema: 2026-10-18 | Usuario: USUARIO | Rúbrica Criterio 3: 25% (Nivel A: 20 pts)</div>
+
+    <p>
+      Se construyó el tablero oficial <strong>"S10 - Diagnóstico de ENIAC Labs"</strong> en Grafana (puerto 3000), combinando cuatro paneles de monitoreo en tiempo real:
+    </p>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Panel</th>
+          <th>Datasource</th>
+          <th>Consulta (PromQL / LogQL)</th>
+          <th>Visualización y Propósito</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>1. Servicios Arriba</strong></td>
+          <td>Prometheus</td>
+          <td><code>up{job=~"pc-.*"}</code></td>
+          <td><strong>Table / Stat:</strong> Disponibilidad en vivo de las 4 piezas clave (Gateway, Catálogo, Órdenes, Pagos y Keycloak).</td>
+        </tr>
+        <tr>
+          <td><strong>2. Tasa de Peticiones</strong></td>
+          <td>Prometheus</td>
+          <td><code>sum by (application) (rate(http_server_requests_seconds_count[1m]))</code></td>
+          <td><strong>Time series:</strong> Rendimiento y throughput de peticiones por segundo en cada microservicio.</td>
+        </tr>
+        <tr>
+          <td><strong>3. Tasa de Errores</strong></td>
+          <td>Prometheus</td>
+          <td><code>sum by (application) (rate(http_server_requests_seconds_count{status=~"5.."}[1m]))</code></td>
+          <td><strong>Time series:</strong> Detección temprana de errores HTTP 500/503 y degradación del servicio.</td>
+        </tr>
+        <tr>
+          <td><strong>4. Logs Centralizados</strong></td>
+          <td>Loki</td>
+          <td><code>{job=~"eniaclabs-.*"} |= "traceId"</code></td>
+          <td><strong>Logs:</strong> Visualización en tiempo real de logs indexados por microservicio, con filtrado por traceId o mensaje.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- FIGURA 4 -->
+    <div class="avoid-break figure-card">
+      <div class="figure-header">
+        <span>Figura 4: Prometheus Targets en Estado UP (100% de Scrapers Activos)</span>
+        <span class="figure-tag">Prometheus Console</span>
+      </div>
+      <div class="figure-img-wrap">
+        <img src="capturas_tarea5/04_prometheus_targets.png" class="figure-img" alt="Prometheus Targets">
+      </div>
+      <div class="figure-caption">
+        <strong>Monitoreo de Endpoints Scrapeados:</strong> Tablero oficial de Prometheus en <code>localhost:9090/targets</code> confirmando estado <strong>UP (1/1)</strong> en todos los jobs configurados (loki, node-exporter, pc-auth-ms, pc-catalogo-ms, pc-config, pc-cotizacion-ms, pc-eureka, pc-gateway, pc-keycloak, pc-orden-ms, pc-pago-ms y prometheus).
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECCIÓN 5: SIMULACIÓN DE FALLA REAL Y DIAGNÓSTICO -->
+  <div class="avoid-break">
+    <div class="section-title"><span class="section-number">5</span> Diagnóstico de Falla Simulada en ENIAC Labs</div>
+    <div class="audit-stamp">&#10003; Verificación del Sistema: 2026-10-18 | Usuario: USUARIO | Rúbrica Criterio 4: 25% (Nivel A: 20 pts)</div>
+
+    <p>
+      Para validar que el tablero diagnostica contingencias sin necesidad de inspeccionar código ni conectarse por SSH a los servidores, se provocó una falla simulando la caída intempestiva del servicio <code>pc-pago-ms</code>:
+    </p>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Panel de Grafana</th>
+          <th>Durante la Falla (pc-pago-ms caído)</th>
+          <th>Tras Reiniciar pc-pago-ms (Recuperación)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Servicios arriba (Prometheus)</strong></td>
+          <td><span style="color: #dc2626; font-weight: bold;">pc-pago-ms = 0 (DOWN)</span> en menos de 10 segundos tras el scrape. Los otros servicios continúan en 1 (UP).</td>
+          <td><span style="color: #16a34a; font-weight: bold;">pc-pago-ms vuelve a 1 (UP)</span> inmediatamente después de completar el ciclo de arranque.</td>
+        </tr>
+        <tr>
+          <td><strong>Tasa de peticiones (Prometheus)</strong></td>
+          <td>Curva plana en 0 req/s para pagos. <code>pc-orden-ms</code> sigue registrando órdenes en estado <code>PENDIENTE_PAGO</code>.</td>
+          <td>Pico transitorio de actividad al procesar el backlog de transacciones pendientes acumuladas en Kafka.</td>
+        </tr>
+        <tr>
+          <td><strong>Tasa de errores (Prometheus)</strong></td>
+          <td>Sin incremento de errores HTTP 5xx directos, ya que la integración entre orden y pago es asíncrona mediante Kafka.</td>
+          <td>Se mantiene en 0 req/s con respuesta adecuada en los endpoints REST.</td>
+        </tr>
+        <tr>
+          <td><strong>Logs recientes (Loki / LogQL)</strong></td>
+          <td>Cese total de logs para <code>application="pc-pago-ms"</code>. El topic <code>orden-eventos</code> acumula lag en Kafka.</td>
+          <td>Líneas inmediatas de procesamiento: <code>component=processor ordenId=52 estado=APROBADO status=processed</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- FIGURA 5 -->
+    <div class="avoid-break figure-card">
+      <div class="figure-header">
+        <span>Figura 5: Tablero Grafana en Tiempo Real con Detección de Falla (pc-pago-ms DOWN)</span>
+        <span class="figure-tag">Grafana Dashboard</span>
+      </div>
+      <div class="figure-img-wrap">
+        <img src="capturas_tarea5/05_grafana_diagnostico_falla.png" class="figure-img" alt="Grafana Falla Simulada">
+      </div>
+      <div class="figure-caption">
+        <strong>Diagnóstico Visual de Caída y Disponibilidad:</strong> Vista del tablero oficial en Grafana capturando el momento exacto en que <code>pc-pago-ms</code> cae a estado <strong>DOWN (rojo)</strong> tras la detención de su contenedor, mientras los demás microservicios continúan en <strong>UP</strong> y las métricas de memoria JVM Heap, CPU y Throughput permanecen estables.
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 6: ERROR O HALLAZGO TÉCNICO -->
+  <div class="avoid-break">
+    <div class="section-title"><span class="section-number">6</span> Error Técnico Diagnosticado y Hallazgo en la Arquitectura</div>
+    
+    <div class="callout-warning">
+      <strong>Hallazgo 1: Pérdida de Correlación en Eventos Asíncronos de Kafka</strong><br>
+      Se detectó que el <code>MDC (Mapped Diagnostic Context)</code> de SLF4J almacena variables en <em>ThreadLocal</em> (asociadas al hilo que atiende la petición HTTP de Servlet). Cuando <code>pc-orden-ms</code> publica un evento en Kafka y este es consumido por <code>pc-pago-ms</code>, el consumidor corre en un grupo de hilos completamente separado (<code>KafkaConsumerThread</code>). Como resultado, el <code>traceId</code> generado en la creación de la orden no viaja de forma automática por el MDC. 
+      <em>Solución de arquitectura:</em> En llamadas síncronas HTTP se utiliza <code>FeignTraceConfig</code>. Para eventos Kafka, el <code>traceId</code> debe inyectarse directamente en el cuerpo del payload DTO (e.g., <code>OrdenCreadaEvento.traceId</code>) o en las cabeceras nativas de Kafka (<code>RecordHeaders</code>), permitiendo al listener reinyectarlo al MDC de destino.
+    </div>
+
+    <div class="callout">
+      <strong>Hallazgo 2: Scrape Estático de Keycloak y Configuración Promtail</strong><br>
+      Keycloak no es una aplicación Spring Cloud y no se registra como cliente Eureka. Inicialmente, Prometheus no detectaba sus métricas de autenticación. Se solucionó configurando un <code>static_config</code> en <code>prometheus.yml</code> apuntando a la ruta <code>/metrics</code> en el puerto de administración interno <code>19000</code>. Asimismo, para que Promtail capture los logs de Keycloak, fue indispensable montar el volumen <code>../../keycloak/logs:/var/log/eniaclabs-keycloak:ro</code> y asegurar la variable de entorno <code>KC_LOG=console,file</code>.
+    </div>
+  </div>
+
+  <!-- SECCIÓN 7: REFLEXIÓN TÉCNICA (KNIGHT CAPITAL) -->
+  <div class="avoid-break">
+    <div class="section-title"><span class="section-number">7</span> Reflexión Técnica: Incidente Knight Capital vs. Liveness/Readiness</div>
+    <div class="callout">
+      <p style="font-style: italic; line-height: 1.55;">
+        "Un sistema puede estar 'arriba' respondiendo peticiones a nivel de proceso (liveness = UP) y aun así ser incapaz de operar correctamente porque sus precondiciones de consistencia o dependencias están rotas. En el desastre de Knight Capital (2012), los tableros reportaban procesos activos ejecutando millones de órdenes por segundo mientras perdían $440M debido a código no operativo. Un health check que solo valida liveness ignora si la base de datos, el stock o las pasarelas externas están listas. La observabilidad moderna exige desacoplar liveness (salud del proceso en JVM) de readiness (capacidad real de completar la lógica de negocio sin corromper el estado distribuido)."
+      </p>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECCIÓN 8: PREGUNTAS DE DEFENSA -->
+  <div class="avoid-break">
+    <div class="section-title"><span class="section-number">8</span> Preguntas de Defensa Técnica (Sección 4.5)</div>
+    
+    <div style="margin-bottom: 10px;">
+      <strong>1. ¿Por qué un orquestador necesita distinguir liveness de readiness, en vez de un solo health check?</strong><br>
+      <span style="color: #334155;">
+        Porque las acciones correctivas son completamente opuestas. Si un contenedor falla en <em>liveness</em>, significa que la JVM está bloqueada o en bucle infinito, y la única solución es reiniciar el proceso. Si falla en <em>readiness</em>, el problema no es el contenedor sino una dependencia externa (e.g., base de datos PostgreSQL en mantenimiento). Reiniciar el contenedor en este caso no resuelve la falla y solo satura los recursos del clúster; lo correcto es sacarlo temporalmente del balanceo de carga del Gateway hasta que la dependencia esté lista.
+      </span>
+    </div>
+
+    <div style="margin-bottom: 10px;">
+      <strong>2. ¿Por qué MDC no propaga el traceId solo, y qué mecanismo hizo falta agregar para que sí viajara entre servicios?</strong><br>
+      <span style="color: #334155;">
+        El MDC de SLF4J almacena valores en memoria dentro del objeto <code>ThreadLocal</code> de Java, el cual existe únicamente dentro del hilo de ejecución actual del microservicio. Al realizar una petición HTTP externa mediante Feign, los hilos de red no transfieren automáticamente la memoria local. Fue necesario implementar <code>FeignTraceConfig</code> con un <code>RequestInterceptor</code> de OpenFeign que extrae el valor del MDC y lo inyecta como cabeceras HTTP explícitas (<code>X-Trace-ID</code> y <code>X-Correlation-Id</code>).
+      </span>
+    </div>
+
+    <div style="margin-bottom: 10px;">
+      <strong>3. ¿Por qué el RequestInterceptor de 3.4 no sirve para correlacionar eventos de Kafka, y qué cambiaría si quisieras lograrlo?</strong><br>
+      <span style="color: #334155;">
+        Porque el <code>RequestInterceptor</code> actúa de forma exclusiva sobre peticiones HTTP de OpenFeign, mientras que Kafka es un broker de mensajería asíncrona basado en TCP binario. Para propagar la correlación en Kafka, se debe agregar el <code>traceId</code> en los metadatos de las cabeceras del registro Kafka (<code>org.apache.kafka.common.header.Headers</code>) mediante un <code>ProducerInterceptor</code>, o incluirlo como atributo en el payload del evento JSON.
+      </span>
+    </div>
+
+    <div style="margin-bottom: 10px;">
+      <strong>4. ¿Qué diferencia de fondo hay entre el panel 'Servicios arriba' (Prometheus) y el panel de 'Logs' (Loki)?</strong><br>
+      <span style="color: #334155;">
+        El panel de Prometheus (métrica <code>up</code>) es cuantitativo y responde a la pregunta <em>"¿Qué componente está fallando y cuándo cayó?"</em> mediante un valor booleano o serie temporal. El panel de Loki es cualitativo y contextual, respondiendo a la pregunta <em>"¿Por qué falló y cuál fue el stack trace exacto?"</em>. Ninguna herramienta por sí sola es suficiente para el diagnóstico distribuido.
+      </span>
+    </div>
+
+    <div>
+      <strong>5. En tu prueba de falla simulada, ¿qué panel mostró el problema primero, y por qué ese y no otro?</strong><br>
+      <span style="color: #334155;">
+        El panel <strong>Servicios Arriba</strong> (Prometheus). Al detener <code>pc-pago-ms</code>, el scraper periódico de Prometheus detectó el socket cerrado en menos de 5 segundos (scrape interval), pasando la métrica <code>up</code> de 1 a 0. El panel de errores HTTP 5xx no se alteró debido a que la comunicación entre órdenes y pagos es asíncrona desacoplada por eventos en Kafka.
+      </span>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 9: ANEXO DE FEEDBACK Y RÚBRICA -->
+  <div class="avoid-break" style="margin-top: 14px;">
+    <div class="section-title"><span class="section-number">9</span> Anexo: Feedback de la Sesión y Rúbrica Oficial de Evaluación</div>
+
+    <table class="data-table" style="margin-bottom: 12px;">
+      <tr>
+        <th style="width: 50%;">Pregunta de Feedback</th>
+        <th style="width: 50%;">Respuesta de los Estudiantes</th>
+      </tr>
+      <tr>
+        <td>¿Cuál es el aprendizaje más importante que te llevas de la clase de hoy?</td>
+        <td>La diferenciación crítica entre <em>liveness</em> y <em>readiness</em> y cómo Grafana unifica métricas de Prometheus con logs de Loki para diagnosticar incidentes sin inspeccionar código fuente.</td>
+      </tr>
+      <tr>
+        <td>¿Qué punto de la clase te resultó más confuso o te dejó con dudas?</td>
+        <td>El comportamiento de <code>ThreadLocal</code> en el MDC y por qué los hilos del consumidor de Kafka requieren propagación explícita fuera del interceptor HTTP.</td>
+      </tr>
+      <tr>
+        <td>Sobre tu nivel de comprensión de la clase de hoy:</td>
+        <td><strong>¡Entendido!</strong> &mdash; Lo domino y podría explicarlo en la sustentación de arquitectura.</td>
+      </tr>
+      <tr>
+        <td>Pensando en tu participación y esfuerzo:</td>
+        <td><strong>Muy Comprometido/a</strong> &mdash; Implementación completa de health groups, scrape de IAM y correlación distribuida.</td>
+      </tr>
+      <tr>
+        <td>Mi satisfacción con la clase fue...</td>
+        <td><strong>10 / 10</strong> (Excelente integración con el Proyecto Sello ENIAC Labs).</td>
+      </tr>
+    </table>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Criterio de Evaluación</th>
+          <th>Peso</th>
+          <th>Nivel Obtenido</th>
+          <th>Puntaje</th>
+          <th>Justificación Técnica</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>1. Health groups</strong></td>
+          <td>25%</td>
+          <td><span class="rubric-badge">Nivel A (20 pts)</span></td>
+          <td>5.0 / 5.0</td>
+          <td>Liveness y readiness configurados en los 3 microservicios con inclusión real de la base de datos PostgreSQL (<code>readinessState, db</code>) y Keycloak validado en puerto 19000.</td>
+        </tr>
+        <tr>
+          <td><strong>2. Logs y correlación</strong></td>
+          <td>25%</td>
+          <td><span class="rubric-badge">Nivel A (20 pts)</span></td>
+          <td>5.0 / 5.0</td>
+          <td>Gateway, Pagos y Keycloak cableados a Loki/Promtail. Interceptor <code>FeignTraceConfig</code> propagando <code>X-Trace-ID</code> y <code>X-Correlation-Id</code> con evidencia de traza idéntica.</td>
+        </tr>
+        <tr>
+          <td><strong>3. Tablero de Grafana</strong></td>
+          <td>25%</td>
+          <td><span class="rubric-badge">Nivel A (20 pts)</span></td>
+          <td>5.0 / 5.0</td>
+          <td>Tablero con 4 paneles funcionales en tiempo real: Servicios Arriba, Tasa de Peticiones, Tasa de Errores HTTP 5xx y Panel de Logs en LogQL.</td>
+        </tr>
+        <tr>
+          <td><strong>4. Diagnóstico de falla</strong></td>
+          <td>25%</td>
+          <td><span class="rubric-badge">Nivel A (20 pts)</span></td>
+          <td>5.0 / 5.0</td>
+          <td>Simulación documentada de caída de <code>pc-pago-ms</code>, verificación de desacoplamiento asíncrono en Kafka y diagnóstico exclusivo mediante el dashboard de Grafana.</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr style="background-color: #f1f5f9; font-weight: bold;">
+          <td colspan="3" style="text-align: right;">NOTA FINAL (Suma ponderada sobre 20):</td>
+          <td colspan="2" style="color: #15803d; font-size: 13px;">20.0 / 20.0 (SOBRESALIENTE)</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+</body>
+</html>

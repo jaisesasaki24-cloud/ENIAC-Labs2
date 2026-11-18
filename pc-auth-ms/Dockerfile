@@ -1,12 +1,4 @@
-# Multi-stage build for smaller, secure image
-FROM eclipse-temurin:21-jdk-alpine AS builder
-WORKDIR /app
-COPY .mvn/ .mvn
-COPY mvnw pom.xml ./
-RUN ./mvnw dependency:go-offline -B
-COPY src ./src
-RUN ./mvnw package -DskipTests
-
+# Fast portable runtime image (Pre-built production JAR)
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
@@ -14,8 +6,8 @@ WORKDIR /app
 RUN addgroup -g 10001 -S appgroup && \
     adduser -u 10001 -S appuser -G appgroup
 
-# Copy jar from builder stage
-COPY --from=builder /app/target/*.jar app.jar
+# Copy pre-built production jar directly (0s build time)
+COPY target/app.jar app.jar
 
 # Change ownership
 RUN chown appuser:appgroup app.jar
