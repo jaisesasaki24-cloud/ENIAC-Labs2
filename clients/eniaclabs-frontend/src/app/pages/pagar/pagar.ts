@@ -472,7 +472,18 @@ import { environment } from '../../../environments/environment';
                   <div class="space-y-4">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-lg">
                       <!-- Tarjeta Yape -->
-                      <div class="p-4 rounded-xl border-2 border-purple-600 bg-purple-50/60 text-left transition-all shadow-xs relative">
+                      <div 
+                        (click)="selectedPaymentMethod.set('YAPE')"
+                        [class.border-purple-600]="selectedPaymentMethod() === 'YAPE'"
+                        [class.bg-purple-50]="selectedPaymentMethod() === 'YAPE'"
+                        [class.ring-2]="selectedPaymentMethod() === 'YAPE'"
+                        [class.ring-purple-600]="selectedPaymentMethod() === 'YAPE'"
+                        [class.shadow-md]="selectedPaymentMethod() === 'YAPE'"
+                        [class.border-gray-200]="selectedPaymentMethod() !== 'YAPE'"
+                        [class.bg-white]="selectedPaymentMethod() !== 'YAPE'"
+                        [class.opacity-70]="selectedPaymentMethod() !== 'YAPE'"
+                        class="p-4 rounded-xl border-2 text-left transition-all cursor-pointer relative"
+                      >
                         <div class="flex items-center justify-between mb-1">
                           <span class="text-sm font-black text-purple-900 flex items-center gap-1.5">
                             <span class="w-2.5 h-2.5 rounded-full bg-purple-600 inline-block animate-pulse"></span> Yape Oficial
@@ -480,10 +491,26 @@ import { environment } from '../../../environments/environment';
                           <span class="text-[9px] bg-purple-600 text-white px-2 py-0.5 rounded-full font-black uppercase">Perú QR</span>
                         </div>
                         <div class="text-[11px] text-purple-900/80 font-medium leading-relaxed">Código QR móvil y código de aprobación en vivo</div>
+                        @if (selectedPaymentMethod() === 'YAPE') {
+                          <div class="mt-2 text-[10px] text-purple-700 font-bold flex items-center gap-1">
+                            <span>✓ Seleccionado para pago rápido</span>
+                          </div>
+                        }
                       </div>
 
                       <!-- Tarjeta Mercado Pago Pro -->
-                      <div class="p-4 rounded-xl border border-gray-200 bg-gray-50/80 text-left transition-all shadow-xs">
+                      <div 
+                        (click)="selectedPaymentMethod.set('MERCADOPAGO')"
+                        [class.border-[#009ee3]]="selectedPaymentMethod() === 'MERCADOPAGO'"
+                        [class.bg-sky-50]="selectedPaymentMethod() === 'MERCADOPAGO'"
+                        [class.ring-2]="selectedPaymentMethod() === 'MERCADOPAGO'"
+                        [class.ring-[#009ee3]]="selectedPaymentMethod() === 'MERCADOPAGO'"
+                        [class.shadow-md]="selectedPaymentMethod() === 'MERCADOPAGO'"
+                        [class.border-gray-200]="selectedPaymentMethod() !== 'MERCADOPAGO'"
+                        [class.bg-white]="selectedPaymentMethod() !== 'MERCADOPAGO'"
+                        [class.opacity-70]="selectedPaymentMethod() !== 'MERCADOPAGO'"
+                        class="p-4 rounded-xl border-2 text-left transition-all cursor-pointer relative"
+                      >
                         <div class="flex items-center justify-between mb-1">
                           <span class="text-xs font-bold text-gray-900 flex items-center gap-1.5">
                             <span>⚡</span> Mercado Pago
@@ -491,6 +518,11 @@ import { environment } from '../../../environments/environment';
                           <span class="text-[9px] bg-[#009ee3] text-white px-1.5 py-0.5 rounded font-black">PRO</span>
                         </div>
                         <div class="text-[11px] text-gray-600 font-medium leading-relaxed">Tarjetas de Débito, Crédito y PagoEfectivo</div>
+                        @if (selectedPaymentMethod() === 'MERCADOPAGO') {
+                          <div class="mt-2 text-[10px] text-[#007ebb] font-bold flex items-center gap-1">
+                            <span>✓ Seleccionado para tarjeta / efectivo</span>
+                          </div>
+                        }
                       </div>
                     </div>
 
@@ -801,7 +833,7 @@ import { environment } from '../../../environments/environment';
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-500">Total pagado:</span>
-                <span class="font-bold text-gray-900">S/ {{ (orderSuccess()?.monto != null ? orderSuccess().monto : (isRealYapeDemoMode() ? 1.00 : totalCalculado())) | number:'1.2-2' }}</span>
+                <span class="font-bold text-gray-900">S/ {{ (orderSuccess()?.monto != null ? orderSuccess().monto : (isRealYapeDemoMode() ? 3.00 : totalCalculado())) | number:'1.2-2' }}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-500">Destino:</span>
@@ -981,7 +1013,7 @@ export class PagarPage implements OnInit {
   }
 
   onContinuarStep3() {
-    if (this.selectedPaymentMethod() === 'MERCADOPAGO') {
+    if (this.selectedPaymentMethod() === 'MERCADOPAGO' || this.selectedPaymentMethod() === 'YAPE') {
       this.pagarConMercadoPago();
     } else {
       this.advanceStep(4);
