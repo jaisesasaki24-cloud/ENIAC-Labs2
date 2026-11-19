@@ -229,7 +229,7 @@ class AngularSpaHandler(SimpleHTTPRequestHandler):
 
             # Token de producción oficial de Eliceo Parillo (Soporte Yape Real en Perú)
             mp_token = 'APP_USR-7798988609356730-111819-96e585696ba88ed36d038c742adc400c-3649448406'
-            unit_price = float(payload.get('unitPrice', 1.00))
+            unit_price = float(payload.get('unitPrice', 3.00))
             order_id = str(payload.get('orderId', f"ENIAC-{datetime.now().strftime('%Y%m%d')}-{random.randint(1000, 9999)}"))
 
             items = payload.get('items')

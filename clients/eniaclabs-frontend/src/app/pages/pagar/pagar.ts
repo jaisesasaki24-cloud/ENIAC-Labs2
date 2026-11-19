@@ -504,10 +504,10 @@ import { environment } from '../../../environments/environment';
                         class="mt-0.5 w-4 h-4 text-purple-600 rounded border-gray-300 focus:ring-purple-500 cursor-pointer"
                       />
                       <label for="demoYapeCheck" class="text-xs cursor-pointer select-none">
-                        <span class="font-bold text-amber-950 block">🎯 Modo Demostración Real Yape: Cobrar S/ 1.00 Sol</span>
+                        <span class="font-bold text-amber-950 block">🎯 Modo Demostración Real Yape: Cobrar S/ 3.00 Soles</span>
                         <span class="text-amber-800 text-[11px] leading-tight block mt-0.5">
                           {{ isRealYapeDemoMode() 
-                            ? '✓ ACTIVO: Se generará la pasarela por S/ 1.00 para que puedas escanear el QR con tu Yape real en tu celular frente al jurado.' 
+                            ? '✓ ACTIVO: Se generará la pasarela por S/ 3.00 para que puedas escanear el QR con tu Yape real en tu celular frente al jurado.' 
                             : 'Cobro por el monto total del carrito (S/ ' + (totalCalculado() | number:'1.2-2') + ').' }}
                         </span>
                       </label>
@@ -525,7 +525,7 @@ import { environment } from '../../../environments/environment';
                         <div class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                         <span>Conectando a Mercado Pago...</span>
                       } @else {
-                        <span>Pagar con Yape / Mercado Pago (S/ {{ isRealYapeDemoMode() ? '1.00' : (totalCalculado() | number:'1.2-2') }}) →</span>
+                        <span>Pagar con Yape / Mercado Pago (S/ {{ isRealYapeDemoMode() ? '3.00' : (totalCalculado() | number:'1.2-2') }}) →</span>
                       }
                     </button>
 
@@ -593,7 +593,7 @@ import { environment } from '../../../environments/environment';
                         <span>Procesando pago con pc-orden-ms...</span>
                       } @else {
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        <span>Pagar con Yape / Mercado Pago (S/ {{ isRealYapeDemoMode() ? '1.00' : (totalCalculado() | number:'1.2-2') }})</span>
+                        <span>Pagar con Yape / Mercado Pago (S/ {{ isRealYapeDemoMode() ? '3.00' : (totalCalculado() | number:'1.2-2') }})</span>
                       }
                     </button>
 
@@ -922,7 +922,7 @@ export class PagarPage implements OnInit {
         const storedMonto = typeof window !== 'undefined' ? localStorage.getItem('lastEniacMonto') : null;
         const storedMetodo = typeof window !== 'undefined' ? localStorage.getItem('lastEniacMetodo') : null;
         const resolvedOrderId = externalRef || storedOrderId || (paymentId ? 'MP-' + paymentId : 'ENIAC-1024');
-        const resolvedMonto = storedMonto ? parseFloat(storedMonto) : (this.isRealYapeDemoMode() ? 1.00 : 1.00);
+        const resolvedMonto = storedMonto ? parseFloat(storedMonto) : (this.isRealYapeDemoMode() ? 3.00 : 3.00);
 
         this.orderSuccess.set({
           id: resolvedOrderId,
@@ -1042,7 +1042,7 @@ export class PagarPage implements OnInit {
     const isDemo = this.isRealYapeDemoMode();
     const firstItem = this.displayItems()[0];
     const returnUrl = typeof window !== 'undefined' ? window.location.origin : 'https://eniaclabs-nine.vercel.app';
-    const montoFinal = isDemo ? 1.00 : this.totalCalculado();
+    const montoFinal = isDemo ? 3.00 : this.totalCalculado();
 
     if (typeof window !== 'undefined') {
       localStorage.setItem('lastEniacMonto', montoFinal.toString());
@@ -1050,10 +1050,10 @@ export class PagarPage implements OnInit {
     }
 
     const items = isDemo ? [{
-      id: 'demo-yape-1sol',
+      id: 'demo-yape-3soles',
       title: 'ENIAC Labs - Demostración Yape Real (Sustentación)',
       quantity: 1,
-      unitPrice: 1.00,
+      unitPrice: 3.00,
       currencyId: 'PEN'
     }] : this.displayItems().map(it => ({
       id: it.id,
@@ -1064,7 +1064,7 @@ export class PagarPage implements OnInit {
     }));
 
     const payload = {
-      title: isDemo ? 'ENIAC Labs - Demostración Yape Real S/ 1.00' : (firstItem ? firstItem.name : 'Componentes Gamer ENIAC Labs'),
+      title: isDemo ? 'ENIAC Labs - Demostración Yape Real S/ 3.00' : (firstItem ? firstItem.name : 'Componentes Gamer ENIAC Labs'),
       quantity: 1,
       unitPrice: montoFinal,
       currencyId: 'PEN',
@@ -1137,7 +1137,7 @@ export class PagarPage implements OnInit {
 
   private finalizarPagoExitoso(orderId: string, metodo: string) {
     this.isProcessing.set(false);
-    const montoFinal = this.isRealYapeDemoMode() ? 1.00 : this.totalCalculado();
+    const montoFinal = this.isRealYapeDemoMode() ? 3.00 : this.totalCalculado();
     this.cart.clearCart();
 
     const paymentId = 'MP-' + Math.floor(10000000 + Math.random() * 90000000);
