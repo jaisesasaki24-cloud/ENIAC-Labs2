@@ -514,19 +514,27 @@ import { environment } from '../../../environments/environment';
                     </div>
                   </div>
 
-                  <div>
+                  <div class="flex items-center gap-3 pt-2">
                     <button 
                       type="button" 
                       (click)="onContinuarStep3()"
                       [disabled]="isProcessing()"
-                      class="px-8 py-3 bg-black hover:bg-[#256fff] disabled:bg-gray-400 text-white font-bold text-xs rounded-full transition-colors shadow-sm cursor-pointer flex items-center gap-2"
+                      class="px-8 py-3.5 bg-black hover:bg-[#256fff] disabled:bg-gray-400 text-white font-bold text-xs rounded-full transition-all shadow-md cursor-pointer flex items-center gap-2"
                     >
                       @if (isProcessing()) {
                         <div class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                         <span>Conectando a Mercado Pago...</span>
                       } @else {
-                        <span>Continuar a Mercado Pago →</span>
+                        <span>Pagar con Yape / Mercado Pago (S/ {{ isRealYapeDemoMode() ? '1.00' : (totalCalculado() | number:'1.2-2') }}) →</span>
                       }
+                    </button>
+
+                    <button 
+                      type="button" 
+                      (click)="advanceStep(4)"
+                      class="px-5 py-3 text-xs text-gray-500 hover:text-black font-semibold rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
+                    >
+                      Revisar en Paso 4 ›
                     </button>
                   </div>
 
@@ -793,7 +801,7 @@ import { environment } from '../../../environments/environment';
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-500">Total pagado:</span>
-                <span class="font-bold text-gray-900">S/ {{ totalCalculado() | number:'1.2-2' }}</span>
+                <span class="font-bold text-gray-900">S/ {{ (orderSuccess()?.monto != null ? orderSuccess().monto : (isRealYapeDemoMode() ? 1.00 : totalCalculado())) | number:'1.2-2' }}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-500">Destino:</span>
@@ -911,13 +919,17 @@ export class PagarPage implements OnInit {
 
       if (status === 'approved') {
         const storedOrderId = typeof window !== 'undefined' ? localStorage.getItem('lastEniacOrderId') : null;
+        const storedMonto = typeof window !== 'undefined' ? localStorage.getItem('lastEniacMonto') : null;
+        const storedMetodo = typeof window !== 'undefined' ? localStorage.getItem('lastEniacMetodo') : null;
         const resolvedOrderId = externalRef || storedOrderId || (paymentId ? 'MP-' + paymentId : 'ENIAC-1024');
+        const resolvedMonto = storedMonto ? parseFloat(storedMonto) : (this.isRealYapeDemoMode() ? 1.00 : 1.00);
 
         this.orderSuccess.set({
           id: resolvedOrderId,
           paymentId: paymentId,
           status: 'Aprobado',
-          paymentType: params['payment_type'] || 'Tarjeta / Checkout Pro',
+          paymentType: storedMetodo || (params['payment_type'] ? ('Mercado Pago (' + params['payment_type'] + ')') : 'Yape Oficial / Mercado Pago'),
+          monto: resolvedMonto,
           isMercadoPago: true
         });
         this.cart.clearCart();
@@ -1029,8 +1041,13 @@ export class PagarPage implements OnInit {
   private redireccionarAMercadoPago(orderId: string) {
     const isDemo = this.isRealYapeDemoMode();
     const firstItem = this.displayItems()[0];
-    // Mercado Pago Producción exige estrictamente HTTPS para las URLs de retorno
-    const returnUrl = 'https://eniaclabs-nine.vercel.app';
+    const returnUrl = typeof window !== 'undefined' ? window.location.origin : 'https://eniaclabs-nine.vercel.app';
+    const montoFinal = isDemo ? 1.00 : this.totalCalculado();
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('lastEniacMonto', montoFinal.toString());
+      localStorage.setItem('lastEniacMetodo', isDemo ? 'Yape Oficial (Perú QR)' : 'Mercado Pago');
+    }
 
     const items = isDemo ? [{
       id: 'demo-yape-1sol',
@@ -1049,7 +1066,7 @@ export class PagarPage implements OnInit {
     const payload = {
       title: isDemo ? 'ENIAC Labs - Demostración Yape Real S/ 1.00' : (firstItem ? firstItem.name : 'Componentes Gamer ENIAC Labs'),
       quantity: 1,
-      unitPrice: isDemo ? 1.00 : this.totalCalculado(),
+      unitPrice: montoFinal,
       currencyId: 'PEN',
       orderId: orderId,
       payerEmail: this.formData.email && this.formData.email.includes('@') ? this.formData.email : 'jaisesasaki24@gmail.com',
@@ -1120,6 +1137,7 @@ export class PagarPage implements OnInit {
 
   private finalizarPagoExitoso(orderId: string, metodo: string) {
     this.isProcessing.set(false);
+    const montoFinal = this.isRealYapeDemoMode() ? 1.00 : this.totalCalculado();
     this.cart.clearCart();
 
     const paymentId = 'MP-' + Math.floor(10000000 + Math.random() * 90000000);
@@ -1129,7 +1147,8 @@ export class PagarPage implements OnInit {
       paymentId: paymentId,
       status: 'Aprobado',
       paymentType: `${metodo} (Kafka OK)`,
-      isMercadoPago: metodo.includes('Mercado Pago')
+      monto: montoFinal,
+      isMercadoPago: metodo.includes('Mercado Pago') || metodo.includes('Yape')
     });
 
     this.toast.show('¡Transacción completada exitosamente! Orden Pagada (Kafka OK)');
