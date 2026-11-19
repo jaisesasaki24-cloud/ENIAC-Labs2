@@ -1029,7 +1029,8 @@ export class PagarPage implements OnInit {
   private redireccionarAMercadoPago(orderId: string) {
     const isDemo = this.isRealYapeDemoMode();
     const firstItem = this.displayItems()[0];
-    const returnUrl = typeof window !== 'undefined' ? window.location.origin : 'https://eniaclabs-nine.vercel.app';
+    // Mercado Pago Producción exige estrictamente HTTPS para las URLs de retorno
+    const returnUrl = 'https://eniaclabs-nine.vercel.app';
 
     const items = isDemo ? [{
       id: 'demo-yape-1sol',

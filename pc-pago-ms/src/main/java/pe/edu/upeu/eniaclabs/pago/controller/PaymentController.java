@@ -129,10 +129,10 @@ public class PaymentController {
 
             baseUrl = baseUrl.replaceAll("/+$", "");
 
-            // Mercado Pago exige HTTPS para dominios externos, pero en localhost acepta HTTP
+            // Mercado Pago Producción exige estrictamente HTTPS para las Back URLs
             String safeBaseUrl = baseUrl;
-            if (safeBaseUrl.startsWith("http://") && !safeBaseUrl.contains("localhost") && !safeBaseUrl.contains("127.0.0.1")) {
-                safeBaseUrl = safeBaseUrl.replaceFirst("^http://", "https://");
+            if (safeBaseUrl == null || safeBaseUrl.contains("localhost") || safeBaseUrl.contains("127.0.0.1") || !safeBaseUrl.startsWith("https://")) {
+                safeBaseUrl = "https://eniaclabs-nine.vercel.app";
             }
 
             String successUrl = safeBaseUrl + "/pagar/success";
