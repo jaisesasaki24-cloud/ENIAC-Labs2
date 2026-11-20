@@ -6,12 +6,14 @@ echo "    ENIAC LABS - REPARACIÓN INTEGRAL EN AZURE VM         "
 echo "    Autor: Parillo Mostajo Eliceo | Docente: Ing. Abel Angel"
 echo "=========================================================="
 
-# 1. Configurar directorio seguro y sincronizar con Git main
-git config --global --add safe.directory "*"
+# 1. Configurar entorno seguro y sincronizar con Git main
+export HOME=/root
+git config --system --add safe.directory "*" 2>/dev/null || true
+git config --global --add safe.directory "*" 2>/dev/null || true
 cd /home/azureuser/ENIAC-Labs2
 echo "[1/6] Sincronizando repositorio con origin/main..."
-git fetch origin main
-git reset --hard origin/main
+git -c safe.directory="*" fetch origin main
+git -c safe.directory="*" reset --hard origin/main
 
 # 2. Desactivar SSL Obligatorio directamente en Base de Datos de Keycloak
 echo "[2/6] Desactivando SSL obligatorio en Base de Datos Keycloak..."
@@ -105,3 +107,4 @@ echo ""
 echo "=========================================================="
 echo "    SISTEMA ENIAC LABS 100% OPERATIVO EN AZURE           "
 echo "=========================================================="
+
