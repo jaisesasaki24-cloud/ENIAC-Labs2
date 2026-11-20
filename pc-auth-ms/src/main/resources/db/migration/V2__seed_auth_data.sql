@@ -1,3 +1,10 @@
+-- 0. Asegurar roles base
+INSERT INTO roles (id, nombre, descripcion) VALUES
+(1, 'ROLE_ADMIN', 'Administrador del sistema'),
+(2, 'ROLE_CLIENTE', 'Cliente de ENIAC Labs'),
+(3, 'ROLE_TECNICO', 'Tecnico de ensamblaje')
+ON CONFLICT (id) DO NOTHING;
+
 -- Password "eniaclabs2026" hashed con BCrypt (cost=12):
 -- BCrypt: $2a$12$...
 -- Generated using BCryptPasswordEncoder(12).encode("eniaclabs2026")
