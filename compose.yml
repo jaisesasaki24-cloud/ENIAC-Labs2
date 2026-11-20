@@ -312,7 +312,7 @@ services:
       DB_PORT: 5432
       DB_USER: eniaclabs
       DB_PASS: ${DB_PASSWORD:-eniaclabs}
-      JWT_SECRET: ${JWT_SECRET:-}
+      JWT_SECRET: ${JWT_SECRET:-404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
     depends_on:
       eniaclabs-db-catalogo:
         condition: service_healthy
@@ -345,7 +345,7 @@ services:
       DB_PORT: 5432
       DB_USER: eniaclabs
       DB_PASS: ${DB_PASSWORD:-eniaclabs}
-      JWT_SECRET: ${JWT_SECRET:-}
+      JWT_SECRET: ${JWT_SECRET:-404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
     depends_on:
       eniaclabs-db-orden:
         condition: service_healthy
@@ -381,7 +381,7 @@ services:
       DB_PORT: 5432
       DB_USER: eniaclabs
       DB_PASS: ${DB_PASSWORD:-eniaclabs}
-      JWT_SECRET: ${JWT_SECRET:-}
+      JWT_SECRET: ${JWT_SECRET:-404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
     depends_on:
       eniaclabs-db-pago:
         condition: service_healthy
@@ -414,7 +414,7 @@ services:
       DB_PORT: 5432
       DB_USER: eniaclabs
       DB_PASS: ${DB_PASSWORD:-eniaclabs}
-      JWT_SECRET: ${JWT_SECRET:-}
+      JWT_SECRET: ${JWT_SECRET:-404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
     depends_on:
       eniaclabs-db-cotizacion:
         condition: service_healthy
@@ -447,7 +447,7 @@ services:
       DB_PORT: 5432
       DB_USER: eniaclabs
       DB_PASS: ${DB_PASSWORD:-eniaclabs}
-      JWT_SECRET: ${JWT_SECRET:-}
+      JWT_SECRET: ${JWT_SECRET:-404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
     depends_on:
       eniaclabs-db-auth:
         condition: service_healthy

@@ -69,24 +69,6 @@ scrape_configs:
           application: 'pc-auth-ms'
           environment: 'production'
 
-  - job_name: 'pc-eureka'
-    metrics_path: '/actuator/prometheus'
-    scrape_interval: 5s
-    static_configs:
-      - targets: ['pc-eureka:8761']
-        labels:
-          application: 'pc-eureka'
-          environment: 'production'
-
-  - job_name: 'pc-config'
-    metrics_path: '/actuator/prometheus'
-    scrape_interval: 5s
-    static_configs:
-      - targets: ['pc-config:8888']
-        labels:
-          application: 'pc-config'
-          environment: 'production'
-
   - job_name: 'pc-keycloak'
     metrics_path: '/metrics'
     scrape_interval: 5s
