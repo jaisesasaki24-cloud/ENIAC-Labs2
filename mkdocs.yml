@@ -26,6 +26,12 @@ theme:
 
 nav:
   - Inicio: index.md
+  - Arquitectura C4 Model:
+      - Resumen C4: c4-model/index.md
+      - Nivel 1 - Contexto: c4-model/nivel1-contexto.md
+      - Nivel 2 - Contenedores: c4-model/nivel2-contenedores.md
+      - Nivel 3 - Componentes: c4-model/nivel3-componentes.md
+      - Nivel 4 - Código y Clases: c4-model/nivel4-codigo.md
   - Proyecto Sello:
       - Brief del Proyecto: proyecto-sello/brief.md
       - Producto Unidad 1: proyecto-sello/u1-producto.md
@@ -39,8 +45,11 @@ nav:
   - Sesiones Unidad 2:
       - S06 - Comunicación Síncrona Resiliente: sesiones/S06_Comunicacion_Sincrona_Resiliente.md
       - S07 - Seguridad Distribuida: sesiones/S07_Seguridad_Distribuida_Control_Acceso.md
+      - S07b - Reemplazo por Keycloak: sesiones/S07b_Seguridad_Distribuida_Keycloak.md
       - S08 - Mensajería Asíncrona Kafka: sesiones/S08_Mensajeria_Asincrona_Entre_Servicios.md
-      - S10 - Monitoreo y Observabilidad: sesiones/S06_Monitoreo_Prometheus_Grafana_Loki.md
+      - S09 - Consistencia Distribuida (Saga): sesiones/S09_Consistencia_Distribuida_Procesos_Negocio.md
+      - S10 - Observabilidad y Diagnóstico: sesiones/S10_Observabilidad_Diagnostico_Sistemas_Distribuidos.md
+      - S11 - Integración Frontend Angular & Keycloak: sesiones/S11_Integracion_Cliente_Frontend_Angular_Keycloak.md
       - S12 - Evaluación de la Unidad II: sesiones/S12_Evaluacion_Unidad_2.md
 
 markdown_extensions:
