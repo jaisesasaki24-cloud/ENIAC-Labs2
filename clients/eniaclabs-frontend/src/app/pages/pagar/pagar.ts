@@ -489,10 +489,10 @@ declare let Culqi: any;
                           />
                           <div>
                             <div class="flex items-center gap-1.5">
-                              <span class="text-sm font-black text-purple-950">Culqi Checkout v4</span>
-                              <span class="text-[9px] bg-[#742284] text-white px-2 py-0.5 rounded-full font-bold uppercase">Yape + Tarjeta</span>
+                              <span class="text-sm font-black text-purple-950">Yape Oficial</span>
+                              <span class="text-[9px] bg-[#742284] text-white px-2 py-0.5 rounded-full font-bold uppercase">Solo Yape</span>
                             </div>
-                            <div class="text-[11px] text-purple-900/70 font-medium">Yape con código de aprobación y tarjetas Visa/Mastercard</div>
+                            <div class="text-[11px] text-purple-900/70 font-medium">Pago móvil directo con código de aprobación Yape (Culqi)</div>
                           </div>
                         </div>
                         <input 
@@ -555,7 +555,7 @@ declare let Culqi: any;
                         <span>Conectando pasarela...</span>
                       } @else {
                         @if (selectedPaymentGateway() === 'CULQI') {
-                          <span>Pagar con Culqi (Yape y Tarjetas) (S/ {{ totalCalculado() | number:'1.2-2' }}) →</span>
+                          <span>Pagar con Yape (S/ {{ totalCalculado() | number:'1.2-2' }}) →</span>
                         } @else {
                           <span>Pagar con Mercado Pago (S/ {{ totalCalculado() | number:'1.2-2' }}) →</span>
                         }
@@ -639,7 +639,7 @@ declare let Culqi: any;
                           alt="Culqi Yape" 
                           class="w-4 h-4 rounded-xs object-contain" 
                         />
-                        <span>Pagar con Culqi (Yape / Tarjetas) (S/ {{ totalCalculado() | number:'1.2-2' }})</span>
+                        <span>Pagar con Yape (S/ {{ totalCalculado() | number:'1.2-2' }})</span>
                       }
                     </button>
 
@@ -1166,13 +1166,17 @@ export class PagarPage implements OnInit {
       });
       Culqi.options({
         paymentMethods: {
-          tarjeta: true,
-          yape: true
+          tarjeta: false,
+          yape: true,
+          billetera: false,
+          bancaMovil: false,
+          agente: false,
+          cuotealo: false
         }
       });
 
       this.isProcessing.set(false);
-      this.toast.show('Abre la ventana de Culqi y selecciona Yape o Tarjeta...');
+      this.toast.show('Ingresa tu celular y código de aprobación en Yape...');
       Culqi.open();
     } catch (err: any) {
       this.isProcessing.set(false);

@@ -108,3 +108,4 @@ BEGIN
 
     RAISE NOTICE 'Keycloak configurado con éxito para realm %, cliente %, usuario %', v_realm_id, v_client_id, v_user_id;
 END $$;
+

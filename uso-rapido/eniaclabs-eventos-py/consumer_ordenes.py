@@ -3,7 +3,7 @@ from kafka import KafkaConsumer
 
 consumer = KafkaConsumer(
     'orden-eventos',
-    bootstrap_servers=['kafka:9092'],
+    bootstrap_servers=['localhost:29092'],
     auto_offset_reset='earliest',
     enable_auto_commit=True,
     group_id='eniaclabs-py-consumer',
