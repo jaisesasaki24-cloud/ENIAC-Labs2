@@ -33,6 +33,10 @@ spring:
               uri: lb://PC-PAGO-MS
               predicates:
                 - Path=/api/v1/pagos/**
+            - id: pc-pagos-ms
+              uri: lb://PC-PAGO-MS
+              predicates:
+                - Path=/api/pagos/**
             - id: pc-payments-ms
               uri: lb://PC-PAGO-MS
               predicates:

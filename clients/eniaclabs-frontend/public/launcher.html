@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="es-PE">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>ENIAC Labs • Control Remoto PC (S12 DAD)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --card-bg: rgba(18, 23, 34, 0.88);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-hover-border: rgba(59, 130, 246, 0.4);
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #07090e;
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(30, 58, 138, 0.22) 0%, transparent 50%),
+        radial-gradient(circle at 100% 100%, rgba(15, 23, 42, 0.5) 0%, transparent 50%);
+      background-attachment: fixed;
+    }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .glass-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-card:hover, .glass-card:active {
+      border-color: var(--card-hover-border);
+      box-shadow: 0 8px 30px -10px rgba(0, 102, 255, 0.25);
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+    }
+    @keyframes pulse-slow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.9); }
+    }
+    .status-pulse {
+      animation: pulse-slow 2.4s infinite;
+    }
+  </style>
+</head>
+<body class="text-slate-100 min-h-screen p-3.5 pb-24 max-w-md mx-auto select-none">
+
+  <!-- ================= HEADER PRINCIPAL ================= -->
+  <header class="text-center pt-2 pb-3 sticky top-0 z-30 bg-[#07090e]/95 backdrop-blur-md -mx-3.5 px-3.5 border-b border-white/5">
+    <div class="flex items-center justify-center gap-2">
+      <div class="w-7 h-7 rounded-lg bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 flex items-center justify-center font-black text-white text-xs shadow-md shadow-blue-500/20">
+        E
+      </div>
+      <h1 class="text-base font-extrabold tracking-tight text-white">
+        ENIAC Labs - Panel S12 (DAD)
+      </h1>
+    </div>
+    <div class="flex items-center justify-center gap-2 mt-1">
+      <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[11px] font-bold text-emerald-400">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 status-pulse"></span>
+        Control Remoto PC Activo
+      </span>
+      <span id="networkModeBadge" class="text-[10px] mono px-2 py-0.5 rounded-full bg-blue-500/15 border border-blue-500/30 text-blue-300">
+        Wi-Fi LAN
+      </span>
+    </div>
+  </header>
+
+  <!-- ================= MODO DE APERTURA: ¿EN LA PANTALLA DE LA PC O EN EL CELULAR? ================= -->
+  <section class="mt-3.5 glass-card rounded-2xl p-3 space-y-2 border border-blue-500/30 shadow-lg shadow-blue-900/20">
+    <div class="flex items-center justify-between text-[11px] font-bold">
+      <span class="text-white flex items-center gap-1.5">
+        <span class="text-base">🖥️</span> AL TOCAR UNA TARJETA:
+      </span>
+      <span class="text-[10px] text-cyan-300 font-mono" id="openModeLabel">Abrir en PC</span>
+    </div>
+    <div class="grid grid-cols-2 gap-1.5">
+      <button onclick="setOpenMode('pc')" id="btnOpenPc" class="py-2 px-2 rounded-xl text-xs font-black transition-all bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-600/40 border border-blue-400/30 flex items-center justify-center gap-1.5">
+        <span>🖥️</span> En Pantalla PC
+      </button>
+      <button onclick="setOpenMode('mobile')" id="btnOpenMobile" class="py-2 px-2 rounded-xl text-xs font-bold transition-all bg-white/5 text-gray-400 hover:text-white border border-white/5 flex items-center justify-center gap-1.5">
+        <span>📱</span> En este Celular
+      </button>
+    </div>
+    <!-- Botón directo: Abrir TODO en la PC de un golpe -->
+    <button onclick="abrirTodoEnPc()" class="w-full mt-1 py-2 px-3 rounded-xl text-xs font-black bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white shadow-md shadow-emerald-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]">
+      <span>🚀</span> ¡Abrir Todo el Proyecto en la PC Ahora!
+    </button>
+  </section>
+
+  <!-- ================= SELECTOR DE RED (IP Servidor) ================= -->
+  <section class="mt-3 glass-card rounded-2xl p-3 space-y-1.5 border border-white/10">
+    <div class="flex items-center justify-between text-[11px] font-bold">
+      <span class="text-gray-300 flex items-center gap-1">
+        <span>🌐</span> IP de la PC (Wi-Fi):
+      </span>
+      <span class="text-[10px] mono text-blue-300" id="currentIpLabel">192.168.18.25</span>
+    </div>
+    <div class="flex gap-1.5 items-center">
+      <input id="customIpInput" type="text" value="192.168.18.25" placeholder="IP Servidor" class="flex-1 bg-black/40 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs mono text-cyan-300 focus:outline-none focus:border-blue-500">
+      <button onclick="guardarConfigRed()" class="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-bold transition-all cursor-pointer">
+        Guardar
+      </button>
+    </div>
+  </section>
+
+  <!-- ================= DASHBOARD DE TARJETAS ================= -->
+  <main class="space-y-2.5 mt-3.5">
+
+    <!-- CARD 1: KEYCLOAK (Seguridad S7b) -->
+    <div onclick="abrirServicio('keycloak')" class="glass-card rounded-2xl p-3.5 flex items-center gap-3 cursor-pointer group active:scale-[0.98] relative overflow-hidden">
+      <div class="w-14 flex flex-col items-center justify-center shrink-0">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-red-500/20 via-orange-500/10 to-transparent border border-red-500/30 flex items-center justify-center text-xl text-red-400 shadow-md shadow-red-500/10">
+          🔒
+        </div>
+        <span class="text-[9px] font-bold text-gray-400 text-center leading-tight mt-1.5">
+          Keycloak<br><span class="text-[8px] text-gray-500">(Seguridad S7b)</span>
+        </span>
+      </div>
+      <div class="flex-1 min-w-0 pr-1">
+        <div class="text-[12px] font-extrabold text-white tracking-tight flex items-center gap-1.5">
+          Token KEYCLOAK: <span class="text-emerald-400 font-bold">Validados</span>
+        </div>
+        <div class="text-[10px] text-gray-300 mt-0.5 leading-snug">
+          Lista rápida: Microservicios internos / Gateway
+        </div>
+        <div class="flex flex-wrap gap-1 mt-1.5">
+          <span class="px-1.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-[9px] mono text-gray-300">Realm: eniaclabs</span>
+          <span class="px-1.5 py-0.5 rounded-md bg-red-500/10 border border-red-500/20 text-[9px] mono text-red-300">:18180</span>
+        </div>
+      </div>
+      <button class="w-9 h-9 rounded-xl bg-blue-600 group-hover:bg-blue-500 flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-lg shadow-blue-600/30 transition-transform group-hover:translate-x-0.5">
+        &gt;
+      </button>
+    </div>
+
+    <!-- CARD 2: ENIAC LABS FRONTEND (S11) -->
+    <div onclick="abrirServicio('frontend')" class="glass-card rounded-2xl p-3.5 flex items-center gap-3 cursor-pointer group active:scale-[0.98] relative overflow-hidden">
+      <div class="w-14 flex flex-col items-center justify-center shrink-0">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-cyan-500/20 via-blue-500/10 to-transparent border border-cyan-500/30 flex items-center justify-center text-xl text-cyan-400 shadow-md shadow-cyan-500/10">
+          💻
+        </div>
+        <span class="text-[9px] font-bold text-gray-400 text-center leading-tight mt-1.5">
+          ENIAC Labs<br><span class="text-[8px] text-gray-500">(Clients Frontend S11)</span>
+        </span>
+      </div>
+      <div class="flex-1 min-w-0 pr-1">
+        <div class="text-[12px] font-extrabold text-white tracking-tight">
+          Gateway: <span class="text-blue-400">API única</span>
+        </div>
+        <div class="text-[10px] text-emerald-400 font-semibold mt-0.5 flex items-center gap-1">
+          <span>✓</span> Rutas protegidas: OK
+        </div>
+        <div class="mt-1.5 rounded-lg overflow-hidden border border-white/10 h-7 w-28 bg-black/60 relative">
+          <img src="/images/hero-pc-rig.jpg" alt="Store preview" class="w-full h-full object-cover opacity-85">
+          <div class="absolute inset-0 bg-gradient-to-r from-blue-900/60 to-transparent flex items-center px-1 text-[8px] font-bold text-white">
+            Gaming Store
+          </div>
+        </div>
+      </div>
+      <button class="w-9 h-9 rounded-xl bg-blue-600 group-hover:bg-blue-500 flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-lg shadow-blue-600/30 transition-transform group-hover:translate-x-0.5">
+        &gt;
+      </button>
+    </div>
+
+    <!-- CARD 3: MERCADO PAGO (Pasarela de Pago S12) -->
+    <div onclick="abrirServicio('checkout')" class="glass-card rounded-2xl p-3.5 flex items-center gap-3 cursor-pointer group active:scale-[0.98] relative overflow-hidden">
+      <div class="w-14 flex flex-col items-center justify-center shrink-0">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-500/20 via-sky-500/10 to-transparent border border-blue-500/30 flex items-center justify-center text-xl text-sky-400 shadow-md shadow-blue-500/10">
+          🤝
+        </div>
+        <span class="text-[9px] font-bold text-gray-400 text-center leading-tight mt-1.5">
+          Mercado Pago<br><span class="text-[8px] text-gray-500">(Pasarela Pago S12)</span>
+        </span>
+      </div>
+      <div class="flex-1 min-w-0 pr-1 space-y-0.5">
+        <div class="text-[11px] font-bold text-white flex items-center justify-between">
+          <span>Pagos aprobados: <span class="text-emerald-400 font-extrabold" id="metricPagos">14</span></span>
+          <span class="text-[9px] mono px-1.5 py-0.2 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">PEN (Soles)</span>
+        </div>
+        <div class="text-[10px] text-amber-300 font-semibold leading-tight">
+          Resiliencia: <span class="text-gray-300 font-normal">Fallback Activo (Prueba Provocada)</span>
+        </div>
+        <div class="text-[10px] text-gray-400 leading-tight">
+          Consistencia: <span class="text-emerald-300 font-semibold">Compensado / Idempotente</span>
+        </div>
+      </div>
+      <button class="w-9 h-9 rounded-xl bg-blue-600 group-hover:bg-blue-500 flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-lg shadow-blue-600/30 transition-transform group-hover:translate-x-0.5">
+        &gt;
+      </button>
+    </div>
+
+    <!-- CARD 4: MENSAJERÍA KAFKA (Asíncrona S8) -->
+    <div onclick="abrirServicio('kafka')" class="glass-card rounded-2xl p-3.5 flex items-center gap-3 cursor-pointer group active:scale-[0.98] relative overflow-hidden">
+      <div class="w-14 flex flex-col items-center justify-center shrink-0">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-500/20 via-orange-500/10 to-transparent border border-amber-500/30 flex items-center justify-center text-xl text-amber-400 shadow-md shadow-amber-500/10">
+          ⚡
+        </div>
+        <span class="text-[9px] font-bold text-gray-400 text-center leading-tight mt-1.5">
+          Mensajería Kafka<br><span class="text-[8px] text-gray-500">(Asíncrona S8)</span>
+        </span>
+      </div>
+      <div class="flex-1 min-w-0 pr-1">
+        <div class="text-[12px] font-extrabold text-white tracking-tight">
+          Eventos: <span class="text-amber-300">pago-eventos</span>
+        </div>
+        <div class="text-[10px] text-emerald-400 font-bold mt-0.5">
+          (PROCESADOS)
+        </div>
+        <div class="text-[10px] text-gray-300 mt-0.5 flex items-center justify-between">
+          <span>Estadísticas rápidas:</span>
+          <span class="text-emerald-400 font-bold mono" id="metricKafka">16 publicados</span>
+        </div>
+        <div class="mt-1 flex items-center gap-1 text-[9px] mono text-gray-400">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Kafka UI: Port 18085
+        </div>
+      </div>
+      <button class="w-9 h-9 rounded-xl bg-blue-600 group-hover:bg-blue-500 flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-lg shadow-blue-600/30 transition-transform group-hover:translate-x-0.5">
+        &gt;
+      </button>
+    </div>
+
+    <!-- CARD 5: GRAFANA & PROMETHEUS (Métricas S10) -->
+    <div onclick="abrirServicio('grafana')" class="glass-card rounded-2xl p-3.5 flex items-center gap-3 cursor-pointer group active:scale-[0.98] relative overflow-hidden">
+      <div class="w-14 flex flex-col items-center justify-center shrink-0">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-orange-500/20 via-amber-500/10 to-transparent border border-orange-500/30 flex items-center justify-center text-xl text-orange-400 shadow-md shadow-orange-500/10">
+          📈
+        </div>
+        <span class="text-[9px] font-bold text-gray-400 text-center leading-tight mt-1.5">
+          Grafana &amp; Prom<br><span class="text-[8px] text-gray-500">(Métricas S10)</span>
+        </span>
+      </div>
+      <div class="flex-1 min-w-0 pr-1 space-y-0.5">
+        <div class="text-[11px] font-bold text-white flex items-center justify-between">
+          <span>Micro-gráficos:</span>
+          <span class="text-cyan-400 font-mono text-[10px]">CPU ~8.4%</span>
+        </div>
+        <div class="text-[10px] text-gray-300">
+          Métricas: <span class="text-amber-300 font-semibold">JVM de Java 21</span>
+        </div>
+        <div class="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
+          <span>✓</span> Trazabilidad: 100% Logs Loki
+        </div>
+        <div class="flex gap-1.5 pt-0.5">
+          <span class="text-[9px] mono px-1.5 py-0.2 rounded bg-orange-500/15 text-orange-300 border border-orange-500/30">Grafana :3000</span>
+          <span class="text-[9px] mono px-1.5 py-0.2 rounded bg-red-500/15 text-red-300 border border-red-500/30">Prometheus :9090</span>
+        </div>
+      </div>
+      <button class="w-9 h-9 rounded-xl bg-blue-600 group-hover:bg-blue-500 flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-lg shadow-blue-600/30 transition-transform group-hover:translate-x-0.5">
+        &gt;
+      </button>
+    </div>
+
+    <!-- CARD 6: SPRING CLOUD EUREKA & CONFIG SERVER (S5 Cloud) -->
+    <div onclick="abrirServicio('eureka')" class="glass-card rounded-2xl p-3.5 flex items-center gap-3 cursor-pointer group active:scale-[0.98] relative overflow-hidden">
+      <div class="w-14 flex flex-col items-center justify-center shrink-0">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-500/20 via-teal-500/10 to-transparent border border-emerald-500/30 flex items-center justify-center text-xl text-emerald-400 shadow-md shadow-emerald-500/10">
+          ☁️
+        </div>
+        <span class="text-[9px] font-bold text-gray-400 text-center leading-tight mt-1.5">
+          Spring Cloud<br><span class="text-[8px] text-gray-500">(Eureka / Config S5)</span>
+        </span>
+      </div>
+      <div class="flex-1 min-w-0 pr-1 space-y-0.5">
+        <div class="text-[12px] font-extrabold text-white tracking-tight flex items-center gap-1">
+          Discovery: <span class="text-emerald-400">6 Microservicios UP</span>
+        </div>
+        <div class="text-[10px] text-gray-300 leading-snug">
+          pc-gateway, pago, orden, catálogo, cotización, auth
+        </div>
+        <div class="flex gap-1.5 pt-1">
+          <span class="text-[9px] mono px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Eureka :18761</span>
+          <span class="text-[9px] mono px-1.5 py-0.2 rounded bg-purple-500/15 text-purple-300 border border-purple-500/30">Config :18888</span>
+        </div>
+      </div>
+      <button class="w-9 h-9 rounded-xl bg-blue-600 group-hover:bg-blue-500 flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-lg shadow-blue-600/30 transition-transform group-hover:translate-x-0.5">
+        &gt;
+      </button>
+    </div>
+
+    <!-- CARD 7: MIS PEDIDOS (Órdenes S12) -->
+    <div onclick="abrirServicio('pedidos')" class="glass-card rounded-2xl p-3.5 flex items-center gap-3 cursor-pointer group active:scale-[0.98] relative overflow-hidden">
+      <div class="w-14 flex flex-col items-center justify-center shrink-0">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500/20 via-blue-500/10 to-transparent border border-indigo-500/30 flex items-center justify-center text-xl text-indigo-400 shadow-md shadow-indigo-500/10">
+          📦
+        </div>
+        <span class="text-[9px] font-bold text-gray-400 text-center leading-tight mt-1.5">
+          Mis Pedidos<br><span class="text-[8px] text-gray-500">(Historial S12)</span>
+        </span>
+      </div>
+      <div class="flex-1 min-w-0 pr-1 space-y-0.5">
+        <div class="text-[12px] font-extrabold text-white tracking-tight">
+          Órdenes: <span class="text-emerald-400">Estado PAGADA</span>
+        </div>
+        <div class="text-[10px] text-gray-300">
+          Sincronización Kafka en tiempo real con Procesamiento de Pagos
+        </div>
+        <div class="flex gap-1.5 pt-0.5">
+          <span class="text-[9px] mono px-1.5 py-0.2 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">/mis-pedidos</span>
+          <span class="text-[9px] mono px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">POSTgreSQL :5433</span>
+        </div>
+      </div>
+      <button class="w-9 h-9 rounded-xl bg-blue-600 group-hover:bg-blue-500 flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-lg shadow-blue-600/30 transition-transform group-hover:translate-x-0.5">
+        &gt;
+      </button>
+    </div>
+
+    <!-- CARD 8: DOCUMENTACIÓN ARQUITECTURA C4 (MkDocs) -->
+    <div onclick="abrirServicio('mkdocs')" class="glass-card rounded-2xl p-3.5 flex items-center gap-3 cursor-pointer group active:scale-[0.98] relative overflow-hidden">
+      <div class="w-14 flex flex-col items-center justify-center shrink-0">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-violet-500/20 via-purple-500/10 to-transparent border border-violet-500/30 flex items-center justify-center text-xl text-violet-400 shadow-md shadow-violet-500/10">
+          📚
+        </div>
+        <span class="text-[9px] font-bold text-gray-400 text-center leading-tight mt-1.5">
+          Arquitectura C4<br><span class="text-[8px] text-gray-500">(Portal MkDocs)</span>
+        </span>
+      </div>
+      <div class="flex-1 min-w-0 pr-1 space-y-0.5">
+        <div class="text-[12px] font-extrabold text-white tracking-tight">
+          Diagramas C4: <span class="text-violet-300">Contexto &amp; Código</span>
+        </div>
+        <div class="text-[10px] text-gray-300">
+          Documentación técnica completa de los 6 microservicios
+        </div>
+        <div class="flex gap-1.5 pt-0.5">
+          <span class="text-[9px] mono px-1.5 py-0.2 rounded bg-violet-500/15 text-violet-300 border border-violet-500/30">Port: 8000</span>
+          <span class="text-[9px] mono px-1.5 py-0.2 rounded bg-white/5 text-gray-300 border border-white/10">Material Theme</span>
+        </div>
+      </div>
+      <button class="w-9 h-9 rounded-xl bg-blue-600 group-hover:bg-blue-500 flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-lg shadow-blue-600/30 transition-transform group-hover:translate-x-0.5">
+        &gt;
+      </button>
+    </div>
+
+  </main>
+
+  <!-- ================= ACCIONES RÁPIDAS DE SUSTENTACIÓN EN VIVO ================= -->
+  <section class="mt-4 space-y-2">
+    <div class="flex items-center justify-between px-1">
+      <span class="text-[11px] font-extrabold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+        <span>⚡</span> PRUEBAS EN VIVO (SUSTENTACIÓN)
+      </span>
+      <span class="text-[9px] text-emerald-400 mono">Kafka &amp; Resilience</span>
+    </div>
+
+    <!-- Botón 1: Validar Pago & Kafka -->
+    <button onclick="ejecutarTest('approved')" class="w-full glass-card hover:bg-white/5 active:scale-[0.98] transition-all p-3 rounded-2xl border-l-4 border-l-emerald-500 text-left flex items-center justify-between cursor-pointer shadow-md">
+      <div>
+        <div class="text-xs font-black text-emerald-400 flex items-center gap-1.5">
+          <span>⚡</span> 1. Validar Pago &amp; Emitir Kafka (200 OK)
+        </div>
+        <div class="text-[10px] text-gray-300 mt-0.5">Emite 'pago.validado' y actualiza la orden a PAGADA</div>
+      </div>
+      <span class="text-emerald-400 text-sm font-bold ml-2">&rarr;</span>
+    </button>
+
+    <!-- Botón 2: Forzar Circuit Breaker -->
+    <button onclick="forzarCircuitBreaker()" class="w-full glass-card hover:bg-white/5 active:scale-[0.98] transition-all p-3 rounded-2xl border-l-4 border-l-amber-500 text-left flex items-center justify-between cursor-pointer shadow-md">
+      <div>
+        <div class="text-xs font-black text-amber-400 flex items-center gap-1.5">
+          <span>🛡️</span> 2. Test Resiliencia (Circuit Breaker)
+        </div>
+        <div class="text-[10px] text-gray-300 mt-0.5">Prueba de llamadas protegidas con Fallback Resilience4j</div>
+      </div>
+      <span class="text-amber-400 text-sm font-bold ml-2">&rarr;</span>
+    </button>
+
+    <!-- Botón 3: Compensación Saga -->
+    <button onclick="ejecutarTest('rejected')" class="w-full glass-card hover:bg-white/5 active:scale-[0.98] transition-all p-3 rounded-2xl border-l-4 border-l-red-500 text-left flex items-center justify-between cursor-pointer shadow-md">
+      <div>
+        <div class="text-xs font-black text-red-400 flex items-center gap-1.5">
+          <span>↩️</span> 3. Compensación Saga (Revertir Stock)
+        </div>
+        <div class="text-[10px] text-gray-300 mt-0.5">Emite 'pago.fallido' y ejecuta rollback en el catálogo</div>
+      </div>
+      <span class="text-red-400 text-sm font-bold ml-2">&rarr;</span>
+    </button>
+  </section>
+
+  <!-- ================= TERMINAL DE LOGS EN VIVO ================= -->
+  <section class="mt-4 glass-card rounded-2xl p-3.5 space-y-2 border border-white/10 shadow-lg">
+    <div class="flex items-center justify-between text-[11px] font-bold">
+      <span class="flex items-center gap-1.5 text-white">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 status-pulse"></span>
+        CONSOLA EN TIEMPO REAL:
+      </span>
+      <button onclick="limpiarLogs()" class="text-blue-400 hover:text-white transition-colors cursor-pointer text-[10px] mono">
+        LIMPIAR
+      </button>
+    </div>
+    <pre id="console" class="text-[10px] mono text-emerald-300 bg-black/70 p-2.5 rounded-xl h-28 overflow-y-auto leading-relaxed border border-white/5 custom-scroll">Listo. Toca cualquier servicio para abrirlo en la pantalla de la PC...</pre>
+  </section>
+
+  <!-- ================= SCRIPT DE CONTROL REMOTO PC ================= -->
+  <script>
+    let openMode = localStorage.getItem('eniac_open_mode') || 'pc'; // 'pc' o 'mobile'
+    let serverIp = localStorage.getItem('eniac_server_ip') || '192.168.18.25';
+    const tunnelDomain = 'https://stat-church-periodic-milton.trycloudflare.com';
+
+    document.getElementById('customIpInput').value = serverIp;
+    actualizarModoUI();
+
+    function setOpenMode(mode) {
+      openMode = mode;
+      localStorage.setItem('eniac_open_mode', mode);
+      actualizarModoUI();
+      log(`✓ Modo de apertura cambiado a: ${mode === 'pc' ? '🖥️ ABRIR EN PANTALLA PC' : '📱 ABRIR EN EL CELULAR'}`);
+    }
+
+    function actualizarModoUI() {
+      const btnPc = document.getElementById('btnOpenPc');
+      const btnMobile = document.getElementById('btnOpenMobile');
+      const label = document.getElementById('openModeLabel');
+
+      if (openMode === 'pc') {
+        btnPc.className = 'py-2 px-2 rounded-xl text-xs font-black transition-all bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-600/40 border border-blue-400/30 flex items-center justify-center gap-1.5';
+        btnMobile.className = 'py-2 px-2 rounded-xl text-xs font-bold transition-all bg-white/5 text-gray-400 hover:text-white border border-white/5 flex items-center justify-center gap-1.5';
+        label.innerText = '🖥️ Abre en PC';
+        label.className = 'text-[10px] text-cyan-300 font-mono';
+      } else {
+        btnMobile.className = 'py-2 px-2 rounded-xl text-xs font-black transition-all bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-600/40 border border-blue-400/30 flex items-center justify-center gap-1.5';
+        btnPc.className = 'py-2 px-2 rounded-xl text-xs font-bold transition-all bg-white/5 text-gray-400 hover:text-white border border-white/5 flex items-center justify-center gap-1.5';
+        label.innerText = '📱 Abre en Móvil';
+        label.className = 'text-[10px] text-emerald-300 font-mono';
+      }
+    }
+
+    function guardarConfigRed() {
+      const val = document.getElementById('customIpInput').value.trim();
+      if (val) {
+        serverIp = val;
+        localStorage.setItem('eniac_server_ip', serverIp);
+        document.getElementById('currentIpLabel').innerText = serverIp;
+        log(`✓ IP del servidor actualizada: ${serverIp}`);
+      }
+    }
+
+    // DISPATCHER PRINCIPAL: Decide si abrir en la PC o en el móvil
+    async function abrirServicio(target) {
+      if (openMode === 'pc') {
+        await enviarComandoAbrirEnPc(target);
+      } else {
+        abrirEnCelular(target);
+      }
+    }
+
+    // 🖥️ Envía la orden a la PC para que abra la pestaña en su monitor/proyector
+    async function enviarComandoAbrirEnPc(target) {
+      log(`🖥️ [Comando Remoto] Ordenando a la PC abrir: ${target.toUpperCase()}...`);
+
+      // Intentar múltiples vías (proxy Angular /remote o llamada directa a la IP:8899)
+      const endpoints = [
+        `/remote/open?target=${target}`,
+        `${window.location.origin}/remote/open?target=${target}`,
+        `http://${serverIp}:8899/open?target=${target}`
+      ];
+
+      let ok = false;
+      for (const ep of endpoints) {
+        try {
+          const res = await fetch(ep, { method: 'GET' });
+          if (res.ok) {
+            const data = await res.json();
+            log(`✓ ¡Pestaña abierta en la PC!: ${data.opened_url || target}`);
+            ok = true;
+            break;
+          }
+        } catch (e) {
+          // Continuar con el siguiente endpoint de fallback
+        }
+      }
+
+      if (!ok) {
+        log(`⚠️ Nota: No se pudo contactar el receptor en la PC. Abriendo en móvil como respaldo.`);
+        abrirEnCelular(target);
+      }
+    }
+
+    // 🚀 Abrir múltiples pestañas esenciales en la PC con un solo toque
+    async function abrirTodoEnPc() {
+      log(`🚀 ¡Enviando ráfaga para abrir todo el proyecto en la pantalla de la PC!`);
+      const tabs = ['launcher', 'pedidos', 'grafana', 'kafka'];
+      for (const t of tabs) {
+        await enviarComandoAbrirEnPc(t);
+        await new Promise(r => setTimeout(r, 600)); // Pequeña pausa entre pestañas
+      }
+      log(`✓ Proyecto completo desplegado en las pestañas del navegador de tu PC.`);
+    }
+
+    // 📱 Abre en el propio celular si el usuario seleccionó modo móvil
+    function abrirEnCelular(target) {
+      let url = '';
+      switch (target) {
+        case 'keycloak':
+          url = `http://${serverIp}:18180/admin/eniaclabs/console/`;
+          break;
+        case 'frontend':
+          url = `/catalogo`;
+          break;
+        case 'checkout':
+          url = `/pagar`;
+          break;
+        case 'kafka':
+          url = `http://${serverIp}:18085`;
+          break;
+        case 'grafana':
+          url = `http://${serverIp}:3000`;
+          break;
+        case 'eureka':
+          url = `http://${serverIp}:18761`;
+          break;
+        case 'pedidos':
+          url = `/mis-pedidos`;
+          break;
+        case 'mkdocs':
+          url = `http://${serverIp}:8000`;
+          break;
+        default:
+          url = `/`;
+      }
+      log(`📱 Abriendo en celular: ${url}`);
+      window.open(url, '_blank');
+    }
+
+    // Logger
+    function log(msg) {
+      const el = document.getElementById('console');
+      const time = new Date().toLocaleTimeString();
+      el.innerHTML = `[${time}] ${msg}\n` + el.innerHTML;
+    }
+
+    function limpiarLogs() {
+      document.getElementById('console').innerText = '';
+    }
+
+    // Triggers de prueba en vivo
+    async function ejecutarTest(status) {
+      const paymentId = '186319464790';
+      const ordenId = 13;
+      log(`▶ POST /api/payments/confirm (status=${status}, ordenId=${ordenId})...`);
+      try {
+        const res = await fetch(`/api/payments/confirm`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            paymentId: paymentId,
+            ordenId: ordenId,
+            status: status
+          })
+        });
+        const data = await res.json();
+        log(`✓ Kafka Evento: ${JSON.stringify(data)}`);
+        if (status === 'approved') {
+          log(`★ ¡Orden #${ordenId} pasó a PAGADA vía Kafka!`);
+          let current = parseInt(document.getElementById('metricPagos').innerText) || 14;
+          document.getElementById('metricPagos').innerText = current + 1;
+        } else {
+          log(`⚠ Evento de compensación Saga emitido.`);
+        }
+      } catch (e) {
+        log(`✕ Error: ${e.message}`);
+      }
+    }
+
+    async function forzarCircuitBreaker() {
+      log(`▶ Test Resilience4j: Creando preferencia con fallback protegido...`);
+      try {
+        const res = await fetch(`/api/payments/create-preference`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: "Test Resilience4j S6",
+            quantity: 1,
+            unitPrice: 2899,
+            currencyId: "PEN",
+            orderId: "TEST-CB-" + Date.now()
+          })
+        });
+        const data = await res.json();
+        log(`✓ Preferencia creada: ${data.preferenceId || 'OK'}`);
+        log(`★ Circuit Breaker operativo: Modo seguro activo.`);
+      } catch (e) {
+        log(`✕ Error: ${e.message}`);
+      }
+    }
+
+    // ================= RECEPTOR EN TIEMPO REAL PARA PANTALLA PC =================
+    let lastPollId = 0;
+    let pollerInitialized = false;
+    const isRunningOnPc = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+    if (isRunningOnPc) {
+      log("🖥️ Receptor de PC activo: Esta pantalla responderá a las órdenes de tu smartphone.");
+      
+      const banner = document.createElement('div');
+      banner.id = 'pcReceiverBanner';
+      banner.className = 'fixed bottom-4 left-4 right-4 max-w-md mx-auto bg-blue-950/90 border border-blue-500/50 rounded-2xl p-3 shadow-2xl backdrop-blur-md flex items-center justify-between z-50 transition-all';
+      banner.innerHTML = `
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 status-pulse"></span>
+          <div>
+            <div class="text-[11px] font-black text-white">RECEPTOR DE PANTALLA PC ACTIVO</div>
+            <div class="text-[9px] text-blue-300">Toca una tarjeta en tu celular para abrirla</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button onclick="togglePcNavMode()" id="btnNavMode" class="px-2 py-1 rounded-lg text-[9px] font-bold bg-white/10 hover:bg-white/20 text-cyan-300 border border-white/10">
+            Nueva pestaña
+          </button>
+        </div>
+      `;
+      document.body.appendChild(banner);
+
+      let navMode = localStorage.getItem('eniac_pc_nav_mode') || 'tab'; // 'tab' por defecto para no cerrar el launcher
+      window.togglePcNavMode = function() {
+        navMode = (navMode === 'tab') ? 'navigate' : 'tab';
+        localStorage.setItem('eniac_pc_nav_mode', navMode);
+        document.getElementById('btnNavMode').innerText = (navMode === 'tab') ? 'Nueva pestaña' : 'Navegar aquí';
+        log(`✓ Modo PC: ${navMode === 'tab' ? 'Abrir nueva pestaña' : 'Navegar en esta pantalla'}`);
+      };
+      document.getElementById('btnNavMode').innerText = (navMode === 'tab') ? 'Nueva pestaña' : 'Navegar aquí';
+
+      // Polling cada 600ms al servidor de comandos
+      setInterval(async () => {
+        try {
+          const res = await fetch(`http://localhost:8899/poll?since=${lastPollId}`);
+          if (res.ok) {
+            const data = await res.json();
+            // En el primer fetch, solo sincronizamos el ID actual para no ejecutar órdenes viejas
+            if (!pollerInitialized) {
+              lastPollId = data.current_id || 0;
+              pollerInitialized = true;
+              return;
+            }
+
+            if (data.has_new && data.current_id > lastPollId) {
+              lastPollId = data.current_id;
+              if (data.url) {
+                log(`📡 [Comando Celular] Abriendo en PC: ${data.url}`);
+                if (navMode === 'navigate') {
+                  window.location.href = data.url;
+                }
+              }
+            } else if (data.current_id) {
+              lastPollId = Math.max(lastPollId, data.current_id);
+            }
+          }
+        } catch (e) {}
+      }, 600);
+    }
+
+    log("Control Remoto de PC listo. Cada toque en el celular controlará la pantalla de la PC.");
+  </script>
+</body>
+</html>

@@ -1,0 +1,297 @@
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { ToastService } from '../../services/toast.service';
+
+@Component({
+  selector: 'app-footer',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  template: `
+    <footer id="footer" class="bg-[#0c0e14] text-white pt-14 pb-8 text-sm border-t border-white/10">
+      <div class="max-w-[1400px] mx-auto px-4 sm:px-6">
+        
+        <!-- Breadcrumb & Back to top strip -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-8 border-b border-white/10 gap-4">
+          <nav aria-label="Breadcrumb" class="flex flex-wrap items-center text-xs text-gray-400 gap-2">
+            <a href="#" (click)="scrollToTop($event)" class="hover:text-white flex items-center gap-1.5 font-bold text-white tracking-tight">
+              <span class="text-sm font-black font-sans">ENIAC <span class="text-[#256fff]">Labs</span></span>
+            </a>
+            <span>›</span>
+            <span class="text-white font-medium">Tienda Oficial de Componentes de PC & Estaciones de Trabajo</span>
+            <span>›</span>
+            <span class="text-emerald-400 font-semibold flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-ping"></span>
+              RUC 20608945123
+            </span>
+          </nav>
+
+          <button (click)="scrollToTop($event)" class="text-xs text-gray-400 hover:text-white flex items-center gap-1.5 transition-colors cursor-pointer">
+            Volver arriba 
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+          </button>
+        </div>
+
+        <!-- Upper Section: Subscription, Customer Service & Navigation Columns -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 py-12 border-b border-white/10">
+          
+          <!-- Left Column (4 cols): Business Profile, Newsletter & Direct Contact -->
+          <div class="lg:col-span-4 space-y-6">
+            <div>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-xl font-black tracking-tight text-white">ENIAC <span class="text-[#256fff]">LABS</span></span>
+                <span class="text-[10px] bg-[#256fff]/20 text-[#256fff] border border-[#256fff]/30 font-bold px-2 py-0.5 rounded">E.I.R.L.</span>
+              </div>
+              <p class="text-xs text-gray-400 leading-relaxed">
+                Especialistas en hardware de alto rendimiento, ensamblaje de PC Gamer y Workstations en el Perú. Arquitectura de comercio distribuida segura e integrada.
+              </p>
+            </div>
+
+            <!-- Mini subscribe input -->
+            <div>
+              <h4 class="text-xs font-bold text-white uppercase tracking-wider mb-2">Newsletter de Ofertas & Stock</h4>
+              <form [formGroup]="newsletterForm" (ngSubmit)="onNewsletterSubmit()" class="flex max-w-sm rounded-full bg-white/5 border border-white/20 p-1 focus-within:border-[#256fff] transition-colors">
+                <input 
+                  type="email" 
+                  formControlName="email"
+                  placeholder="tucorreo@ejemplo.com" 
+                  class="bg-transparent px-4 py-2 text-xs text-white placeholder-gray-400 focus:outline-none flex-1"
+                />
+                <button type="submit" class="bg-[#256fff] hover:bg-[#1f5ee0] text-white text-xs font-semibold px-4 py-2 rounded-full transition-colors flex-shrink-0 cursor-pointer">
+                  SUSCRIBIRSE
+                </button>
+              </form>
+            </div>
+
+            <!-- Datos de Contacto Directo del Negocio -->
+            <div class="pt-4 border-t border-white/10 space-y-3">
+              <div class="flex items-start gap-3">
+                <svg class="w-4 h-4 text-[#256fff] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                <div class="text-xs text-gray-300">
+                  <div class="font-bold text-white">Sede Central & Showroom:</div>
+                  <div>Av. José Larco 743, Of. 502, Miraflores, Lima - Perú</div>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-3">
+                <svg class="w-4 h-4 text-[#256fff] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                <div class="text-xs text-gray-300">
+                  <div class="font-bold text-white">Central Telefónica:</div>
+                  <div class="text-sm font-black text-white">(01) 480-9200</div>
+                  <div class="text-[11px] text-gray-400">Lun - Sáb: 9:00 AM – 8:00 PM</div>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-3">
+                <svg class="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.698c.97.53 1.838.814 2.795.814 3.182 0 5.768-2.586 5.768-5.766 0-3.18-2.586-5.767-5.768-5.767zm7.424 5.766c0 4.097-3.334 7.429-7.424 7.429-.982 0-1.928-.201-2.799-.58l-3.987 1.045 1.064-3.89c-.482-.937-.738-1.99-.738-3.004 0-4.097 3.334-7.429 7.424-7.429 4.09 0 7.424 3.332 7.424 7.429z"/></svg>
+                <div class="text-xs text-gray-300">
+                  <div class="font-bold text-emerald-400">WhatsApp Ventas Directas:</div>
+                  <a href="https://wa.me/51984512870?text=Hola%20ENIAC%20Labs%2C%20deseo%20cotizar%20componentes%20de%20PC" target="_blank" class="hover:underline font-bold text-white">
+                    +51 984 512 870
+                  </a>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-3">
+                <svg class="w-4 h-4 text-[#256fff] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                <div class="text-xs text-gray-300 space-y-0.5">
+                  <div><span class="text-gray-400">Ventas:</span> <a href="mailto:ventas@eniaclabs.pe" class="text-white hover:text-[#256fff] underline">ventas&#64;eniaclabs.pe</a></div>
+                  <div><span class="text-gray-400">Soporte/RMA:</span> <a href="mailto:soporte@eniaclabs.pe" class="text-white hover:text-[#256fff] underline">soporte&#64;eniaclabs.pe</a></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Libro de Reclamaciones Compliance Box -->
+            <div class="pt-2">
+              <div class="bg-white/10 hover:bg-white/15 p-3 rounded-xl border border-white/20 transition-all flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center font-bold text-black text-xs">
+                    📖
+                  </div>
+                  <div>
+                    <span class="text-xs text-white font-bold block">Libro de Reclamaciones</span>
+                    <span class="text-[10px] text-gray-300">Conforme a la Ley N° 29571 (INDECOPI)</span>
+                  </div>
+                </div>
+                <span class="text-[10px] bg-white/20 px-2 py-1 rounded text-white font-mono">Virtual</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Right Columns (8 cols): 4 Organized Navigation Sections -->
+          <div class="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8 text-xs">
+            
+            <!-- Columna 1: Componentes de PC -->
+            <div class="space-y-3">
+              <h4 class="font-bold text-white text-sm tracking-wide border-b border-white/10 pb-1 text-[#256fff]">
+                Componentes PC
+              </h4>
+              <ul class="space-y-2 text-gray-300">
+                <li><a href="#category" (click)="scrollToSection('category', $event)" class="hover:text-white transition-colors">Tarjetas Gráficas (RTX 40 / RX 7000)</a></li>
+                <li><a href="#category" (click)="scrollToSection('category', $event)" class="hover:text-white transition-colors">Procesadores AMD AM5 & Intel Gen 14</a></li>
+                <li><a href="#tablets" (click)="scrollToSection('tablets', $event)" class="hover:text-white transition-colors">Placas Madre ASUS ROG / MSI</a></li>
+                <li><a href="#tablets" (click)="scrollToSection('tablets', $event)" class="hover:text-white transition-colors">Memorias RAM DDR5 6000MHz</a></li>
+                <li><a href="#others" (click)="scrollToSection('others', $event)" class="hover:text-white transition-colors">Almacenamiento NVMe PCIe 4.0/5.0</a></li>
+                <li><a href="#HONOR_CHOICE" (click)="scrollToSection('HONOR_CHOICE', $event)" class="hover:text-white transition-colors">Fuentes Modulares 80+ Gold</a></li>
+                <li><a href="#HONOR_CHOICE" (click)="scrollToSection('HONOR_CHOICE', $event)" class="hover:text-white transition-colors">Gabinetes Lian Li & NZXT</a></li>
+              </ul>
+            </div>
+
+            <!-- Columna 2: Servicios & Ensamblaje -->
+            <div class="space-y-3">
+              <h4 class="font-bold text-white text-sm tracking-wide border-b border-white/10 pb-1 text-[#256fff]">
+                Servicios Gamer
+              </h4>
+              <ul class="space-y-2 text-gray-300">
+                <li><a routerLink="/explorar" class="hover:text-white transition-colors">PC Builder Inteligente 3D</a></li>
+                <li><a href="#peshop1" (click)="scrollToSection('peshop1', $event)" class="hover:text-white transition-colors">Ensamblaje & Cable Management</a></li>
+                <li><a href="#peshop1" (click)="scrollToSection('peshop1', $event)" class="hover:text-white transition-colors">Pruebas de Estrés y Benchmarking</a></li>
+                <li><a href="#peshop1" (click)="scrollToSection('peshop1', $event)" class="hover:text-white transition-colors">Actualización de BIOS & Firmware</a></li>
+                <li><a href="#peshop1" (click)="scrollToSection('peshop1', $event)" class="hover:text-white transition-colors">Overclocking y Undervolting Seguro</a></li>
+                <li><a routerLink="/pagar" class="hover:text-white transition-colors">Cotización Rápida en Línea</a></li>
+              </ul>
+            </div>
+
+            <!-- Columna 3: Información Legal & Garantías -->
+            <div class="space-y-3">
+              <h4 class="font-bold text-white text-sm tracking-wide border-b border-white/10 pb-1 text-[#256fff]">
+                Políticas & Legal
+              </h4>
+              <ul class="space-y-2 text-gray-300">
+                <li><span class="text-white font-medium">ENIAC LABS E.I.R.L.</span></li>
+                <li><span class="text-gray-400">RUC: 20608945123</span></li>
+                <li><a href="javascript:;" class="hover:text-white transition-colors">Póliza de Garantía Oficial 3 Años</a></li>
+                <li><a href="javascript:;" class="hover:text-white transition-colors">Términos y Condiciones de Compra</a></li>
+                <li><a href="javascript:;" class="hover:text-white transition-colors">Envíos a Nivel Nacional con Seguro</a></li>
+                <li><a href="javascript:;" class="hover:text-white transition-colors">Protección de Datos Personales</a></li>
+                <li><a href="javascript:;" class="hover:text-white transition-colors">Facturación Electrónica SUNAT</a></li>
+              </ul>
+            </div>
+
+            <!-- Columna 4: Arquitectura del Sistema Distribuido -->
+            <div class="space-y-3">
+              <h4 class="font-bold text-white text-sm tracking-wide border-b border-white/10 pb-1 text-emerald-400">
+                Arquitectura Cloud
+              </h4>
+              <ul class="space-y-2 text-gray-300 text-[11px]">
+                <li class="flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                  <span>Spring Cloud Gateway (:18080)</span>
+                </li>
+                <li class="flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                  <span>Keycloak OIDC Auth (:18180)</span>
+                </li>
+                <li class="flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                  <span>Eureka Service Discovery (:18761)</span>
+                </li>
+                <li class="flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                  <span>Apache Kafka & PostgreSQL</span>
+                </li>
+                <li class="pt-2 border-t border-white/10 text-gray-400">
+                  Arquitectos del Sistema:
+                  <div class="text-white font-semibold">Eliceo Parillo Mostajo</div>
+                  <div class="text-white font-semibold">Laura Vargas Cristhian Paul</div>
+                </li>
+                <li class="pt-1">
+                  <a routerLink="/admin/login" class="text-[#256fff] hover:underline font-bold flex items-center gap-1">
+                    Acceso Portal Admin →
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Social Media, Pay Methods & Country Selector Strip -->
+        <div class="flex flex-col sm:flex-row items-center justify-between py-6 border-b border-white/10 gap-4">
+          <div class="flex items-center gap-4 text-gray-400">
+            <span class="text-xs text-gray-400 font-medium">Síguenos:</span>
+            <a href="https://facebook.com/eniaclabs.pe" target="_blank" class="hover:text-[#256fff] p-1.5 rounded-full hover:bg-white/10 transition-colors" aria-label="Facebook">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg>
+            </a>
+            <a href="https://twitter.com/eniaclabs_pe" target="_blank" class="hover:text-white p-1.5 rounded-full hover:bg-white/10 transition-colors" aria-label="X / Twitter">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+            <a href="https://instagram.com/eniaclabs.pe" target="_blank" class="hover:text-[#e1306c] p-1.5 rounded-full hover:bg-white/10 transition-colors" aria-label="Instagram">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            </a>
+            <a href="https://wa.me/51984512870" target="_blank" class="hover:text-emerald-400 p-1.5 rounded-full hover:bg-white/10 transition-colors" aria-label="WhatsApp">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.698c.97.53 1.838.814 2.795.814 3.182 0 5.768-2.586 5.768-5.766 0-3.18-2.586-5.767-5.768-5.767zm7.424 5.766c0 4.097-3.334 7.429-7.424 7.429-.982 0-1.928-.201-2.799-.58l-3.987 1.045 1.064-3.89c-.482-.937-.738-1.99-.738-3.004 0-4.097 3.334-7.429 7.424-7.429 4.09 0 7.424 3.332 7.424 7.429z"/></svg>
+            </a>
+          </div>
+
+          <!-- Métodos de Pago Aceptados -->
+          <div class="flex items-center gap-2 text-xs text-gray-400">
+            <span class="text-[11px] text-gray-400">Métodos aceptados:</span>
+            <span class="bg-white/10 text-white font-bold px-2 py-0.5 rounded text-[10px]">VISA</span>
+            <span class="bg-white/10 text-white font-bold px-2 py-0.5 rounded text-[10px]">Mastercard</span>
+            <span class="bg-white/10 text-white font-bold px-2 py-0.5 rounded text-[10px]">Yape</span>
+            <span class="bg-white/10 text-white font-bold px-2 py-0.5 rounded text-[10px]">Plin</span>
+            <span class="bg-white/10 text-white font-bold px-2 py-0.5 rounded text-[10px]">Transferencia BCP/BBVA</span>
+          </div>
+
+          <div class="flex items-center gap-2 text-xs text-gray-300 font-medium">
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>Perú</span>
+            <span class="text-gray-500">(Lima Metropolitana & Provincias)</span>
+          </div>
+        </div>
+
+        <!-- Bottom Copyright & Legal Links -->
+        <div class="flex flex-col sm:flex-row items-center justify-between pt-6 text-[11px] text-gray-500 gap-4">
+          <div class="flex flex-wrap items-center gap-4">
+            <a href="javascript:;" class="hover:text-white">Mapa del Sitio</a>
+            <span>•</span>
+            <a href="javascript:;" class="hover:text-white">Términos de Compra</a>
+            <span>•</span>
+            <a href="javascript:;" class="hover:text-white">Declaración de Privacidad</a>
+            <span>•</span>
+            <a href="javascript:;" class="hover:text-white">Políticas de Cookies</a>
+          </div>
+
+          <div class="text-center sm:text-right">
+            Copyright © 2026 <strong class="text-gray-300">ENIAC LABS E.I.R.L.</strong> RUC: 20608945123. Todos los derechos reservados.
+          </div>
+        </div>
+
+      </div>
+    </footer>
+  `
+})
+export class FooterComponent {
+  private fb = inject(FormBuilder);
+  private toast = inject(ToastService);
+
+  newsletterForm = this.fb.group({
+    email: ['', [Validators.required, Validators.email]]
+  });
+
+  onNewsletterSubmit() {
+    if (this.newsletterForm.valid) {
+      this.toast.show('¡Gracias por suscribirte al boletín de hardware de ENIAC Labs!');
+      this.newsletterForm.reset();
+    } else {
+      this.toast.show('Por favor ingresa un correo electrónico válido');
+    }
+  }
+
+  scrollToTop(event: Event) {
+    event.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  scrollToSection(id: string, event: Event) {
+    event.preventDefault();
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+}

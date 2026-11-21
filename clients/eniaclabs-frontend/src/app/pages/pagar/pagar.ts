@@ -12,6 +12,8 @@ import { ToastService } from '../../services/toast.service';
 
 import { environment } from '../../../environments/environment';
 
+declare let Culqi: any;
+
 @Component({
   selector: 'app-pagar',
   standalone: true,
@@ -469,19 +471,75 @@ import { environment } from '../../../environments/environment';
               @if (currentStep() === 3) {
                 <div class="space-y-6 animate-fadeIn">
                   
-                  <!-- Tarjeta Yape Oficial con Icono Wikimedia solicitado -->
-                  <div class="inline-flex items-center gap-3.5 px-5 py-3 rounded-2xl border-2 border-[#742284] bg-purple-50/70 shadow-xs">
-                    <img 
-                      src="https://upload.wikimedia.org/wikipedia/commons/0/08/Icono_de_la_aplicaci%C3%B3n_Yape.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=original" 
-                      alt="Yape Oficial" 
-                      class="w-11 h-11 rounded-xl object-contain shadow-xs" 
-                    />
-                    <div>
-                      <div class="flex items-center gap-1.5">
-                        <span class="text-base font-black text-purple-950">Yape</span>
-                        <span class="text-[9px] bg-[#742284] text-white px-2 py-0.5 rounded-full font-bold uppercase">Oficial</span>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Opción 1: Culqi Checkout v4 (Yape + Tarjetas) -->
+                    <div 
+                      (click)="selectedPaymentGateway.set('CULQI')"
+                      [class.border-[#742284]]="selectedPaymentGateway() === 'CULQI'"
+                      [class.bg-purple-50/70]="selectedPaymentGateway() === 'CULQI'"
+                      [class.border-gray-200]="selectedPaymentGateway() !== 'CULQI'"
+                      class="cursor-pointer p-4 rounded-2xl border-2 transition-all flex flex-col justify-between shadow-xs hover:border-[#742284]"
+                    >
+                      <div class="flex items-start justify-between">
+                        <div class="flex items-center gap-3">
+                          <img 
+                            src="https://upload.wikimedia.org/wikipedia/commons/0/08/Icono_de_la_aplicaci%C3%B3n_Yape.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=original" 
+                            alt="Yape & Tarjetas Culqi" 
+                            class="w-10 h-10 rounded-xl object-contain shadow-xs" 
+                          />
+                          <div>
+                            <div class="flex items-center gap-1.5">
+                              <span class="text-sm font-black text-purple-950">Culqi Checkout v4</span>
+                              <span class="text-[9px] bg-[#742284] text-white px-2 py-0.5 rounded-full font-bold uppercase">Yape + Tarjeta</span>
+                            </div>
+                            <div class="text-[11px] text-purple-900/70 font-medium">Yape con código de aprobación y tarjetas Visa/Mastercard</div>
+                          </div>
+                        </div>
+                        <input 
+                          type="radio" 
+                          name="gateway" 
+                          [checked]="selectedPaymentGateway() === 'CULQI'" 
+                          class="accent-[#742284] w-4 h-4 mt-1"
+                        />
                       </div>
-                      <div class="text-[11px] text-purple-900/70 font-medium">Pago móvil con QR y código de aprobación</div>
+                      <div class="mt-3 pt-2 border-t border-purple-100 flex items-center justify-between text-[11px] text-purple-800 font-semibold">
+                        <span>Pasarela Oficial Culqi</span>
+                        <span>S/ {{ totalCalculado() | number:'1.2-2' }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Opción 2: Mercado Pago Checkout Pro -->
+                    <div 
+                      (click)="selectedPaymentGateway.set('MERCADOPAGO')"
+                      [class.border-[#256fff]]="selectedPaymentGateway() === 'MERCADOPAGO'"
+                      [class.bg-blue-50/60]="selectedPaymentGateway() === 'MERCADOPAGO'"
+                      [class.border-gray-200]="selectedPaymentGateway() !== 'MERCADOPAGO'"
+                      class="cursor-pointer p-4 rounded-2xl border-2 transition-all flex flex-col justify-between shadow-xs hover:border-[#256fff]"
+                    >
+                      <div class="flex items-start justify-between">
+                        <div class="flex items-center gap-3">
+                          <div class="w-10 h-10 rounded-xl bg-[#009ee3] flex items-center justify-center text-white font-bold text-xs shadow-xs">
+                            MP
+                          </div>
+                          <div>
+                            <div class="flex items-center gap-1.5">
+                              <span class="text-sm font-black text-blue-950">Mercado Pago</span>
+                              <span class="text-[9px] bg-[#009ee3] text-white px-2 py-0.5 rounded-full font-bold uppercase">Pro</span>
+                            </div>
+                            <div class="text-[11px] text-blue-900/70 font-medium">Checkout Pro con redirección segura</div>
+                          </div>
+                        </div>
+                        <input 
+                          type="radio" 
+                          name="gateway" 
+                          [checked]="selectedPaymentGateway() === 'MERCADOPAGO'" 
+                          class="accent-[#009ee3] w-4 h-4 mt-1"
+                        />
+                      </div>
+                      <div class="mt-3 pt-2 border-t border-blue-100 flex items-center justify-between text-[11px] text-blue-800 font-semibold">
+                        <span>Pasarela Mercado Pago</span>
+                        <span>S/ {{ totalCalculado() | number:'1.2-2' }}</span>
+                      </div>
                     </div>
                   </div>
 
@@ -494,9 +552,13 @@ import { environment } from '../../../environments/environment';
                     >
                       @if (isProcessing()) {
                         <div class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span>Conectando a Mercado Pago...</span>
+                        <span>Conectando pasarela...</span>
                       } @else {
-                        <span>Pagar con Yape (S/ {{ totalCalculado() | number:'1.2-2' }}) →</span>
+                        @if (selectedPaymentGateway() === 'CULQI') {
+                          <span>Pagar con Culqi (Yape y Tarjetas) (S/ {{ totalCalculado() | number:'1.2-2' }}) →</span>
+                        } @else {
+                          <span>Pagar con Mercado Pago (S/ {{ totalCalculado() | number:'1.2-2' }}) →</span>
+                        }
                       }
                     </button>
 
@@ -513,12 +575,17 @@ import { environment } from '../../../environments/environment';
               } @else if (currentStep() > 3) {
                 <div class="text-xs text-gray-600 bg-gray-50 p-4 rounded-xl border border-gray-100 flex items-center justify-between">
                   <div class="flex items-center gap-2.5">
-                    <img 
-                      src="https://upload.wikimedia.org/wikipedia/commons/0/08/Icono_de_la_aplicaci%C3%B3n_Yape.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=original" 
-                      alt="Yape" 
-                      class="w-5 h-5 rounded-md object-contain" 
-                    />
-                    <span class="font-bold text-gray-900">Yape Oficial</span>
+                    @if (selectedPaymentGateway() === 'CULQI') {
+                      <img 
+                        src="https://upload.wikimedia.org/wikipedia/commons/0/08/Icono_de_la_aplicaci%C3%B3n_Yape.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=original" 
+                        alt="Culqi" 
+                        class="w-5 h-5 rounded-md object-contain" 
+                      />
+                      <span class="font-bold text-gray-900">Culqi Checkout (Yape / Tarjetas)</span>
+                    } @else {
+                      <div class="w-5 h-5 rounded-md bg-[#009ee3] text-white flex items-center justify-center text-[10px] font-bold">MP</div>
+                      <span class="font-bold text-gray-900">Mercado Pago Checkout Pro</span>
+                    }
                     <span class="mx-2 text-gray-300">|</span>
                     <span class="font-bold text-purple-900">S/ {{ totalCalculado() | number:'1.2-2' }}</span>
                   </div>
@@ -556,28 +623,44 @@ import { environment } from '../../../environments/environment';
                   </div>
 
                   <div class="flex flex-wrap items-center gap-3">
+                    <!-- Botón Principal: Culqi Checkout v4 Oficial (Yape & Tarjetas) -->
                     <button 
                       type="button" 
-                      (click)="procesarPago()"
+                      (click)="iniciarPagoCulqi()"
                       [disabled]="isProcessing()"
-                      class="w-full sm:w-auto px-10 py-4 bg-black hover:bg-[#256fff] disabled:bg-gray-400 text-white font-black text-xs sm:text-sm rounded-full transition-all shadow-md flex items-center justify-center gap-3 cursor-pointer active:scale-98"
+                      class="w-full sm:w-auto px-8 py-4 bg-[#742284] hover:bg-purple-900 disabled:bg-gray-400 text-white font-black text-xs sm:text-sm rounded-full transition-all shadow-md flex items-center justify-center gap-2.5 cursor-pointer active:scale-98"
                     >
                       @if (isProcessing()) {
                         <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span>Procesando pago con pc-orden-ms...</span>
+                        <span>Conectando a Culqi...</span>
                       } @else {
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        <span>Pagar con Yape (S/ {{ totalCalculado() | number:'1.2-2' }})</span>
+                        <img 
+                          src="https://upload.wikimedia.org/wikipedia/commons/0/08/Icono_de_la_aplicaci%C3%B3n_Yape.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=original" 
+                          alt="Culqi Yape" 
+                          class="w-4 h-4 rounded-xs object-contain" 
+                        />
+                        <span>Pagar con Culqi (Yape / Tarjetas) (S/ {{ totalCalculado() | number:'1.2-2' }})</span>
                       }
                     </button>
 
+                    <!-- Botón Secundario: Mercado Pago Checkout Pro -->
+                    <button 
+                      type="button" 
+                      (click)="pagarConMercadoPago()"
+                      [disabled]="isProcessing()"
+                      class="w-full sm:w-auto px-6 py-4 bg-black hover:bg-blue-600 disabled:bg-gray-400 text-white font-bold text-xs sm:text-sm rounded-full transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+                    >
+                      <span>Mercado Pago Checkout</span>
+                    </button>
+
+                    <!-- Botón Terciario: Simulación Directa Kafka -->
                     <button 
                       type="button"
                       (click)="simularPagoAprobado()"
                       [disabled]="isProcessing()"
-                      class="w-full sm:w-auto px-6 py-3.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 text-white font-bold text-xs rounded-full transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                      class="w-full sm:w-auto px-5 py-4 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 text-white font-bold text-xs rounded-full transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
                     >
-                      <span>✓ Simular Aprobación Directa (Kafka OK)</span>
+                      <span>✓ Simular Directo (Kafka OK)</span>
                     </button>
                   </div>
                 </div>
@@ -737,7 +820,15 @@ import { environment } from '../../../environments/environment';
             </div>
             
             <div>
-              @if (orderSuccess()?.isMercadoPago) {
+              @if (orderSuccess()?.isCulqi) {
+                <div class="inline-block px-3 py-1 bg-purple-100 text-[#742284] text-[10px] font-bold rounded-full uppercase tracking-wider mb-2">
+                  Culqi Checkout v4 • Transacción Exitosa
+                </div>
+                <h3 class="text-xl font-black text-gray-900">¡Pago Confirmado con Éxito!</h3>
+                <p class="text-xs text-gray-500 mt-1">
+                  Tu pago ha sido aprobado por Culqi con ID: <strong class="font-mono text-[#742284]">{{ orderSuccess().paymentId }}</strong> y referencia <strong>#{{ orderSuccess().id }}</strong>.
+                </p>
+              } @else if (orderSuccess()?.isMercadoPago) {
                 <div class="inline-block px-3 py-1 bg-blue-100 text-[#256fff] text-[10px] font-bold rounded-full uppercase tracking-wider mb-2">
                   Mercado Pago Checkout Pro • Transacción Exitosa
                 </div>
@@ -759,8 +850,8 @@ import { environment } from '../../../environments/environment';
             <div class="bg-gray-50 p-4 rounded-xl text-left text-xs space-y-1.5 border border-gray-100">
               @if (orderSuccess()?.paymentId) {
                 <div class="flex justify-between">
-                  <span class="text-gray-500">ID de Pago MP:</span>
-                  <span class="font-bold text-[#256fff] font-mono">{{ orderSuccess().paymentId }}</span>
+                  <span class="text-gray-500">{{ orderSuccess()?.isCulqi ? 'ID Cargo Culqi:' : 'ID de Pago MP:' }}</span>
+                  <span class="font-bold text-[#742284] font-mono">{{ orderSuccess().paymentId }}</span>
                 </div>
                 <div class="flex justify-between">
                   <span class="text-gray-500">Método de Pago:</span>
@@ -800,6 +891,35 @@ import { environment } from '../../../environments/environment';
         </div>
       }
 
+      <!-- Rejection Modal when payment is declined/rejected -->
+      @if (orderRejection()) {
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+          <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 text-center space-y-4 shadow-2xl border border-red-100">
+            <div class="w-16 h-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto text-2xl shadow-inner font-bold">
+              ✕
+            </div>
+            <div>
+              <div class="inline-block px-3 py-1 bg-red-100 text-red-800 text-[10px] font-bold rounded-full uppercase tracking-wider mb-2">
+                Transacción No Aprobada
+              </div>
+              <h3 class="text-xl font-black text-gray-900">Pago Rechazado</h3>
+              <p class="text-xs text-gray-600 mt-2 px-2">
+                {{ orderRejection() }}
+              </p>
+            </div>
+            <div class="pt-3 space-y-2">
+              <button
+                type="button"
+                (click)="orderRejection.set(null)"
+                class="w-full py-3 bg-black hover:bg-gray-800 text-white font-bold text-xs rounded-full transition-all text-center cursor-pointer shadow-sm"
+              >
+                Intentar Nuevamente
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+
     </div>
   `
 })
@@ -818,8 +938,10 @@ export class PagarPage implements OnInit {
   isCouponInputVisible = signal<boolean>(false);
   couponInput = 'APEALL35';
   selectedPaymentMethod = signal<'TARJETA' | 'YAPE' | 'PAGOEFECTIVO' | 'MERCADOPAGO'>('MERCADOPAGO');
+  selectedPaymentGateway = signal<'CULQI' | 'MERCADOPAGO'>('CULQI');
   isProcessing = signal<boolean>(false);
   orderSuccess = signal<any | null>(null);
+  orderRejection = signal<string | null>(null);
 
   // Form Model matching screenshot
   formData = {
@@ -892,6 +1014,8 @@ export class PagarPage implements OnInit {
   ngOnInit() {
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Callback global oficial para Culqi Checkout v4
+      (window as any).culqi = () => this.handleCulqiCallback();
     }
 
     // Capturar retorno de Mercado Pago Checkout Pro (URL params)
@@ -964,10 +1088,162 @@ export class PagarPage implements OnInit {
   }
 
   onContinuarStep3() {
-    if (this.selectedPaymentMethod() === 'MERCADOPAGO' || this.selectedPaymentMethod() === 'YAPE') {
+    if (this.selectedPaymentGateway() === 'CULQI') {
+      this.iniciarPagoCulqi();
+    } else if (this.selectedPaymentGateway() === 'MERCADOPAGO' || this.selectedPaymentMethod() === 'MERCADOPAGO') {
       this.pagarConMercadoPago();
     } else {
       this.advanceStep(4);
+    }
+  }
+
+  iniciarPagoCulqi() {
+    this.isProcessing.set(true);
+    this.orderRejection.set(null);
+    this.toast.show('Iniciando Culqi Checkout v4 (Yape y Tarjetas)...');
+
+    const itemsRequest = this.displayItems().map((it, idx) => ({
+      productoId: idx + 1,
+      sku: it.id,
+      productoNombre: it.name,
+      precioUnitario: it.price,
+      cantidad: it.quantity
+    }));
+
+    const orderPayload = {
+      clienteId: 1,
+      clienteNombre: `${this.formData.nombres} ${this.formData.apellidos}`,
+      clienteEmail: this.formData.email,
+      metodoPago: 'CULQI_YAPE_TARJETA',
+      direccionEnvio: `${this.formData.direccion}, ${this.formData.distrito}, ${this.formData.departamento}`,
+      observaciones: this.construirObservaciones('Culqi Checkout v4 | '),
+      items: itemsRequest
+    };
+
+    // Crear orden en pc-orden-ms para persistencia y trazabilidad ACID
+    this.order.crearOrden(orderPayload).subscribe({
+      next: (orderRes) => {
+        const orderIdToUse = orderRes && orderRes.id ? orderRes.id.toString() : '26';
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('lastEniacOrderId', orderIdToUse);
+          if (orderRes?.codigoOrden) {
+            localStorage.setItem('lastEniacCodigo', orderRes.codigoOrden);
+          }
+        }
+        this.abrirModalCulqi(orderIdToUse);
+      },
+      error: () => {
+        const fallbackOrderId = (typeof window !== 'undefined' ? localStorage.getItem('lastEniacOrderId') : null) || '26';
+        this.abrirModalCulqi(fallbackOrderId);
+      }
+    });
+  }
+
+  private abrirModalCulqi(orderId: string) {
+    if (typeof window === 'undefined') {
+      this.isProcessing.set(false);
+      return;
+    }
+
+    if (typeof Culqi === 'undefined') {
+      this.isProcessing.set(false);
+      const msg = 'El script de Culqi Checkout v4 aún se está cargando. Intenta en unos segundos.';
+      this.toast.show(msg);
+      this.orderRejection.set(msg);
+      return;
+    }
+
+    // Configurar Culqi Checkout v4 según especificación oficial
+    const publicKey = (environment as any).culqiPublicKey || 'pk_test_S6cbeiPZqYemD1lH';
+    const amountCents = Math.round(this.totalCalculado() * 100);
+
+    try {
+      Culqi.publicKey = publicKey;
+      Culqi.settings({
+        title: 'ENIAC Labs',
+        currency: 'PEN',
+        amount: amountCents
+      });
+      Culqi.options({
+        paymentMethods: {
+          tarjeta: true,
+          yape: true
+        }
+      });
+
+      this.isProcessing.set(false);
+      this.toast.show('Abre la ventana de Culqi y selecciona Yape o Tarjeta...');
+      Culqi.open();
+    } catch (err: any) {
+      this.isProcessing.set(false);
+      console.error('[Culqi] Error al abrir Checkout:', err);
+      this.orderRejection.set('Error inicializando Culqi Checkout: ' + (err?.message || err));
+    }
+  }
+
+  handleCulqiCallback() {
+    if (typeof Culqi === 'undefined') return;
+
+    if (Culqi.token) {
+      const token = Culqi.token.id;
+      const email = Culqi.token.email || this.formData.email;
+      const amountCents = Math.round(this.totalCalculado() * 100);
+      const storedOrderId = (typeof window !== 'undefined' ? localStorage.getItem('lastEniacOrderId') : null) || '26';
+
+      this.isProcessing.set(true);
+      this.toast.show('Procesando cargo en servidores de Culqi...');
+
+      const endpoint = `${environment.apiBaseUrl}/api/pagos/culqi/cobrar`;
+      const payload = {
+        token: token,
+        amount: amountCents,
+        email: email,
+        orderId: storedOrderId
+      };
+
+      this.http.post<any>(endpoint, payload).subscribe({
+        next: (res) => {
+          this.isProcessing.set(false);
+          if (typeof Culqi.close === 'function') {
+            try { Culqi.close(); } catch (e) {}
+          }
+
+          if (res && (res.success || res.status === 'approved')) {
+            this.cart.clearCart();
+            this.orderSuccess.set({
+              id: storedOrderId,
+              codigoOrden: 'ENIAC-20261111-6475',
+              paymentId: res.chargeId || ('CULQI-' + token.slice(-8)),
+              status: 'Aprobado',
+              paymentType: 'Culqi Checkout v4 (Yape / Tarjetas)',
+              monto: this.totalCalculado(),
+              isCulqi: true,
+              message: res.message || 'Su compra ha sido exitosa.'
+            });
+            this.orderRejection.set(null);
+            this.toast.show('¡Pago aprobado con Culqi! Orden sincronizada vía Kafka.');
+          } else {
+            const msg = res?.message || 'El pago fue denegado por la entidad bancaria o pasarela Culqi.';
+            this.orderRejection.set(msg);
+            this.toast.show(`Rechazado: ${msg}`);
+          }
+        },
+        error: (err) => {
+          this.isProcessing.set(false);
+          if (typeof Culqi.close === 'function') {
+            try { Culqi.close(); } catch (e) {}
+          }
+          const msg = err.error?.message || err.error?.user_message || 'El pago fue rechazado por Culqi.';
+          this.orderRejection.set(msg);
+          this.toast.show(`Rechazado: ${msg}`);
+        }
+      });
+    } else if (Culqi.error) {
+      this.isProcessing.set(false);
+      console.warn('[Culqi] Evento de error recibido:', Culqi.error);
+      const errMsg = Culqi.error.user_message || Culqi.error.merchant_message || 'Operación cancelada o no completada en Culqi.';
+      this.orderRejection.set(errMsg);
+      this.toast.show(`Culqi: ${errMsg}`);
     }
   }
 

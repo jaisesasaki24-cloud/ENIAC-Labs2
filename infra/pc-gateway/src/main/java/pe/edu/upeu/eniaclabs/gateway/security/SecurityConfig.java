@@ -21,6 +21,7 @@ public class SecurityConfig {
                         .pathMatchers("/api/v1/auth/**").permitAll()
                         .pathMatchers("/api/payments/**").permitAll()
                         .pathMatchers("/api/v1/pagos/**").permitAll()
+                        .pathMatchers("/api/pagos/**").permitAll()
                         .pathMatchers("/api/contabilidad/**").permitAll()
                         .pathMatchers("/actuator/**").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/v1/productos/**").permitAll()

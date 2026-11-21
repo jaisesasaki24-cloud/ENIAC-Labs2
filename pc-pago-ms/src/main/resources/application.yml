@@ -18,6 +18,10 @@ mercadopago:
   currency: PEN
   auto-return: approved
 
+culqi:
+  secret-key: ${CULQI_SECRET_KEY:sk_test_g83TjoIFV36RcQqK}
+  public-key: ${CULQI_PUBLIC_KEY:pk_test_S6cbeiPZqYemD1lH}
+
 management:
   endpoints:
     web:

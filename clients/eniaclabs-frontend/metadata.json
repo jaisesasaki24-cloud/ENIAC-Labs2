@@ -1,0 +1,6 @@
+{
+  "name": "Tienda de Componentes de Computadora",
+  "description": "Tienda especializada en componentes de computadora, procesadores, tarjetas gráficas, memorias RAM, placas madre y almacenamiento.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

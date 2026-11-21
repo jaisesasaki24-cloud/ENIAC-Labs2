@@ -1,0 +1,20 @@
+<div class="min-h-screen flex flex-col bg-white">
+  <!-- Official Header Navigation & Mega Menu -->
+  <app-header />
+
+  <!-- Main Store / Page Content -->
+  <main id="mainContent" class="flex-1">
+    <router-outlet />
+  </main>
+
+  <!-- Official Footer & Compliance -->
+  <app-footer />
+
+  <!-- Overlays & Interactive Modals -->
+  <app-cart-drawer />
+  <app-search-modal />
+  <app-quick-buy-modal />
+  <app-login-modal />
+  <app-floating-actions />
+  <app-toast />
+</div>

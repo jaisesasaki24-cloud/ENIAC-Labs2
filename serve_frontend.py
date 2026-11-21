@@ -20,9 +20,9 @@ from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FRONTEND_DIST = os.path.join(BASE_DIR, 'clients', 'eniaclabs-frontend', 'dist', 'app', 'browser')
-AZURE_HOST = 'http://eniaclabs.chilecentral.cloudapp.azure.com'
-GATEWAY_URL = os.environ.get('GATEWAY_URL', f'{AZURE_HOST}:18080')
-KEYCLOAK_URL = os.environ.get('KEYCLOAK_URL', f'{AZURE_HOST}:18180')
+LOCAL_HOST = 'http://localhost'
+GATEWAY_URL = os.environ.get('GATEWAY_URL', f'{LOCAL_HOST}:18080')
+KEYCLOAK_URL = os.environ.get('KEYCLOAK_URL', f'{LOCAL_HOST}:18180')
 
 # Contadores y metricas para Prometheus
 REQUEST_COUNTER = 120
@@ -351,6 +351,78 @@ class AngularSpaHandler(SimpleHTTPRequestHandler):
                 "message": "Pago confirmado y evento Kafka emitido exitosamente"
             })
             return
+
+        if clean_path in ('/api/pagos/culqi/cobrar', '/api/v1/pagos/culqi/cobrar'):
+            try:
+                payload = json.loads(body.decode('utf-8', errors='ignore')) if body else {}
+            except Exception:
+                payload = {}
+
+            culqi_token = payload.get('token')
+            amount = payload.get('amount', 1000)
+            email = payload.get('email', 'cliente.eniac@gmail.com')
+            order_id = payload.get('orderId', '26')
+
+            culqi_sk = os.environ.get('CULQI_SECRET_KEY', 'sk_test_g83TjoIFV36RcQqK')
+            culqi_payload = {
+                'amount': amount,
+                'currency_code': 'PEN',
+                'email': email,
+                'source_id': culqi_token
+            }
+
+            try:
+                req = urllib.request.Request(
+                    'https://api.culqi.com/v2/charges',
+                    data=json.dumps(culqi_payload).encode('utf-8'),
+                    headers={'Authorization': f'Bearer {culqi_sk}', 'Content-Type': 'application/json'}
+                )
+                with urllib.request.urlopen(req, timeout=20) as resp:
+                    resp_data = json.loads(resp.read().decode('utf-8'))
+                    charge_id = resp_data.get('id')
+                    outcome = resp_data.get('outcome', {})
+                    user_msg = outcome.get('user_message', 'Su compra ha sido exitosa.')
+                    if MOCK_ORDERS:
+                        MOCK_ORDERS[0]["estado"] = "PAGADA"
+                        MOCK_ORDERS[0]["metodoPago"] = "CULQI_YAPE_TARJETA"
+                    self._send_json_response(201, {
+                        "success": True,
+                        "status": "approved",
+                        "chargeId": charge_id,
+                        "outcomeType": outcome.get('type', 'venta_exitosa'),
+                        "message": user_msg,
+                        "orderId": order_id,
+                        "amount": amount,
+                        "currency": "PEN"
+                    })
+                    return
+            except urllib.error.HTTPError as err:
+                err_body = err.read().decode('utf-8', errors='ignore')
+                try:
+                    err_json = json.loads(err_body)
+                    msg = err_json.get('user_message') or err_json.get('merchant_message') or 'Error en pasarela Culqi'
+                    outcome_type = err_json.get('type', 'error')
+                except Exception:
+                    msg = 'Error al comunicarse con Culqi'
+                    outcome_type = 'error'
+                self._send_json_response(400, {
+                    "success": False,
+                    "status": "rejected",
+                    "chargeId": None,
+                    "outcomeType": outcome_type,
+                    "message": msg,
+                    "orderId": order_id,
+                    "amount": amount,
+                    "currency": "PEN"
+                })
+                return
+            except Exception as ex:
+                self._send_json_response(500, {
+                    "success": False,
+                    "status": "error",
+                    "message": str(ex)
+                })
+                return
 
         # Respuesta generica
         self._send_json_response(200, {"status": "OK", "offline_fallback": True, "path": clean_path})
@@ -702,7 +774,7 @@ class AngularSpaHandler(SimpleHTTPRequestHandler):
             self._handle_dev_open_code()
             return
         clean_path = self.path.split('?')[0]
-        if clean_path in ('/api/payments/create-preference', '/api/v1/pagos/preferencia', '/api/v1/ordenes', '/api/payments/confirm'):
+        if clean_path in ('/api/payments/create-preference', '/api/v1/pagos/preferencia', '/api/payments/confirm', '/api/pagos/culqi/cobrar', '/api/v1/pagos/culqi/cobrar'):
             content_len = int(self.headers.get('Content-Length', 0))
             body = self.rfile.read(content_len) if content_len > 0 else None
             self._handle_offline_mock(body)

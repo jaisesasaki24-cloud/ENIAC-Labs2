@@ -10,6 +10,10 @@ mercadopago:
   currency: PEN
   auto-return: approved
 
+culqi:
+  secret-key: ${CULQI_SECRET_KEY:sk_test_g83TjoIFV36RcQqK}
+  public-key: ${CULQI_PUBLIC_KEY:pk_test_S6cbeiPZqYemD1lH}
+
 spring:
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:eniaclabs_pago_db;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH}
