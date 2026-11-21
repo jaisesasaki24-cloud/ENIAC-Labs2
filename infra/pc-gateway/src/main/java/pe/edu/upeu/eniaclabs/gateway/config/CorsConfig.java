@@ -15,17 +15,14 @@ import java.util.List;
 @Configuration
 public class CorsConfig {
 
-    @Value("${eniaclabs.cors.allowed-origins:http://localhost:4200,http://127.0.0.1:4200,https://localhost:4200,https://127.0.0.1:4200}")
+    @Value("${eniaclabs.cors.allowed-origins:http://localhost:4200,http://127.0.0.1:4200,https://localhost:4200,https://127.0.0.1:4200,https://eniaclabs-nine.vercel.app,http://eniaclabs.chilecentral.cloudapp.azure.com}")
     private String allowedOrigins;
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration configuracion = new CorsConfiguration();
-        configuracion.setAllowedOrigins(Arrays.stream(allowedOrigins.split(","))
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .toList());
+        configuracion.addAllowedOriginPattern("*");
         configuracion.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuracion.setAllowedHeaders(List.of("*"));
         configuracion.setAllowCredentials(true);

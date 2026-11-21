@@ -3,7 +3,7 @@ server:
 
 eniaclabs:
   cors:
-    allowed-origins: http://localhost:4200,http://127.0.0.1:4200,https://localhost:4200,https://127.0.0.1:4200
+    allowed-origins: http://localhost:4200,http://127.0.0.1:4200,https://localhost:4200,https://127.0.0.1:4200,https://eniaclabs-nine.vercel.app,https://*.vercel.app,http://eniaclabs.chilecentral.cloudapp.azure.com
 
 
 spring:
