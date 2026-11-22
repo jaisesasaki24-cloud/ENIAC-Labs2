@@ -34,6 +34,26 @@ export class CatalogService {
   isLoginModalOpen = signal<boolean>(false);
 
   readonly products: Product[] = [
+    // 0. Cable HDMI a S/ 10.00 para pruebas completas de pasarelas Culqi y Yape
+    {
+      id: 'cable-hdmi-8k',
+      name: 'Cable HDMI 2.1 Ultra High Speed 8K (2m)',
+      category: 'phones',
+      series: 'n_series',
+      badge: 'Oferta S/ 10',
+      price: 10.00,
+      originalPrice: 45.00,
+      description: 'Conectores enchapados en oro 24K, 48Gbps, soporte 8K@60Hz y 4K@120Hz con HDR dinámico y eARC para máxima fidelidad.',
+      colors: [
+        {
+          name: 'Negro Blindado Oro 24K',
+          hex: '#ffd700',
+          image: '/images/cable-hdmi.svg',
+          secondaryImage: '/images/cable-hdmi.svg'
+        }
+      ],
+      specs: ['HDMI 2.1 Ultra 48Gbps', 'Resolución 8K 60Hz / 4K 120Hz', 'Conectores Oro 24K', 'Longitud 2 Metros']
+    },
     // 1. Tarjetas Gráficas y Procesadores (categoría principal con productos de prueba a S/ 6.00)
     {
       id: 'honor-600-pro',

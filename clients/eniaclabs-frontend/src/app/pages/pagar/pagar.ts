@@ -1024,46 +1024,46 @@ export class PagarPage implements OnInit {
     cvv: '•••'
   };
 
-  // Sample fallback item si el carrito estuviera vacío (a precio de prueba S/ 6.00)
+  // Sample fallback item si el carrito estuviera vacío (Cable HDMI a S/ 10.00)
   sampleItem: CartItem = {
-    id: 'honor-600-pro',
-    name: 'GeForce RTX 4080 Super OC 16GB GDDR6X',
-    color: 'Edición Titanio OC',
-    storage: '16GB GDDR6X',
-    price: 6.00,
-    originalPrice: 3499.00,
+    id: 'cable-hdmi-8k',
+    name: 'Cable HDMI 2.1 Ultra High Speed 8K (2m)',
+    color: 'Negro Blindado Oro 24K',
+    storage: '2 Metros (48Gbps)',
+    price: 10.00,
+    originalPrice: 45.00,
     quantity: 1,
-    image: '/images/gpu-rtx4080.jpg'
+    image: '/images/cable-hdmi.svg'
   };
 
   displayItems = computed<CartItem[]>(() => {
     const raw = this.cart.items();
     const items = raw.length > 0 ? raw : [this.sampleItem];
     return items.map(it => {
-      // Yape en Perú y Mercado Pago tiene un límite estricto de máx S/ 2,000. Si viene 3399 se normaliza a 6.00
-      const safePrice = (typeof it.price === 'number' && !isNaN(it.price) && it.price > 0 && it.price <= 2000) ? it.price : 6.00;
+      // Normalización segura para pagos de prueba
+      const safePrice = (typeof it.price === 'number' && !isNaN(it.price) && it.price > 0 && it.price <= 2000) ? it.price : 10.00;
       return { ...it, price: safePrice };
     });
   });
 
   subtotalCalculado = computed<number>(() => {
     const sum = this.displayItems().reduce((acc, item) => {
-      const p = typeof item.price === 'number' && !isNaN(item.price) && item.price > 0 ? item.price : 6.00;
+      const p = typeof item.price === 'number' && !isNaN(item.price) && item.price > 0 ? item.price : 10.00;
       const q = typeof item.quantity === 'number' && !isNaN(item.quantity) && item.quantity > 0 ? item.quantity : 1;
       return acc + (p * q);
     }, 0);
-    return Math.max(6.00, sum);
+    return Math.max(10.00, sum);
   });
 
   descuentoCalculado = computed<number>(() => {
     if (!this.cart.appliedCoupon()) return 0;
     const discount = (this.subtotalCalculado() * (this.cart.couponDiscountPercent() / 100));
-    return Math.min(discount, Math.max(0, this.subtotalCalculado() - 6.00));
+    return Math.min(discount, Math.max(0, this.subtotalCalculado() - 10.00));
   });
 
   totalCalculado = computed<number>(() => {
     const total = this.subtotalCalculado() - this.descuentoCalculado();
-    return Math.max(6.00, isNaN(total) ? 6.00 : total);
+    return Math.max(10.00, isNaN(total) ? 10.00 : total);
   });
 
   ngOnInit() {

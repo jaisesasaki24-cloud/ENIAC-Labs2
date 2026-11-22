@@ -146,6 +146,16 @@ class AngularSpaHandler(SimpleHTTPRequestHandler):
         if clean_path == '/api/v1/productos':
             prods = [
                 {
+                    "id": 100,
+                    "nombre": "Cable HDMI 2.1 Ultra High Speed 8K (2m)",
+                    "categoria": "Accesorios",
+                    "precio": 10.0,
+                    "stock": 50,
+                    "sku": "ACC-HDMI-21-8K",
+                    "descripcion": "Conectores enchapados en oro 24K, 48Gbps, soporte 8K@60Hz y 4K@120Hz con HDR dinámico",
+                    "imagen": "/images/cable-hdmi.svg"
+                },
+                {
                     "id": 1,
                     "nombre": "GeForce RTX 4080 Super OC 16GB GDDR6X",
                     "categoria": "GPU",

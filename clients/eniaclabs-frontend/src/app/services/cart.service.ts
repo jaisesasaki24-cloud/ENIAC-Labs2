@@ -17,14 +17,14 @@ export interface CartItem {
 export class CartService {
   private itemsSignal = signal<CartItem[]>([
     {
-      id: 'honor-600-pro',
-      name: 'GeForce RTX 4080 Super OC 16GB',
-      color: 'Edición Titanio OC',
-      storage: '16GB GDDR6X',
-      price: 6.00,
-      originalPrice: 3499,
+      id: 'cable-hdmi-8k',
+      name: 'Cable HDMI 2.1 Ultra High Speed 8K (2m)',
+      color: 'Negro Blindado Oro 24K',
+      storage: '2 Metros (48Gbps)',
+      price: 10.00,
+      originalPrice: 45.00,
       quantity: 1,
-      image: '/images/gpu-rtx4080.jpg'
+      image: '/images/cable-hdmi.svg'
     }
   ]);
 
