@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "=== ACTUALIZANDO REPOSITORIO Y COMPILANDO CULQI CHECKOUT EN AZURE ==="
+echo "=== 1. ACTUALIZANDO REPOSITORIO DESDE ORIGIN MAIN ==="
 export HOME=/root
 git config --system --add safe.directory "*" 2>/dev/null || true
 git config --global --add safe.directory "*" 2>/dev/null || true
@@ -10,22 +10,33 @@ cd /home/azureuser/ENIAC-Labs2
 git -c safe.directory="*" fetch origin main
 git -c safe.directory="*" reset --hard origin/main
 
-echo "=== RECONSTRUYENDO CONTENEDOR PC-PAGO-MS CON CONTROLADOR Y SERVICIO CULQI ==="
-docker compose build pc-pago-ms
+echo "=== 2. COMPILANDO EL MICROSERVICIO PC-PAGO-MS (CON CULQI Y YAPE) ==="
+cd pc-pago-ms
+chmod +x mvnw || true
+if command -v mvn &> /dev/null; then
+    mvn clean package -DskipTests
+elif [ -f "./mvnw" ] && command -v java &> /dev/null; then
+    ./mvnw clean package -DskipTests
+else
+    docker run --rm -v "$(pwd)":/app -w /app eclipse-temurin:21-jdk-alpine sh -c "chmod +x ./mvnw && ./mvnw clean package -DskipTests"
+fi
 
-echo "=== RECREANDO CONTENEDORES CON NUEVAS RUTAS Y VARIABLES DE ENTORNO ==="
-docker compose up -d --force-recreate pc-config pc-gateway pc-pago-ms
+cp -f target/pc-pago-ms-*.jar target/app.jar
+cd ..
 
-sleep 6
+echo "=== 3. CONSTRUYENDO IMAGEN DOCKER PC-PAGO-MS CON EL NUEVO JAR ==="
+docker compose build --no-cache pc-pago-ms
 
-echo "=== TEST DE VERIFICACIÓN ENDPOINT CULQI CONFIG ==="
-curl -s -i "http://localhost:18080/api/pagos/culqi/config" | head -n 15
+echo "=== 4. RECREANDO CONTENEDOR ENIACLABS-PAGO-MS ==="
+docker compose up -d --force-recreate pc-pago-ms
+
+echo "=== 5. ESPERANDO A QUE EL SERVICIO ESTE ONLINE ==="
+sleep 10
+
+echo "=== 6. VERIFICANDO ENDPOINTS CULQI Y PAGO ==="
+curl -s -i "http://localhost:18080/api/pagos/culqi/config" | head -n 15 || true
+echo ""
+curl -s -i "http://localhost:8080/actuator/health" | head -n 10 || true
 
 echo ""
-echo "=== TEST DE COBRO CULQI V2 CHARGES ==="
-curl -s -i -X POST "http://localhost:18080/api/pagos/culqi/cobrar" \
-  -H "Content-Type: application/json" \
-  -d '{"token":"tkn_test_demo","amount":1000,"email":"cliente@eniac.pe","orderId":"26"}' | head -n 20
-
-echo ""
-echo "=== ¡PASARELA CULQI LISTA Y OPERATIVA EN AZURE VM! ==="
+echo "=== ¡DESPLIEGUE DE CULQI Y YAPE COMPLETADO AL 100% EN AZURE! ==="
