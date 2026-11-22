@@ -471,48 +471,8 @@ declare let Culqi: any;
               @if (currentStep() === 3) {
                 <div class="space-y-6 animate-fadeIn">
                   
-                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <!-- Opción 1: Yape Oficial con Mercado Pago (Orders API en Tiempo Real) -->
-                    <div 
-                      (click)="selectedPaymentGateway.set('MP_YAPE')"
-                      [class.border-[#742284]]="selectedPaymentGateway() === 'MP_YAPE'"
-                      [class.bg-purple-50/80]="selectedPaymentGateway() === 'MP_YAPE'"
-                      [class.border-gray-200]="selectedPaymentGateway() !== 'MP_YAPE'"
-                      class="cursor-pointer p-4 rounded-2xl border-2 transition-all flex flex-col justify-between shadow-xs hover:border-[#742284]"
-                    >
-                      <div>
-                        <div class="flex items-start justify-between">
-                          <div class="flex items-center gap-2.5">
-                            <img 
-                              src="https://upload.wikimedia.org/wikipedia/commons/0/08/Icono_de_la_aplicaci%C3%B3n_Yape.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=original" 
-                              alt="Yape Oficial" 
-                              class="w-9 h-9 rounded-xl object-contain shadow-xs" 
-                            />
-                            <div>
-                              <div class="flex items-center gap-1">
-                                <span class="text-sm font-black text-purple-950">Yape</span>
-                                <span class="text-[9px] bg-[#009ee3] text-white px-1.5 py-0.2 rounded-full font-bold uppercase">Mercado Pago</span>
-                              </div>
-                              <span class="text-[9px] bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded-full font-bold">Tiempo Real</span>
-                            </div>
-                          </div>
-                          <input 
-                            type="radio" 
-                            name="gateway" 
-                            [checked]="selectedPaymentGateway() === 'MP_YAPE'" 
-                            class="accent-[#742284] w-4 h-4 mt-1"
-                          />
-                        </div>
-                        <p class="text-[11px] text-purple-900/80 mt-2 font-medium">Orders API sincrónica con celular y código OTP</p>
-                      </div>
-
-                      <div class="mt-3 pt-2 border-t border-purple-100 flex items-center justify-between text-[11px] text-purple-800 font-semibold">
-                        <span>Sin Redirección</span>
-                        <span>S/ {{ totalCalculado() | number:'1.2-2' }}</span>
-                      </div>
-                    </div>
-
-                    <!-- Opción 2: Culqi Checkout v4 (Yape y Tarjetas) -->
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Opción 1: Culqi Checkout v4 (Yape Oficial) -->
                     <div 
                       (click)="selectedPaymentGateway.set('CULQI')"
                       [class.border-[#742284]]="selectedPaymentGateway() === 'CULQI'"
@@ -520,38 +480,35 @@ declare let Culqi: any;
                       [class.border-gray-200]="selectedPaymentGateway() !== 'CULQI'"
                       class="cursor-pointer p-4 rounded-2xl border-2 transition-all flex flex-col justify-between shadow-xs hover:border-[#742284]"
                     >
-                      <div>
-                        <div class="flex items-start justify-between">
-                          <div class="flex items-center gap-2.5">
-                            <img 
-                              src="https://checkout.culqi.com/static/images/logo-culqi.svg" 
-                              alt="Culqi" 
-                              class="w-9 h-9 p-1 rounded-xl bg-orange-50 object-contain shadow-xs" 
-                            />
-                            <div>
-                              <div class="flex items-center gap-1">
-                                <span class="text-sm font-black text-gray-950">Culqi Checkout</span>
-                              </div>
-                              <span class="text-[9px] bg-purple-100 text-[#742284] px-1.5 py-0.2 rounded-full font-bold">Checkout v4</span>
-                            </div>
-                          </div>
-                          <input 
-                            type="radio" 
-                            name="gateway" 
-                            [checked]="selectedPaymentGateway() === 'CULQI'" 
-                            class="accent-[#742284] w-4 h-4 mt-1"
+                      <div class="flex items-start justify-between">
+                        <div class="flex items-center gap-3">
+                          <img 
+                            src="https://upload.wikimedia.org/wikipedia/commons/0/08/Icono_de_la_aplicaci%C3%B3n_Yape.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=original" 
+                            alt="Yape Oficial Culqi" 
+                            class="w-10 h-10 rounded-xl object-contain shadow-xs" 
                           />
+                          <div>
+                            <div class="flex items-center gap-1.5">
+                              <span class="text-sm font-black text-purple-950">Yape Oficial</span>
+                              <span class="text-[9px] bg-[#742284] text-white px-2 py-0.5 rounded-full font-bold uppercase">Solo Yape</span>
+                            </div>
+                            <div class="text-[11px] text-purple-900/70 font-medium">Pago móvil directo con código de aprobación Yape (Culqi)</div>
+                          </div>
                         </div>
-                        <p class="text-[11px] text-gray-600 mt-2 font-medium">Modal oficial Culqi v4 con tokenización</p>
+                        <input 
+                          type="radio" 
+                          name="gateway" 
+                          [checked]="selectedPaymentGateway() === 'CULQI'" 
+                          class="accent-[#742284] w-4 h-4 mt-1"
+                        />
                       </div>
-
-                      <div class="mt-3 pt-2 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-700 font-semibold">
-                        <span>Pasarela Culqi</span>
+                      <div class="mt-3 pt-2 border-t border-purple-100 flex items-center justify-between text-[11px] text-purple-800 font-semibold">
+                        <span>Pasarela Oficial Culqi</span>
                         <span>S/ {{ totalCalculado() | number:'1.2-2' }}</span>
                       </div>
                     </div>
 
-                    <!-- Opción 3: Mercado Pago Checkout Pro -->
+                    <!-- Opción 2: Mercado Pago Checkout Pro -->
                     <div 
                       (click)="selectedPaymentGateway.set('MERCADOPAGO')"
                       [class.border-[#256fff]]="selectedPaymentGateway() === 'MERCADOPAGO'"
@@ -559,110 +516,48 @@ declare let Culqi: any;
                       [class.border-gray-200]="selectedPaymentGateway() !== 'MERCADOPAGO'"
                       class="cursor-pointer p-4 rounded-2xl border-2 transition-all flex flex-col justify-between shadow-xs hover:border-[#256fff]"
                     >
-                      <div>
-                        <div class="flex items-start justify-between">
-                          <div class="flex items-center gap-2.5">
-                            <div class="w-9 h-9 rounded-xl bg-[#009ee3] flex items-center justify-center text-white font-bold text-xs shadow-xs">
-                              MP
-                            </div>
-                            <div>
-                              <div class="flex items-center gap-1">
-                                <span class="text-sm font-black text-blue-950">Mercado Pago</span>
-                              </div>
-                              <span class="text-[9px] bg-[#009ee3] text-white px-1.5 py-0.2 rounded-full font-bold uppercase">Checkout Pro</span>
-                            </div>
+                      <div class="flex items-start justify-between">
+                        <div class="flex items-center gap-3">
+                          <div class="w-10 h-10 rounded-xl bg-[#009ee3] flex items-center justify-center text-white font-bold text-xs shadow-xs">
+                            MP
                           </div>
-                          <input 
-                            type="radio" 
-                            name="gateway" 
-                            [checked]="selectedPaymentGateway() === 'MERCADOPAGO'" 
-                            class="accent-[#009ee3] w-4 h-4 mt-1"
-                          />
+                          <div>
+                            <div class="flex items-center gap-1.5">
+                              <span class="text-sm font-black text-blue-950">Mercado Pago</span>
+                              <span class="text-[9px] bg-[#009ee3] text-white px-2 py-0.5 rounded-full font-bold uppercase">Pro</span>
+                            </div>
+                            <div class="text-[11px] text-blue-900/70 font-medium">Checkout Pro con redirección segura</div>
+                          </div>
                         </div>
-                        <p class="text-[11px] text-blue-900/70 mt-2 font-medium">Redirección a pasarela externa</p>
+                        <input 
+                          type="radio" 
+                          name="gateway" 
+                          [checked]="selectedPaymentGateway() === 'MERCADOPAGO'" 
+                          class="accent-[#009ee3] w-4 h-4 mt-1"
+                        />
                       </div>
-
                       <div class="mt-3 pt-2 border-t border-blue-100 flex items-center justify-between text-[11px] text-blue-800 font-semibold">
-                        <span>Checkout Pro</span>
+                        <span>Pasarela Mercado Pago</span>
                         <span>S/ {{ totalCalculado() | number:'1.2-2' }}</span>
                       </div>
                     </div>
                   </div>
-
-                  <!-- Formulario oficial Yape (Mercado Pago Orders API) -->
-                  @if (selectedPaymentGateway() === 'MP_YAPE') {
-                    <div class="bg-gradient-to-br from-purple-50/80 to-indigo-50/50 border border-purple-200/80 rounded-2xl p-5 space-y-4 animate-fadeIn">
-                      <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                          <h4 class="text-xs font-black uppercase tracking-wider text-purple-950">Formulario Yape • Confirmación en Tiempo Real</h4>
-                        </div>
-                        <span class="text-[10px] text-purple-800 font-semibold">Orders API (Automatic Mode)</span>
-                      </div>
-
-                      <form id="form-checkout" (submit)="$event.preventDefault(); onContinuarStep3()" class="space-y-4">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div>
-                            <label for="form-checkout__payerPhone" class="block text-xs font-bold text-gray-800 mb-1.5">
-                              Número de celular (Yape) <span class="text-red-500">*</span>
-                            </label>
-                            <div class="relative">
-                              <span class="absolute left-3 top-2.5 text-xs text-gray-400 font-bold">+51</span>
-                              <input 
-                                id="form-checkout__payerPhone"
-                                name="phoneNumber"
-                                type="tel" 
-                                [(ngModel)]="yapeMpPhone"
-                                placeholder="984 512 870"
-                                maxlength="12"
-                                class="w-full pl-11 pr-3 py-2 text-xs font-semibold bg-white border border-gray-300 rounded-xl focus:outline-none focus:border-[#742284] focus:ring-1 focus:ring-[#742284] shadow-2xs"
-                              />
-                            </div>
-                          </div>
-
-                          <div>
-                            <label for="form-checkout__payerOTP" class="block text-xs font-bold text-gray-800 mb-1.5">
-                              Código de aprobación OTP <span class="text-red-500">*</span>
-                            </label>
-                            <input 
-                              id="form-checkout__payerOTP"
-                              name="otp"
-                              type="text" 
-                              [(ngModel)]="yapeMpOtp"
-                              placeholder="6 dígitos (ej: 123456)"
-                              maxlength="6"
-                              class="w-full px-3 py-2 text-xs font-mono font-bold tracking-widest text-center bg-white border border-gray-300 rounded-xl focus:outline-none focus:border-[#742284] focus:ring-1 focus:ring-[#742284] shadow-2xs"
-                            />
-                          </div>
-                        </div>
-
-                        <div class="p-3 bg-white/80 rounded-xl border border-purple-100 flex items-start gap-2.5 text-xs text-purple-950">
-                          <span class="text-base">📱</span>
-                          <div class="text-[11px] leading-relaxed">
-                            <strong>¿Dónde encuentro el código OTP?</strong> Abre tu aplicación <strong>Yape</strong>, abre el menú lateral o la opción <em>"Código de aprobación"</em> y escribe aquí los 6 dígitos generados. El token se procesa al instante sin salir de la tienda.
-                          </div>
-                        </div>
-                      </form>
-                    </div>
-                  }
 
                   <div class="flex items-center gap-3 pt-2">
                     <button 
                       type="button" 
                       (click)="onContinuarStep3()"
                       [disabled]="isProcessing()"
-                      class="px-8 py-3.5 bg-black hover:bg-[#742284] disabled:bg-gray-400 text-white font-bold text-xs rounded-full transition-all shadow-md cursor-pointer flex items-center gap-2"
+                      class="px-8 py-3.5 bg-black hover:bg-purple-700 disabled:bg-gray-400 text-white font-bold text-xs rounded-full transition-all shadow-md cursor-pointer flex items-center gap-2"
                     >
                       @if (isProcessing()) {
                         <div class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span>Procesando pago con Yape...</span>
+                        <span>Conectando pasarela...</span>
                       } @else {
-                        @if (selectedPaymentGateway() === 'MP_YAPE') {
-                          <span>Pagar con Yape en Tiempo Real (S/ {{ totalCalculado() | number:'1.2-2' }}) →</span>
-                        } @else if (selectedPaymentGateway() === 'CULQI') {
-                          <span>Pagar con Culqi Checkout (S/ {{ totalCalculado() | number:'1.2-2' }}) →</span>
+                        @if (selectedPaymentGateway() === 'CULQI') {
+                          <span>Pagar con Yape (S/ {{ totalCalculado() | number:'1.2-2' }}) →</span>
                         } @else {
-                          <span>Pagar con Mercado Pago Checkout Pro (S/ {{ totalCalculado() | number:'1.2-2' }}) →</span>
+                          <span>Pagar con Mercado Pago (S/ {{ totalCalculado() | number:'1.2-2' }}) →</span>
                         }
                       }
                     </button>
@@ -680,20 +575,13 @@ declare let Culqi: any;
               } @else if (currentStep() > 3) {
                 <div class="text-xs text-gray-600 bg-gray-50 p-4 rounded-xl border border-gray-100 flex items-center justify-between">
                   <div class="flex items-center gap-2.5">
-                    @if (selectedPaymentGateway() === 'MP_YAPE') {
-                      <img 
-                        src="https://upload.wikimedia.org/wikipedia/commons/0/08/Icono_de_la_aplicaci%C3%B3n_Yape.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=original" 
-                        alt="Yape" 
-                        class="w-5 h-5 rounded-md object-contain" 
-                      />
-                      <span class="font-bold text-gray-900">Yape Oficial (Mercado Pago Orders API)</span>
-                    } @else if (selectedPaymentGateway() === 'CULQI') {
+                    @if (selectedPaymentGateway() === 'CULQI') {
                       <img 
                         src="https://upload.wikimedia.org/wikipedia/commons/0/08/Icono_de_la_aplicaci%C3%B3n_Yape.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=original" 
                         alt="Culqi" 
                         class="w-5 h-5 rounded-md object-contain" 
                       />
-                      <span class="font-bold text-gray-900">Culqi Checkout (Yape / Tarjetas)</span>
+                      <span class="font-bold text-gray-900">Yape Oficial (Pasarela Culqi)</span>
                     } @else {
                       <div class="w-5 h-5 rounded-md bg-[#009ee3] text-white flex items-center justify-center text-[10px] font-bold">MP</div>
                       <span class="font-bold text-gray-900">Mercado Pago Checkout Pro</span>
@@ -1058,7 +946,7 @@ export class PagarPage implements OnInit {
   isCouponInputVisible = signal<boolean>(false);
   couponInput = 'APEALL35';
   selectedPaymentMethod = signal<'TARJETA' | 'YAPE' | 'PAGOEFECTIVO' | 'MERCADOPAGO'>('MERCADOPAGO');
-  selectedPaymentGateway = signal<'MP_YAPE' | 'CULQI' | 'MERCADOPAGO'>('MP_YAPE');
+  selectedPaymentGateway = signal<'CULQI' | 'MERCADOPAGO'>('CULQI');
   yapeMpPhone = '984512870';
   yapeMpOtp = '';
   isProcessing = signal<boolean>(false);
@@ -1210,9 +1098,7 @@ export class PagarPage implements OnInit {
   }
 
   onContinuarStep3() {
-    if (this.selectedPaymentGateway() === 'MP_YAPE') {
-      this.iniciarPagoYapeMercadoPago();
-    } else if (this.selectedPaymentGateway() === 'CULQI') {
+    if (this.selectedPaymentGateway() === 'CULQI') {
       this.iniciarPagoCulqi();
     } else if (this.selectedPaymentGateway() === 'MERCADOPAGO' || this.selectedPaymentMethod() === 'MERCADOPAGO') {
       this.pagarConMercadoPago();
