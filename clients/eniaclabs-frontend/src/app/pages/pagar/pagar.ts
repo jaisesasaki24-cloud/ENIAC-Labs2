@@ -969,13 +969,13 @@ export class PagarPage implements OnInit {
     cvv: '•••'
   };
 
-  // Sample fallback item si el carrito estuviera vacío (a precio de prueba S/ 5.00)
+  // Sample fallback item si el carrito estuviera vacío (a precio de prueba S/ 6.00)
   sampleItem: CartItem = {
     id: 'honor-600-pro',
     name: 'GeForce RTX 4080 Super OC 16GB GDDR6X',
     color: 'Edición Titanio OC',
     storage: '16GB GDDR6X',
-    price: 5.00,
+    price: 6.00,
     originalPrice: 3499.00,
     quantity: 1,
     image: '/images/gpu-rtx4080.jpg'
@@ -985,30 +985,30 @@ export class PagarPage implements OnInit {
     const raw = this.cart.items();
     const items = raw.length > 0 ? raw : [this.sampleItem];
     return items.map(it => {
-      // Yape en Perú y Mercado Pago tiene un límite estricto de máx S/ 2,000. Si viene 3399 se normaliza a 5.00
-      const safePrice = (typeof it.price === 'number' && !isNaN(it.price) && it.price > 0 && it.price <= 2000) ? it.price : 5.00;
+      // Yape en Perú y Mercado Pago tiene un límite estricto de máx S/ 2,000. Si viene 3399 se normaliza a 6.00
+      const safePrice = (typeof it.price === 'number' && !isNaN(it.price) && it.price > 0 && it.price <= 2000) ? it.price : 6.00;
       return { ...it, price: safePrice };
     });
   });
 
   subtotalCalculado = computed<number>(() => {
     const sum = this.displayItems().reduce((acc, item) => {
-      const p = typeof item.price === 'number' && !isNaN(item.price) && item.price > 0 ? item.price : 5.00;
+      const p = typeof item.price === 'number' && !isNaN(item.price) && item.price > 0 ? item.price : 6.00;
       const q = typeof item.quantity === 'number' && !isNaN(item.quantity) && item.quantity > 0 ? item.quantity : 1;
       return acc + (p * q);
     }, 0);
-    return Math.max(5.00, sum);
+    return Math.max(6.00, sum);
   });
 
   descuentoCalculado = computed<number>(() => {
     if (!this.cart.appliedCoupon()) return 0;
     const discount = (this.subtotalCalculado() * (this.cart.couponDiscountPercent() / 100));
-    return Math.min(discount, Math.max(0, this.subtotalCalculado() - 5.00));
+    return Math.min(discount, Math.max(0, this.subtotalCalculado() - 6.00));
   });
 
   totalCalculado = computed<number>(() => {
     const total = this.subtotalCalculado() - this.descuentoCalculado();
-    return Math.max(5.00, isNaN(total) ? 5.00 : total);
+    return Math.max(6.00, isNaN(total) ? 6.00 : total);
   });
 
   ngOnInit() {

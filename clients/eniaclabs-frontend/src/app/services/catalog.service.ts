@@ -34,14 +34,14 @@ export class CatalogService {
   isLoginModalOpen = signal<boolean>(false);
 
   readonly products: Product[] = [
-    // 1. Tarjetas Gráficas y Procesadores (categoría principal con productos de prueba a S/ 5.00)
+    // 1. Tarjetas Gráficas y Procesadores (categoría principal con productos de prueba a S/ 6.00)
     {
       id: 'honor-600-pro',
       name: 'GeForce RTX 4080 Super OC 16GB',
       category: 'phones',
       series: 'n_series',
-      badge: 'Oferta S/ 5',
-      price: 5.00,
+      badge: 'Oferta S/ 6',
+      price: 6.00,
       originalPrice: 3499,
       description: 'Arquitectura Ada Lovelace, 16GB GDDR6X, Ray Tracing de 3ª generación y tecnología DLSS 3.5 con IA para gaming extremo.',
       colors: [
@@ -65,8 +65,8 @@ export class CatalogService {
       name: 'GeForce RTX 4070 Ti Super 16GB',
       category: 'phones',
       series: 'n_series',
-      badge: 'Oferta S/ 5',
-      price: 5.00,
+      badge: 'Oferta S/ 6',
+      price: 6.00,
       originalPrice: 2499,
       description: 'Potencia gráfica para gaming 1440p y 4K con 16GB de VRAM de alta velocidad y disipador térmico optimizado.',
       colors: [
@@ -93,8 +93,8 @@ export class CatalogService {
       name: 'AMD Radeon RX 7800 XT 16GB',
       category: 'phones',
       series: 'n_series',
-      badge: 'Oferta S/ 5',
-      price: 5.00,
+      badge: 'Oferta S/ 6',
+      price: 6.00,
       originalPrice: 2199,
       description: 'Rendimiento imbatible en rasterizado con tecnología AMD RDNA 3, 16GB de memoria GDDR6 y FSR 3 FidelityFX.',
       colors: [

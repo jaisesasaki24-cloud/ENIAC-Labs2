@@ -21,7 +21,7 @@ export class CartService {
       name: 'GeForce RTX 4080 Super OC 16GB',
       color: 'Edición Titanio OC',
       storage: '16GB GDDR6X',
-      price: 5.00,
+      price: 6.00,
       originalPrice: 3499,
       quantity: 1,
       image: '/images/gpu-rtx4080.jpg'

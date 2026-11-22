@@ -148,7 +148,7 @@ class AngularSpaHandler(SimpleHTTPRequestHandler):
                     "id": 1,
                     "nombre": "GeForce RTX 4080 Super OC 16GB GDDR6X",
                     "categoria": "GPU",
-                    "precio": 5.0,
+                    "precio": 6.0,
                     "stock": 14,
                     "sku": "GPU-RTX4080-OC",
                     "descripcion": "Ada Lovelace, 16GB GDDR6X, DLSS 3.5 con IA, Ray Tracing Gen3",
@@ -158,7 +158,7 @@ class AngularSpaHandler(SimpleHTTPRequestHandler):
                     "id": 2,
                     "nombre": "Intel Core i9-14900KS 24-Core 6.2GHz",
                     "categoria": "CPU",
-                    "precio": 5.0,
+                    "precio": 6.0,
                     "stock": 8,
                     "sku": "CPU-I9-14900KS",
                     "descripcion": "24 núcleos, 32 hilos, 36MB Intel Smart Cache, LGA1700",
@@ -168,7 +168,7 @@ class AngularSpaHandler(SimpleHTTPRequestHandler):
                     "id": 3,
                     "nombre": "AMD Ryzen 7 7800X3D 8-Core 3D V-Cache",
                     "categoria": "CPU",
-                    "precio": 5.0,
+                    "precio": 6.0,
                     "stock": 20,
                     "sku": "CPU-R7-7800X3D",
                     "descripcion": "8 núcleos Zen 4 con tecnología 3D V-Cache de 96MB",
@@ -235,7 +235,7 @@ class AngularSpaHandler(SimpleHTTPRequestHandler):
             # Token de producción oficial de Eliceo Parillo (Soporte Yape Real en Perú)
             mp_token = 'APP_USR-7798988609356730-111819-96e585696ba88ed36d038c742adc400c-3649448406'
 
-            def _clean_price(val, default_val=5.0):
+            def _clean_price(val, default_val=6.0):
                 if val is None:
                     return default_val
                 try:
