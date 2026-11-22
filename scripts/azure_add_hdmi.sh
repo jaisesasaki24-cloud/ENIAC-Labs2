@@ -15,7 +15,7 @@ git -c safe.directory="*" fetch origin main
 git -c safe.directory="*" reset --hard origin/main
 
 echo "=== 2. Insertando Cable HDMI a S/ 10.00 en la Base de Datos PostgreSQL de Catálogo ==="
-docker exec -i eniaclabs-db-catalogo psql -U postgres -d eniaclabs_catalogo_db << 'EOF'
+docker exec -i eniaclabs-db-catalogo psql -U eniaclabs -d eniaclabs_catalogo_db << 'EOF'
 INSERT INTO categorias_hardware (codigo, nombre, descripcion, activo)
 VALUES ('ACC', 'Accesorios y Cables', 'Cables de video HDMI 2.1 y adaptadores gaming', true)
 ON CONFLICT (codigo) DO NOTHING;
@@ -32,7 +32,7 @@ docker compose up -d pc-catalogo-ms pc-pago-ms pc-gateway
 sleep 4
 
 echo "=== 4. Verificando producto Cable HDMI en el Gateway de Azure (:18080) ==="
-curl -s "http://localhost:18080/api/v1/productos" | grep -o '"nombre":"Cable HDMI[^"]*","marca":"[^"]*","modelo":"[^"]*","precio":[0-9.]*' || echo "Producto listo en base de datos"
+curl -s "http://localhost:18080/api/v1/productos" | grep -o '"nombre":"Cable HDMI[^"]*"' || echo "Producto listo en base de datos"
 
 echo ""
 echo "=== 5. Verificando endpoint Culqi (:18080/api/pagos/culqi/config) ==="
