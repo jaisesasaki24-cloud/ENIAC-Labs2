@@ -483,9 +483,9 @@ declare let Culqi: any;
                       <div class="flex items-start justify-between">
                         <div class="flex items-center gap-3">
                           <img 
-                            src="https://checkout.culqi.com/static/images/logo-culqi.svg" 
+                            src="/images/culqi-logo.svg" 
                             alt="Culqi Checkout v4" 
-                            class="w-10 h-10 p-1.5 rounded-xl bg-orange-100/60 object-contain shadow-xs" 
+                            class="w-10 h-10 p-1 rounded-xl object-contain shadow-xs" 
                           />
                           <div>
                             <div class="flex items-center gap-1.5">
@@ -615,7 +615,7 @@ declare let Culqi: any;
                   <div class="flex items-center gap-2.5">
                     @if (selectedPaymentGateway() === 'CULQI') {
                       <img 
-                        src="https://checkout.culqi.com/static/images/logo-culqi.svg" 
+                        src="/images/culqi-logo.svg" 
                         alt="Culqi" 
                         class="w-5 h-5 object-contain" 
                       />
