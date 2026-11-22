@@ -15,6 +15,7 @@ import subprocess
 import shutil
 import random
 import time
+import uuid
 from datetime import datetime
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 
@@ -424,6 +425,128 @@ class AngularSpaHandler(SimpleHTTPRequestHandler):
                 })
                 return
 
+        if clean_path in ('/api/payments/yape', '/api/v1/pagos/yape'):
+            try:
+                payload = json.loads(body.decode('utf-8', errors='ignore')) if body else {}
+            except Exception:
+                payload = {}
+
+            token = payload.get('token')
+            amount = payload.get('amount', 6.0)
+            order_id = payload.get('orderId', '26')
+            email = payload.get('email', 'cliente.eniac@gmail.com')
+            phone = payload.get('phoneNumber', '984512870')
+            dni = payload.get('dni', '72849102')
+            state_id = payload.get('stateId', 'PE-LIM')
+
+            clean_phone = ''.join(c for c in str(phone) if c.isdigit())
+            if clean_phone.startswith('51') and len(clean_phone) > 9:
+                clean_phone = clean_phone[2:]
+            if len(clean_phone) > 9:
+                clean_phone = clean_phone[-9:]
+
+            mp_token = os.environ.get('MERCADOPAGO_ACCESS_TOKEN', os.environ.get('MP_ACCESS_TOKEN', 'APP_USR-7798988609356730-111819-96e585696ba88ed36d038c742adc400c-3649448406'))
+
+            order_payload = {
+                "type": "online",
+                "external_reference": str(order_id),
+                "processing_mode": "automatic",
+                "total_amount": f"{float(amount):.2f}",
+                "payer": {
+                    "email": email,
+                    "entity_type": "individual",
+                    "identification": {
+                        "type": "DNI",
+                        "number": str(dni)
+                    },
+                    "phone": {
+                        "area_code": "51",
+                        "number": clean_phone
+                    }
+                },
+                "config": {
+                    "location": {
+                        "state_id": state_id
+                    }
+                },
+                "transactions": {
+                    "payments": [
+                        {
+                            "amount": f"{float(amount):.2f}",
+                            "payment_method": {
+                                "id": "yape",
+                                "type": "debit_card",
+                                "token": token
+                            }
+                        }
+                    ]
+                }
+            }
+
+            try:
+                headers = {
+                    'Authorization': f'Bearer {mp_token}',
+                    'Content-Type': 'application/json',
+                    'X-Idempotency-Key': str(uuid.uuid4())
+                }
+                req = urllib.request.Request(
+                    'https://api.mercadopago.com/v1/orders',
+                    data=json.dumps(order_payload).encode('utf-8'),
+                    headers=headers
+                )
+                with urllib.request.urlopen(req, timeout=25) as resp:
+                    resp_data = json.loads(resp.read().decode('utf-8'))
+                    mp_order_id = resp_data.get('id')
+                    status = resp_data.get('status')
+                    status_detail = resp_data.get('status_detail')
+                    payments = resp_data.get('transactions', {}).get('payments', [])
+                    payment_id = payments[0].get('id') if payments else mp_order_id
+
+                    is_approved = (status == 'processed' and status_detail == 'accredited') or (payments and payments[0].get('status') == 'processed' and payments[0].get('status_detail') == 'accredited')
+                    if MOCK_ORDERS and is_approved:
+                        MOCK_ORDERS[0]["estado"] = "PAGADA"
+                        MOCK_ORDERS[0]["metodoPago"] = "YAPE_MERCADOPAGO"
+
+                    self._send_json_response(201 if is_approved else 400, {
+                        "success": is_approved,
+                        "status": status,
+                        "statusDetail": status_detail,
+                        "orderId": order_id,
+                        "mpOrderId": mp_order_id,
+                        "paymentId": payment_id,
+                        "amount": float(amount),
+                        "currency": "PEN",
+                        "message": "Pago con Yape (Mercado Pago) aprobado exitosamente en tiempo real." if is_approved else f"No se pudo procesar el pago ({status_detail})."
+                    })
+                    return
+            except urllib.error.HTTPError as he:
+                err_content = he.read().decode('utf-8', errors='ignore')
+                print(f"[ERROR MP Orders API Yape] HTTP {he.code}: {err_content}")
+                err_msg = "Error procesando el pago con Yape en Mercado Pago."
+                try:
+                    err_json = json.loads(err_content)
+                    err_msg = err_json.get('message', err_msg)
+                except Exception:
+                    pass
+                self._send_json_response(he.code, {
+                    "success": False,
+                    "status": "error",
+                    "statusDetail": f"http_error_{he.code}",
+                    "orderId": order_id,
+                    "amount": float(amount),
+                    "currency": "PEN",
+                    "message": err_msg
+                })
+                return
+            except Exception as mp_err:
+                print(f"[ERROR MP Orders API Yape] {mp_err}")
+                self._send_json_response(500, {
+                    "success": False,
+                    "status": "error",
+                    "message": f"Ocurrió un error al procesar el pago: {mp_err}"
+                })
+                return
+
         # Respuesta generica
         self._send_json_response(200, {"status": "OK", "offline_fallback": True, "path": clean_path})
 
@@ -774,7 +897,7 @@ class AngularSpaHandler(SimpleHTTPRequestHandler):
             self._handle_dev_open_code()
             return
         clean_path = self.path.split('?')[0]
-        if clean_path in ('/api/payments/create-preference', '/api/v1/pagos/preferencia', '/api/payments/confirm', '/api/pagos/culqi/cobrar', '/api/v1/pagos/culqi/cobrar'):
+        if clean_path in ('/api/payments/create-preference', '/api/v1/pagos/preferencia', '/api/payments/confirm', '/api/pagos/culqi/cobrar', '/api/v1/pagos/culqi/cobrar', '/api/payments/yape', '/api/v1/pagos/yape'):
             content_len = int(self.headers.get('Content-Length', 0))
             body = self.rfile.read(content_len) if content_len > 0 else None
             self._handle_offline_mock(body)

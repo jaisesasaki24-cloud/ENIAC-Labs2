@@ -20,14 +20,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pe.edu.upeu.eniaclabs.pago.config.MercadoPagoConfig;
-import pe.edu.upeu.eniaclabs.pago.dto.CreatePreferenceRequestDto;
-import pe.edu.upeu.eniaclabs.pago.dto.PreferenceItemDto;
-import pe.edu.upeu.eniaclabs.pago.dto.PreferenceResponseDto;
+import pe.edu.upeu.eniaclabs.pago.dto.*;
 import pe.edu.upeu.eniaclabs.pago.entity.EstadoPago;
 import pe.edu.upeu.eniaclabs.pago.entity.Pago;
 import pe.edu.upeu.eniaclabs.pago.event.PagoValidadoEvento;
 import pe.edu.upeu.eniaclabs.pago.messaging.PagoEventosProducer;
 import pe.edu.upeu.eniaclabs.pago.repository.PagoRepository;
+import pe.edu.upeu.eniaclabs.pago.service.MercadoPagoOrdersService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -52,9 +51,25 @@ public class PaymentController {
     private final MercadoPagoConfig mpConfig;
     private final PagoRepository pagoRepository;
     private final PagoEventosProducer pagoEventosProducer;
+    private final MercadoPagoOrdersService mpOrdersService;
 
     @Value("${frontend.url:http://localhost:4200}")
     private String frontendUrl;
+
+    /**
+     * Endpoint oficial: POST /api/payments/yape
+     * Procesa pagos con Yape utilizando la Orders API de Mercado Pago (/v1/orders)
+     * en modo sincrónico en tiempo real ("processing_mode": "automatic").
+     */
+    @PostMapping({"/yape", "/orders/yape"})
+    @Operation(summary = "Procesar pago Yape mediante Mercado Pago Orders API (v1/orders en tiempo real)")
+    public ResponseEntity<MercadoPagoYapeResponseDto> procesarPagoYape(
+            @Valid @RequestBody MercadoPagoYapeRequestDto request) {
+        log.info("[PaymentController] Petición de pago Yape (Orders API) recibida para orden: {}", request.getOrderId());
+        MercadoPagoYapeResponseDto response = mpOrdersService.procesarPagoYape(request);
+        HttpStatus status = response.isSuccess() ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST;
+        return ResponseEntity.status(status).body(response);
+    }
 
     /**
      * Endpoint 1: POST /api/payments/create-preference

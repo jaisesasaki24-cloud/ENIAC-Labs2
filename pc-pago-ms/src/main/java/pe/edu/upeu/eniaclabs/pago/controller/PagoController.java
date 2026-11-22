@@ -11,15 +11,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pe.edu.upeu.eniaclabs.pago.dto.CheckoutRequestDto;
 import pe.edu.upeu.eniaclabs.pago.dto.MercadoPagoWebhookDto;
+import pe.edu.upeu.eniaclabs.pago.dto.MercadoPagoYapeRequestDto;
+import pe.edu.upeu.eniaclabs.pago.dto.MercadoPagoYapeResponseDto;
 import pe.edu.upeu.eniaclabs.pago.dto.PagoResponseDto;
 import pe.edu.upeu.eniaclabs.pago.dto.SimularPagoDto;
 import pe.edu.upeu.eniaclabs.pago.entity.EstadoPago;
+import pe.edu.upeu.eniaclabs.pago.service.MercadoPagoOrdersService;
 import pe.edu.upeu.eniaclabs.pago.service.PagoService;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/pagos")
+@CrossOrigin(origins = "*", allowedHeaders = "*", methods = {
+        RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS
+})
 @RequiredArgsConstructor
 @Tag(name = "Pasarela Mercado Pago Sandbox y Webhooks", description = "Endpoints transaccionales para procesamiento de pagos y recepcion de IPN Webhooks")
 @SecurityRequirement(name = "BearerAuth")
@@ -27,6 +33,16 @@ public class PagoController {
 
     private final PagoService pagoService;
     private final ObjectMapper objectMapper;
+    private final MercadoPagoOrdersService mpOrdersService;
+
+    @PostMapping("/yape")
+    @Operation(summary = "Procesar pago Yape mediante Mercado Pago Orders API (v1/orders)")
+    public ResponseEntity<MercadoPagoYapeResponseDto> procesarPagoYape(
+            @Valid @RequestBody MercadoPagoYapeRequestDto request) {
+        MercadoPagoYapeResponseDto response = mpOrdersService.procesarPagoYape(request);
+        HttpStatus status = response.isSuccess() ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST;
+        return ResponseEntity.status(status).body(response);
+    }
 
     @GetMapping
     @Operation(summary = "Listar transacciones de pago con filtro opcional por estado")

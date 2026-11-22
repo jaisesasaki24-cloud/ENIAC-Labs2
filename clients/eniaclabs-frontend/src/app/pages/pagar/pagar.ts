@@ -471,8 +471,48 @@ declare let Culqi: any;
               @if (currentStep() === 3) {
                 <div class="space-y-6 animate-fadeIn">
                   
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <!-- Opción 1: Culqi Checkout v4 (Yape + Tarjetas) -->
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <!-- Opción 1: Yape Oficial con Mercado Pago (Orders API en Tiempo Real) -->
+                    <div 
+                      (click)="selectedPaymentGateway.set('MP_YAPE')"
+                      [class.border-[#742284]]="selectedPaymentGateway() === 'MP_YAPE'"
+                      [class.bg-purple-50/80]="selectedPaymentGateway() === 'MP_YAPE'"
+                      [class.border-gray-200]="selectedPaymentGateway() !== 'MP_YAPE'"
+                      class="cursor-pointer p-4 rounded-2xl border-2 transition-all flex flex-col justify-between shadow-xs hover:border-[#742284]"
+                    >
+                      <div>
+                        <div class="flex items-start justify-between">
+                          <div class="flex items-center gap-2.5">
+                            <img 
+                              src="https://upload.wikimedia.org/wikipedia/commons/0/08/Icono_de_la_aplicaci%C3%B3n_Yape.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=original" 
+                              alt="Yape Oficial" 
+                              class="w-9 h-9 rounded-xl object-contain shadow-xs" 
+                            />
+                            <div>
+                              <div class="flex items-center gap-1">
+                                <span class="text-sm font-black text-purple-950">Yape</span>
+                                <span class="text-[9px] bg-[#009ee3] text-white px-1.5 py-0.2 rounded-full font-bold uppercase">Mercado Pago</span>
+                              </div>
+                              <span class="text-[9px] bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded-full font-bold">Tiempo Real</span>
+                            </div>
+                          </div>
+                          <input 
+                            type="radio" 
+                            name="gateway" 
+                            [checked]="selectedPaymentGateway() === 'MP_YAPE'" 
+                            class="accent-[#742284] w-4 h-4 mt-1"
+                          />
+                        </div>
+                        <p class="text-[11px] text-purple-900/80 mt-2 font-medium">Orders API sincrónica con celular y código OTP</p>
+                      </div>
+
+                      <div class="mt-3 pt-2 border-t border-purple-100 flex items-center justify-between text-[11px] text-purple-800 font-semibold">
+                        <span>Sin Redirección</span>
+                        <span>S/ {{ totalCalculado() | number:'1.2-2' }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Opción 2: Culqi Checkout v4 (Yape y Tarjetas) -->
                     <div 
                       (click)="selectedPaymentGateway.set('CULQI')"
                       [class.border-[#742284]]="selectedPaymentGateway() === 'CULQI'"
@@ -480,35 +520,38 @@ declare let Culqi: any;
                       [class.border-gray-200]="selectedPaymentGateway() !== 'CULQI'"
                       class="cursor-pointer p-4 rounded-2xl border-2 transition-all flex flex-col justify-between shadow-xs hover:border-[#742284]"
                     >
-                      <div class="flex items-start justify-between">
-                        <div class="flex items-center gap-3">
-                          <img 
-                            src="https://upload.wikimedia.org/wikipedia/commons/0/08/Icono_de_la_aplicaci%C3%B3n_Yape.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=original" 
-                            alt="Yape & Tarjetas Culqi" 
-                            class="w-10 h-10 rounded-xl object-contain shadow-xs" 
-                          />
-                          <div>
-                            <div class="flex items-center gap-1.5">
-                              <span class="text-sm font-black text-purple-950">Yape Oficial</span>
-                              <span class="text-[9px] bg-[#742284] text-white px-2 py-0.5 rounded-full font-bold uppercase">Solo Yape</span>
+                      <div>
+                        <div class="flex items-start justify-between">
+                          <div class="flex items-center gap-2.5">
+                            <img 
+                              src="https://checkout.culqi.com/static/images/logo-culqi.svg" 
+                              alt="Culqi" 
+                              class="w-9 h-9 p-1 rounded-xl bg-orange-50 object-contain shadow-xs" 
+                            />
+                            <div>
+                              <div class="flex items-center gap-1">
+                                <span class="text-sm font-black text-gray-950">Culqi Checkout</span>
+                              </div>
+                              <span class="text-[9px] bg-purple-100 text-[#742284] px-1.5 py-0.2 rounded-full font-bold">Checkout v4</span>
                             </div>
-                            <div class="text-[11px] text-purple-900/70 font-medium">Pago móvil directo con código de aprobación Yape (Culqi)</div>
                           </div>
+                          <input 
+                            type="radio" 
+                            name="gateway" 
+                            [checked]="selectedPaymentGateway() === 'CULQI'" 
+                            class="accent-[#742284] w-4 h-4 mt-1"
+                          />
                         </div>
-                        <input 
-                          type="radio" 
-                          name="gateway" 
-                          [checked]="selectedPaymentGateway() === 'CULQI'" 
-                          class="accent-[#742284] w-4 h-4 mt-1"
-                        />
+                        <p class="text-[11px] text-gray-600 mt-2 font-medium">Modal oficial Culqi v4 con tokenización</p>
                       </div>
-                      <div class="mt-3 pt-2 border-t border-purple-100 flex items-center justify-between text-[11px] text-purple-800 font-semibold">
-                        <span>Pasarela Oficial Culqi</span>
+
+                      <div class="mt-3 pt-2 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-700 font-semibold">
+                        <span>Pasarela Culqi</span>
                         <span>S/ {{ totalCalculado() | number:'1.2-2' }}</span>
                       </div>
                     </div>
 
-                    <!-- Opción 2: Mercado Pago Checkout Pro -->
+                    <!-- Opción 3: Mercado Pago Checkout Pro -->
                     <div 
                       (click)="selectedPaymentGateway.set('MERCADOPAGO')"
                       [class.border-[#256fff]]="selectedPaymentGateway() === 'MERCADOPAGO'"
@@ -516,48 +559,110 @@ declare let Culqi: any;
                       [class.border-gray-200]="selectedPaymentGateway() !== 'MERCADOPAGO'"
                       class="cursor-pointer p-4 rounded-2xl border-2 transition-all flex flex-col justify-between shadow-xs hover:border-[#256fff]"
                     >
-                      <div class="flex items-start justify-between">
-                        <div class="flex items-center gap-3">
-                          <div class="w-10 h-10 rounded-xl bg-[#009ee3] flex items-center justify-center text-white font-bold text-xs shadow-xs">
-                            MP
-                          </div>
-                          <div>
-                            <div class="flex items-center gap-1.5">
-                              <span class="text-sm font-black text-blue-950">Mercado Pago</span>
-                              <span class="text-[9px] bg-[#009ee3] text-white px-2 py-0.5 rounded-full font-bold uppercase">Pro</span>
+                      <div>
+                        <div class="flex items-start justify-between">
+                          <div class="flex items-center gap-2.5">
+                            <div class="w-9 h-9 rounded-xl bg-[#009ee3] flex items-center justify-center text-white font-bold text-xs shadow-xs">
+                              MP
                             </div>
-                            <div class="text-[11px] text-blue-900/70 font-medium">Checkout Pro con redirección segura</div>
+                            <div>
+                              <div class="flex items-center gap-1">
+                                <span class="text-sm font-black text-blue-950">Mercado Pago</span>
+                              </div>
+                              <span class="text-[9px] bg-[#009ee3] text-white px-1.5 py-0.2 rounded-full font-bold uppercase">Checkout Pro</span>
+                            </div>
                           </div>
+                          <input 
+                            type="radio" 
+                            name="gateway" 
+                            [checked]="selectedPaymentGateway() === 'MERCADOPAGO'" 
+                            class="accent-[#009ee3] w-4 h-4 mt-1"
+                          />
                         </div>
-                        <input 
-                          type="radio" 
-                          name="gateway" 
-                          [checked]="selectedPaymentGateway() === 'MERCADOPAGO'" 
-                          class="accent-[#009ee3] w-4 h-4 mt-1"
-                        />
+                        <p class="text-[11px] text-blue-900/70 mt-2 font-medium">Redirección a pasarela externa</p>
                       </div>
+
                       <div class="mt-3 pt-2 border-t border-blue-100 flex items-center justify-between text-[11px] text-blue-800 font-semibold">
-                        <span>Pasarela Mercado Pago</span>
+                        <span>Checkout Pro</span>
                         <span>S/ {{ totalCalculado() | number:'1.2-2' }}</span>
                       </div>
                     </div>
                   </div>
+
+                  <!-- Formulario oficial Yape (Mercado Pago Orders API) -->
+                  @if (selectedPaymentGateway() === 'MP_YAPE') {
+                    <div class="bg-gradient-to-br from-purple-50/80 to-indigo-50/50 border border-purple-200/80 rounded-2xl p-5 space-y-4 animate-fadeIn">
+                      <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                          <h4 class="text-xs font-black uppercase tracking-wider text-purple-950">Formulario Yape • Confirmación en Tiempo Real</h4>
+                        </div>
+                        <span class="text-[10px] text-purple-800 font-semibold">Orders API (Automatic Mode)</span>
+                      </div>
+
+                      <form id="form-checkout" (submit)="$event.preventDefault(); onContinuarStep3()" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label for="form-checkout__payerPhone" class="block text-xs font-bold text-gray-800 mb-1.5">
+                              Número de celular (Yape) <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                              <span class="absolute left-3 top-2.5 text-xs text-gray-400 font-bold">+51</span>
+                              <input 
+                                id="form-checkout__payerPhone"
+                                name="phoneNumber"
+                                type="tel" 
+                                [(ngModel)]="yapeMpPhone"
+                                placeholder="984 512 870"
+                                maxlength="12"
+                                class="w-full pl-11 pr-3 py-2 text-xs font-semibold bg-white border border-gray-300 rounded-xl focus:outline-none focus:border-[#742284] focus:ring-1 focus:ring-[#742284] shadow-2xs"
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <label for="form-checkout__payerOTP" class="block text-xs font-bold text-gray-800 mb-1.5">
+                              Código de aprobación OTP <span class="text-red-500">*</span>
+                            </label>
+                            <input 
+                              id="form-checkout__payerOTP"
+                              name="otp"
+                              type="text" 
+                              [(ngModel)]="yapeMpOtp"
+                              placeholder="6 dígitos (ej: 123456)"
+                              maxlength="6"
+                              class="w-full px-3 py-2 text-xs font-mono font-bold tracking-widest text-center bg-white border border-gray-300 rounded-xl focus:outline-none focus:border-[#742284] focus:ring-1 focus:ring-[#742284] shadow-2xs"
+                            />
+                          </div>
+                        </div>
+
+                        <div class="p-3 bg-white/80 rounded-xl border border-purple-100 flex items-start gap-2.5 text-xs text-purple-950">
+                          <span class="text-base">📱</span>
+                          <div class="text-[11px] leading-relaxed">
+                            <strong>¿Dónde encuentro el código OTP?</strong> Abre tu aplicación <strong>Yape</strong>, abre el menú lateral o la opción <em>"Código de aprobación"</em> y escribe aquí los 6 dígitos generados. El token se procesa al instante sin salir de la tienda.
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  }
 
                   <div class="flex items-center gap-3 pt-2">
                     <button 
                       type="button" 
                       (click)="onContinuarStep3()"
                       [disabled]="isProcessing()"
-                      class="px-8 py-3.5 bg-black hover:bg-purple-700 disabled:bg-gray-400 text-white font-bold text-xs rounded-full transition-all shadow-md cursor-pointer flex items-center gap-2"
+                      class="px-8 py-3.5 bg-black hover:bg-[#742284] disabled:bg-gray-400 text-white font-bold text-xs rounded-full transition-all shadow-md cursor-pointer flex items-center gap-2"
                     >
                       @if (isProcessing()) {
                         <div class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span>Conectando pasarela...</span>
+                        <span>Procesando pago con Yape...</span>
                       } @else {
-                        @if (selectedPaymentGateway() === 'CULQI') {
-                          <span>Pagar con Yape (S/ {{ totalCalculado() | number:'1.2-2' }}) →</span>
+                        @if (selectedPaymentGateway() === 'MP_YAPE') {
+                          <span>Pagar con Yape en Tiempo Real (S/ {{ totalCalculado() | number:'1.2-2' }}) →</span>
+                        } @else if (selectedPaymentGateway() === 'CULQI') {
+                          <span>Pagar con Culqi Checkout (S/ {{ totalCalculado() | number:'1.2-2' }}) →</span>
                         } @else {
-                          <span>Pagar con Mercado Pago (S/ {{ totalCalculado() | number:'1.2-2' }}) →</span>
+                          <span>Pagar con Mercado Pago Checkout Pro (S/ {{ totalCalculado() | number:'1.2-2' }}) →</span>
                         }
                       }
                     </button>
@@ -575,7 +680,14 @@ declare let Culqi: any;
               } @else if (currentStep() > 3) {
                 <div class="text-xs text-gray-600 bg-gray-50 p-4 rounded-xl border border-gray-100 flex items-center justify-between">
                   <div class="flex items-center gap-2.5">
-                    @if (selectedPaymentGateway() === 'CULQI') {
+                    @if (selectedPaymentGateway() === 'MP_YAPE') {
+                      <img 
+                        src="https://upload.wikimedia.org/wikipedia/commons/0/08/Icono_de_la_aplicaci%C3%B3n_Yape.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=original" 
+                        alt="Yape" 
+                        class="w-5 h-5 rounded-md object-contain" 
+                      />
+                      <span class="font-bold text-gray-900">Yape Oficial (Mercado Pago Orders API)</span>
+                    } @else if (selectedPaymentGateway() === 'CULQI') {
                       <img 
                         src="https://upload.wikimedia.org/wikipedia/commons/0/08/Icono_de_la_aplicaci%C3%B3n_Yape.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=original" 
                         alt="Culqi" 
@@ -820,7 +932,15 @@ declare let Culqi: any;
             </div>
             
             <div>
-              @if (orderSuccess()?.isCulqi) {
+              @if (orderSuccess()?.isMercadoPagoYape) {
+                <div class="inline-block px-3 py-1 bg-purple-100 text-[#742284] text-[10px] font-bold rounded-full uppercase tracking-wider mb-2">
+                  Mercado Pago Orders API • Sincrónico en Tiempo Real
+                </div>
+                <h3 class="text-xl font-black text-gray-900">¡Pago con Yape Confirmado!</h3>
+                <p class="text-xs text-gray-500 mt-1">
+                  Tu pago ha sido aprobado en tiempo real por Mercado Pago con ID: <strong class="font-mono text-[#009ee3]">{{ orderSuccess().paymentId }}</strong> y orden <strong>#{{ orderSuccess().id }}</strong>.
+                </p>
+              } @else if (orderSuccess()?.isCulqi) {
                 <div class="inline-block px-3 py-1 bg-purple-100 text-[#742284] text-[10px] font-bold rounded-full uppercase tracking-wider mb-2">
                   Culqi Checkout v4 • Transacción Exitosa
                 </div>
@@ -938,7 +1058,9 @@ export class PagarPage implements OnInit {
   isCouponInputVisible = signal<boolean>(false);
   couponInput = 'APEALL35';
   selectedPaymentMethod = signal<'TARJETA' | 'YAPE' | 'PAGOEFECTIVO' | 'MERCADOPAGO'>('MERCADOPAGO');
-  selectedPaymentGateway = signal<'CULQI' | 'MERCADOPAGO'>('CULQI');
+  selectedPaymentGateway = signal<'MP_YAPE' | 'CULQI' | 'MERCADOPAGO'>('MP_YAPE');
+  yapeMpPhone = '984512870';
+  yapeMpOtp = '';
   isProcessing = signal<boolean>(false);
   orderSuccess = signal<any | null>(null);
   orderRejection = signal<string | null>(null);
@@ -1088,12 +1210,162 @@ export class PagarPage implements OnInit {
   }
 
   onContinuarStep3() {
-    if (this.selectedPaymentGateway() === 'CULQI') {
+    if (this.selectedPaymentGateway() === 'MP_YAPE') {
+      this.iniciarPagoYapeMercadoPago();
+    } else if (this.selectedPaymentGateway() === 'CULQI') {
       this.iniciarPagoCulqi();
     } else if (this.selectedPaymentGateway() === 'MERCADOPAGO' || this.selectedPaymentMethod() === 'MERCADOPAGO') {
       this.pagarConMercadoPago();
     } else {
       this.advanceStep(4);
+    }
+  }
+
+  async iniciarPagoYapeMercadoPago() {
+    const rawPhone = this.yapeMpPhone ? this.yapeMpPhone.replace(/\D/g, '') : '';
+    const cleanPhone = rawPhone.length >= 9 ? rawPhone.slice(-9) : rawPhone;
+    const cleanOtp = this.yapeMpOtp ? this.yapeMpOtp.replace(/\D/g, '').trim() : '';
+
+    if (!cleanPhone || cleanPhone.length < 9) {
+      this.toast.show('Por favor ingresa un número de celular Yape válido de 9 dígitos.');
+      return;
+    }
+
+    if (!cleanOtp || cleanOtp.length !== 6) {
+      this.toast.show('Ingresa el código de aprobación (OTP) de 6 dígitos generado en tu app Yape.');
+      return;
+    }
+
+    this.isProcessing.set(true);
+    this.orderRejection.set(null);
+    this.toast.show('Conectando con Mercado Pago Orders API (Yape)...');
+
+    const itemsRequest = this.displayItems().map((it, idx) => ({
+      productoId: idx + 1,
+      sku: it.id,
+      productoNombre: it.name,
+      precioUnitario: it.price,
+      cantidad: it.quantity
+    }));
+
+    const orderPayload = {
+      clienteId: 1,
+      clienteNombre: `${this.formData.nombres} ${this.formData.apellidos}`,
+      clienteEmail: this.formData.email,
+      metodoPago: 'YAPE_MERCADOPAGO',
+      direccionEnvio: `${this.formData.direccion}, ${this.formData.distrito}, ${this.formData.departamento}`,
+      observaciones: this.construirObservaciones('Yape Mercado Pago Orders API | '),
+      items: itemsRequest
+    };
+
+    // Crear orden en pc-orden-ms para persistencia y trazabilidad ACID
+    this.order.crearOrden(orderPayload).subscribe({
+      next: (orderRes) => {
+        const orderIdToUse = orderRes && orderRes.id ? orderRes.id.toString() : '26';
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('lastEniacOrderId', orderIdToUse);
+          if (orderRes?.codigoOrden) {
+            localStorage.setItem('lastEniacCodigo', orderRes.codigoOrden);
+          }
+        }
+        this.ejecutarCobroYapeOrdersApi(orderIdToUse, cleanPhone, cleanOtp);
+      },
+      error: () => {
+        const fallbackOrderId = (typeof window !== 'undefined' ? localStorage.getItem('lastEniacOrderId') : null) || '26';
+        this.ejecutarCobroYapeOrdersApi(fallbackOrderId, cleanPhone, cleanOtp);
+      }
+    });
+  }
+
+  private async ejecutarCobroYapeOrdersApi(orderId: string, phoneNumber: string, otp: string) {
+    const publicKey = environment.mpPublicKey || 'APP_USR-9f3f0419-e6bf-4800-ab6b-50bfd5db448e';
+    let yapeTokenId: string | null = null;
+
+    try {
+      // 1. Crear el token Yape con MercadoPago.js (SDK oficial)
+      if (typeof window !== 'undefined' && (window as any).MercadoPago) {
+        try {
+          const mp = new (window as any).MercadoPago(publicKey);
+          const yapeInstance = mp.yape({ otp, phoneNumber });
+          const tokenRes = await yapeInstance.create();
+          if (tokenRes && tokenRes.id) {
+            yapeTokenId = tokenRes.id;
+            console.log('[MercadoPago.js] Token Yape generado con éxito vía SDK:', yapeTokenId);
+          }
+        } catch (sdkErr) {
+          console.warn('[MercadoPago.js] Error en SDK, usando endpoint directo oficial de tokenización:', sdkErr);
+        }
+      }
+
+      // 2. Fallback oficial: Direct API POST /platforms/pci/yape/v1/payment?public_key=...
+      if (!yapeTokenId) {
+        const requestId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : ('req-' + Date.now());
+        const tokenResponse = await fetch(`https://api.mercadopago.com/platforms/pci/yape/v1/payment?public_key=${publicKey}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            phoneNumber: phoneNumber,
+            otp: otp,
+            requestId: requestId
+          })
+        });
+
+        const tokenData = await tokenResponse.json();
+        if (tokenData && tokenData.id) {
+          yapeTokenId = tokenData.id;
+          console.log('[MercadoPago API Direct] Token Yape generado con éxito:', yapeTokenId);
+        } else {
+          const errMsg = tokenData?.message || tokenData?.error || 'No se pudo generar el token de Yape. Verifica tu número y OTP.';
+          throw new Error(errMsg);
+        }
+      }
+
+      // 3. Enviar al Backend (Spring Boot pc-pago-ms /api/payments/yape)
+      const chargePayload = {
+        token: yapeTokenId,
+        amount: this.totalCalculado(),
+        orderId: orderId,
+        email: this.formData.email,
+        phoneNumber: phoneNumber,
+        dni: this.formData.numeroDocumento,
+        nombre: `${this.formData.nombres} ${this.formData.apellidos}`,
+        stateId: 'PE-LIM'
+      };
+
+      const backendEndpoint = `${environment.apiBaseUrl}/api/payments/yape`;
+      this.http.post<any>(backendEndpoint, chargePayload).subscribe({
+        next: (res) => {
+          this.isProcessing.set(false);
+          if (res && res.success) {
+            this.cart.clearCart();
+            this.orderSuccess.set({
+              isMercadoPagoYape: true,
+              paymentId: res.paymentId || res.mpOrderId,
+              mpOrderId: res.mpOrderId,
+              id: orderId,
+              status: 'Aprobado',
+              paymentType: 'Yape Oficial (Mercado Pago Orders API)',
+              monto: res.amount || this.totalCalculado()
+            });
+            this.toast.show('¡Pago con Yape aprobado en tiempo real!');
+          } else {
+            const msg = res?.message || 'El pago con Yape no fue aprobado por Mercado Pago.';
+            this.orderRejection.set(msg);
+          }
+        },
+        error: (err) => {
+          this.isProcessing.set(false);
+          const errorMsg = err?.error?.message || err?.error?.details || 'Error al conectar con Mercado Pago. Verifica tus credenciales o el código OTP.';
+          this.orderRejection.set(errorMsg);
+        }
+      });
+
+    } catch (err: any) {
+      this.isProcessing.set(false);
+      const msg = err?.message || 'Error tokenizando tu pago con Yape. Verifica que el código OTP esté vigente.';
+      this.orderRejection.set(msg);
     }
   }
 
