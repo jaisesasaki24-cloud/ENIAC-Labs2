@@ -62,6 +62,33 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/admin-productos/admin-productos').then(m => m.AdminProductosPage)
   },
   {
+    path: 'terminos',
+    loadComponent: () => import('./pages/terminos/terminos').then(m => m.TerminosPage)
+  },
+  {
+    path: 'terminos-y-condiciones',
+    redirectTo: 'terminos',
+    pathMatch: 'full'
+  },
+  {
+    path: 'devoluciones',
+    loadComponent: () => import('./pages/devoluciones/devoluciones').then(m => m.DevolucionesPage)
+  },
+  {
+    path: 'politicas-de-devolucion',
+    redirectTo: 'devoluciones',
+    pathMatch: 'full'
+  },
+  {
+    path: 'libro-de-reclamaciones',
+    loadComponent: () => import('./pages/libro-de-reclamaciones/libro-de-reclamaciones').then(m => m.LibroDeReclamacionesPage)
+  },
+  {
+    path: 'reclamaciones',
+    redirectTo: 'libro-de-reclamaciones',
+    pathMatch: 'full'
+  },
+  {
     path: '**',
     redirectTo: ''
   }

@@ -104,18 +104,22 @@ import { ToastService } from '../../services/toast.service';
 
             <!-- Libro de Reclamaciones Compliance Box -->
             <div class="pt-2">
-              <div class="bg-white/10 hover:bg-white/15 p-3 rounded-xl border border-white/20 transition-all flex items-center justify-between gap-3">
+              <a 
+                routerLink="/libro-de-reclamaciones" 
+                class="bg-white/10 hover:bg-white/20 p-3.5 rounded-xl border border-white/20 hover:border-[#256fff] transition-all flex items-center justify-between gap-3 group cursor-pointer block"
+                title="Libro de Reclamaciones Virtual Conforme a Ley N° 29571 INDECOPI"
+              >
                 <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center font-bold text-black text-xs">
+                  <div class="w-9 h-9 rounded-lg bg-white flex items-center justify-center font-bold text-black text-sm shadow-xs group-hover:scale-105 transition-transform">
                     📖
                   </div>
                   <div>
-                    <span class="text-xs text-white font-bold block">Libro de Reclamaciones</span>
-                    <span class="text-[10px] text-gray-300">Conforme a la Ley N° 29571 (INDECOPI)</span>
+                    <span class="text-xs text-white font-bold block group-hover:text-[#256fff] transition-colors">Libro de Reclamaciones</span>
+                    <span class="text-[10px] text-gray-300">Conforme a Ley N° 29571 (INDECOPI)</span>
                   </div>
                 </div>
-                <span class="text-[10px] bg-white/20 px-2 py-1 rounded text-white font-mono">Virtual</span>
-              </div>
+                <span class="text-[10px] bg-[#256fff] text-white px-2.5 py-1 rounded-md font-mono font-bold">Virtual ›</span>
+              </a>
             </div>
 
           </div>
@@ -162,11 +166,16 @@ import { ToastService } from '../../services/toast.service';
               <ul class="space-y-2 text-gray-300">
                 <li><span class="text-white font-medium">ENIAC LABS E.I.R.L.</span></li>
                 <li><span class="text-gray-400">RUC: 20608945123</span></li>
-                <li><a href="javascript:;" class="hover:text-white transition-colors">Póliza de Garantía Oficial 3 Años</a></li>
-                <li><a href="javascript:;" class="hover:text-white transition-colors">Términos y Condiciones de Compra</a></li>
-                <li><a href="javascript:;" class="hover:text-white transition-colors">Envíos a Nivel Nacional con Seguro</a></li>
-                <li><a href="javascript:;" class="hover:text-white transition-colors">Protección de Datos Personales</a></li>
-                <li><a href="javascript:;" class="hover:text-white transition-colors">Facturación Electrónica SUNAT</a></li>
+                <li><a routerLink="/terminos" class="hover:text-white transition-colors text-white font-semibold">Términos y Condiciones de Compra</a></li>
+                <li><a routerLink="/devoluciones" class="hover:text-white transition-colors text-white font-semibold">Políticas de Cambio y Devoluciones</a></li>
+                <li><a routerLink="/libro-de-reclamaciones" class="hover:text-white transition-colors text-white font-semibold flex items-center gap-1.5">
+                  <span>📖 Libro de Reclamaciones</span>
+                  <span class="text-[9px] bg-white/20 px-1.5 py-0.5 rounded text-emerald-300 font-bold">INDECOPI</span>
+                </a></li>
+                <li><a routerLink="/devoluciones" class="hover:text-white transition-colors">Póliza de Garantía Oficial (1 a 3 Años)</a></li>
+                <li><a routerLink="/terminos" class="hover:text-white transition-colors">Envíos a Nivel Nacional con Seguro</a></li>
+                <li><a routerLink="/terminos" class="hover:text-white transition-colors">Protección de Datos Personales (Ley 29733)</a></li>
+                <li><span class="text-gray-400">Facturación Electrónica SUNAT</span></li>
               </ul>
             </div>
 
@@ -212,29 +221,29 @@ import { ToastService } from '../../services/toast.service';
         <!-- Social Media, Pay Methods & Country Selector Strip -->
         <div class="flex flex-col sm:flex-row items-center justify-between py-6 border-b border-white/10 gap-4">
           <div class="flex items-center gap-4 text-gray-400">
-            <span class="text-xs text-gray-400 font-medium">Síguenos:</span>
-            <a href="https://facebook.com/eniaclabs.pe" target="_blank" class="hover:text-[#256fff] p-1.5 rounded-full hover:bg-white/10 transition-colors" aria-label="Facebook">
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg>
+            <span class="text-xs text-gray-400 font-medium">Canales Oficiales:</span>
+            <a href="https://wa.me/51984512870?text=Hola%20ENIAC%20Labs%2C%20deseo%20atencion%20al%20cliente" target="_blank" class="hover:text-emerald-400 p-1.5 rounded-full hover:bg-white/10 transition-colors flex items-center gap-1.5 text-xs text-gray-300" aria-label="WhatsApp Oficial">
+              <svg class="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.698c.97.53 1.838.814 2.795.814 3.182 0 5.768-2.586 5.768-5.766 0-3.18-2.586-5.767-5.768-5.767zm7.424 5.766c0 4.097-3.334 7.429-7.424 7.429-.982 0-1.928-.201-2.799-.58l-3.987 1.045 1.064-3.89c-.482-.937-.738-1.99-.738-3.004 0-4.097 3.334-7.429 7.424-7.429 4.09 0 7.424 3.332 7.424 7.429z"/></svg>
+              <span>WhatsApp</span>
             </a>
-            <a href="https://twitter.com/eniaclabs_pe" target="_blank" class="hover:text-white p-1.5 rounded-full hover:bg-white/10 transition-colors" aria-label="X / Twitter">
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            <a href="https://github.com/jaisesasaki24-cloud/ENIAC-Labs2" target="_blank" class="hover:text-white p-1.5 rounded-full hover:bg-white/10 transition-colors flex items-center gap-1.5 text-xs text-gray-300" aria-label="GitHub Repository">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+              <span>GitHub</span>
             </a>
-            <a href="https://instagram.com/eniaclabs.pe" target="_blank" class="hover:text-[#e1306c] p-1.5 rounded-full hover:bg-white/10 transition-colors" aria-label="Instagram">
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-            </a>
-            <a href="https://wa.me/51984512870" target="_blank" class="hover:text-emerald-400 p-1.5 rounded-full hover:bg-white/10 transition-colors" aria-label="WhatsApp">
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.698c.97.53 1.838.814 2.795.814 3.182 0 5.768-2.586 5.768-5.766 0-3.18-2.586-5.767-5.768-5.767zm7.424 5.766c0 4.097-3.334 7.429-7.424 7.429-.982 0-1.928-.201-2.799-.58l-3.987 1.045 1.064-3.89c-.482-.937-.738-1.99-.738-3.004 0-4.097 3.334-7.429 7.424-7.429 4.09 0 7.424 3.332 7.424 7.429z"/></svg>
+            <a href="mailto:soporte@eniaclabs.pe" class="hover:text-[#256fff] p-1.5 rounded-full hover:bg-white/10 transition-colors flex items-center gap-1.5 text-xs text-gray-300" aria-label="Correo Soporte">
+              <svg class="w-5 h-5 text-[#256fff]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              <span>Soporte</span>
             </a>
           </div>
 
           <!-- Métodos de Pago Aceptados -->
           <div class="flex items-center gap-2 text-xs text-gray-400">
-            <span class="text-[11px] text-gray-400">Métodos aceptados:</span>
+            <span class="text-[11px] text-gray-400">Pasarelas:</span>
+            <span class="bg-orange-500/20 text-orange-400 border border-orange-500/30 font-bold px-2 py-0.5 rounded text-[10px]">Culqi Checkout</span>
+            <span class="bg-blue-500/20 text-blue-400 border border-blue-500/30 font-bold px-2 py-0.5 rounded text-[10px]">Mercado Pago</span>
+            <span class="bg-purple-500/20 text-purple-400 border border-purple-500/30 font-bold px-2 py-0.5 rounded text-[10px]">Yape</span>
             <span class="bg-white/10 text-white font-bold px-2 py-0.5 rounded text-[10px]">VISA</span>
             <span class="bg-white/10 text-white font-bold px-2 py-0.5 rounded text-[10px]">Mastercard</span>
-            <span class="bg-white/10 text-white font-bold px-2 py-0.5 rounded text-[10px]">Yape</span>
-            <span class="bg-white/10 text-white font-bold px-2 py-0.5 rounded text-[10px]">Plin</span>
-            <span class="bg-white/10 text-white font-bold px-2 py-0.5 rounded text-[10px]">Transferencia BCP/BBVA</span>
           </div>
 
           <div class="flex items-center gap-2 text-xs text-gray-300 font-medium">
@@ -247,13 +256,17 @@ import { ToastService } from '../../services/toast.service';
         <!-- Bottom Copyright & Legal Links -->
         <div class="flex flex-col sm:flex-row items-center justify-between pt-6 text-[11px] text-gray-500 gap-4">
           <div class="flex flex-wrap items-center gap-4">
-            <a href="javascript:;" class="hover:text-white">Mapa del Sitio</a>
+            <a routerLink="/" class="hover:text-white">Inicio</a>
             <span>•</span>
-            <a href="javascript:;" class="hover:text-white">Términos de Compra</a>
+            <a routerLink="/terminos" class="hover:text-white text-gray-300 font-medium">Términos y Condiciones</a>
             <span>•</span>
-            <a href="javascript:;" class="hover:text-white">Declaración de Privacidad</a>
+            <a routerLink="/devoluciones" class="hover:text-white text-gray-300 font-medium">Políticas de Devolución</a>
             <span>•</span>
-            <a href="javascript:;" class="hover:text-white">Políticas de Cookies</a>
+            <a routerLink="/libro-de-reclamaciones" class="hover:text-white text-gray-300 font-medium flex items-center gap-1">
+              <span>📖 Libro de Reclamaciones</span>
+            </a>
+            <span>•</span>
+            <span class="text-gray-400">Protección al Consumidor INDECOPI</span>
           </div>
 
           <div class="text-center sm:text-right">
