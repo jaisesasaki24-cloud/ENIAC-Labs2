@@ -471,7 +471,7 @@ declare let Culqi: any;
               @if (currentStep() === 3) {
                 <div class="space-y-6 animate-fadeIn">
                   
-                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <!-- Opción 1: Culqi Checkout v4 (Tarjetas y Yape) -->
                     <div 
                       (click)="selectedPaymentGateway.set('CULQI')"
@@ -508,43 +508,7 @@ declare let Culqi: any;
                       </div>
                     </div>
 
-                    <!-- Opción 2: Yape Oficial -->
-                    <div 
-                      (click)="selectedPaymentGateway.set('YAPE')"
-                      [class.border-[#742284]]="selectedPaymentGateway() === 'YAPE'"
-                      [class.bg-purple-50/70]="selectedPaymentGateway() === 'YAPE'"
-                      [class.border-gray-200]="selectedPaymentGateway() !== 'YAPE'"
-                      class="cursor-pointer p-4 rounded-2xl border-2 transition-all flex flex-col justify-between shadow-xs hover:border-[#742284]"
-                    >
-                      <div class="flex items-start justify-between">
-                        <div class="flex items-center gap-3">
-                          <img 
-                            src="https://upload.wikimedia.org/wikipedia/commons/0/08/Icono_de_la_aplicaci%C3%B3n_Yape.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=original" 
-                            alt="Yape Oficial" 
-                            class="w-10 h-10 rounded-xl object-contain shadow-xs" 
-                          />
-                          <div>
-                            <div class="flex items-center gap-1.5">
-                              <span class="text-sm font-black text-purple-950">Yape Oficial</span>
-                              <span class="text-[9px] bg-[#742284] text-white px-2 py-0.5 rounded-full font-bold uppercase">Solo Yape</span>
-                            </div>
-                            <div class="text-[11px] text-purple-900/70 font-medium">Pago directo con código de aprobación</div>
-                          </div>
-                        </div>
-                        <input 
-                          type="radio" 
-                          name="gateway" 
-                          [checked]="selectedPaymentGateway() === 'YAPE'" 
-                          class="accent-[#742284] w-4 h-4 mt-1"
-                        />
-                      </div>
-                      <div class="mt-3 pt-2 border-t border-purple-100 flex items-center justify-between text-[11px] text-purple-800 font-semibold">
-                        <span>Pago Móvil Directo</span>
-                        <span>S/ {{ totalCalculado() | number:'1.2-2' }}</span>
-                      </div>
-                    </div>
-
-                    <!-- Opción 3: Mercado Pago Checkout Pro -->
+                    <!-- Opción 2: Mercado Pago Checkout Pro -->
                     <div 
                       (click)="selectedPaymentGateway.set('MERCADOPAGO')"
                       [class.border-[#256fff]]="selectedPaymentGateway() === 'MERCADOPAGO'"
@@ -592,8 +556,6 @@ declare let Culqi: any;
                       } @else {
                         @if (selectedPaymentGateway() === 'CULQI') {
                           <span>Pagar con Culqi (Tarjetas / Yape) (S/ {{ totalCalculado() | number:'1.2-2' }}) →</span>
-                        } @else if (selectedPaymentGateway() === 'YAPE') {
-                          <span>Pagar con Yape (S/ {{ totalCalculado() | number:'1.2-2' }}) →</span>
                         } @else {
                           <span>Pagar con Mercado Pago (S/ {{ totalCalculado() | number:'1.2-2' }}) →</span>
                         }
@@ -620,13 +582,6 @@ declare let Culqi: any;
                         class="w-5 h-5 object-contain" 
                       />
                       <span class="font-bold text-gray-900">Culqi Checkout v4 (Tarjetas / Yape)</span>
-                    } @else if (selectedPaymentGateway() === 'YAPE') {
-                      <img 
-                        src="https://upload.wikimedia.org/wikipedia/commons/0/08/Icono_de_la_aplicaci%C3%B3n_Yape.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=original" 
-                        alt="Yape" 
-                        class="w-5 h-5 rounded-md object-contain" 
-                      />
-                      <span class="font-bold text-gray-900">Yape Oficial (Móvil)</span>
                     } @else {
                       <div class="w-5 h-5 rounded-md bg-[#009ee3] text-white flex items-center justify-center text-[10px] font-bold">MP</div>
                       <span class="font-bold text-gray-900">Mercado Pago Checkout Pro</span>
