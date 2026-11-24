@@ -278,6 +278,8 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: prod
       CONFIG_SERVER_URL: http://pc-config:8888
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,metrics,prometheus"
+      MANAGEMENT_ENDPOINT_PROMETHEUS_ENABLED: "true"
       ENIACLABS_CORS_ALLOWED_ORIGINS: "http://localhost:4200,http://127.0.0.1:4200,https://localhost:4200,https://127.0.0.1:4200,https://eniaclabs-nine.vercel.app,http://eniaclabs.chilecentral.cloudapp.azure.com"
       SPRING_MAIN_ALLOW_BEAN_DEFINITION_OVERRIDING: "true"
       JDK_JAVA_OPTIONS: "--add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/sun.net.www.protocol.http=ALL-UNNAMED"
